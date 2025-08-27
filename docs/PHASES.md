@@ -22,9 +22,9 @@ Branch: `phase-0.5-content-loading`
 Depends on: Phase 0  
 Focus: Make content external and resilient.
 
-- [ ] Add JSON loading (levels, puzzles, videos)
-- [ ] Build error/loading/empty state widgets (reusable)
-- [ ] Simple CLI validation script (`tools/validate_content.dart`)  
+- [x] Add JSON loading (levels, puzzles, videos)
+- [x] Build error/loading/empty state widgets (reusable)
+- [x] Simple CLI validation script (`tools/validate_content.dart`)  
 **Testing:** Load mock JSON, verify error/empty states
 
 ---

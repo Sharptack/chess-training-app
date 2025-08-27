@@ -1,0 +1,16 @@
+{
+  "bot_001": {
+    "id": "bot_001",
+    "name": "Beginner Bot",
+    "elo": 400,
+    "style": "aggressive",
+    "weaknesses": ["tactics", "openings"]
+  },
+  "bot_002": {
+    "id": "bot_002",
+    "name": "Intermediate Bot",
+    "elo": 600,
+    "style": "defensive",
+    "weaknesses": ["endgames"]
+  }
+}

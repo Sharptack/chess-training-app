@@ -1,0 +1,12 @@
+{
+  "default_campaign": {
+    "id": "default_campaign",
+    "name": "Training Grounds",
+    "description": "Start your chess training here!",
+    "levels": [
+      "level_1",
+      "level_2",
+      "level_3"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+"$schema": "https://json-schema.org/draft/2020-12/schema",
+"title": "Level",
+"type": "object",
+"required": ["id", "title", "lesson", "boss"],
+"properties": {
+"id": { "type": "string" },
+"title": { "type": "string" },
+"description": { "type": "string" },
+"lesson": {
+"type": "object",
+"required": ["video"],
+"properties": {
+"video": {
+"type": "object",
+"required": ["id", "title", "url"],
+"properties": {
+"id": {"type": "string"},
+"title": {"type": "string"},
+"url": {"type": "string"},
+"thumbnail": {"type": ["string", "null"]}
+}
+}
+}
+},
+"puzzles": { "type": "array", "items": {"type": "string"} },
+"play": {
+"type": "object",
+"properties": {
+"botIds": {"type": "array", "items": {"type": "string"}},
+"gamesRequired": {"type": "integer", "minimum": 0}
+}
+},
+"boss": {
+"type": "object",
+"required": ["id", "name", "elo", "style"],
+"properties": {
+"id": {"type": "string"},
+"name": {"type": "string"},
+"elo": {"type": "integer"},
+"style": {"type": "string"}
+}
+},
+"requirements": {
+"type": "object",
+"properties": {
+"minGames": {"type": "integer", "minimum": 0},
+"minAccuracy": {"type": "integer", "minimum": 0, "maximum": 100}
+}
+}
+}
+}
