@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore all mp4 videos in assets/videos
+assets/videos/*.mp4
