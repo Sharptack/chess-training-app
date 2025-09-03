@@ -1,24 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/repositories/bot_repository.dart';
-import '../data/repositories/puzzle_repository.dart';
-import '../data/models/bot.dart';
-import '../core/utils/result.dart';
-import '../data/models/puzzle.dart';
+import 'package:hive/hive.dart';
 
-final puzzleByIdProvider = FutureProvider.family<Result<Puzzle>, String>((ref, id) async {
-  final repo = ref.watch(puzzleRepositoryProvider);
-  return await repo.getPuzzleById(id);
+import '../data/repositories/progress_repository.dart';
+import '../data/models/progress.dart';
+import '../data/repositories/level_repository.dart';
+import '../data/models/video_item.dart';
+
+// LevelRepository provider
+final levelRepositoryProvider = Provider<LevelRepository>((ref) {
+  return LevelRepository();
 });
 
-final botByIdProvider = FutureProvider.family<Result<Bot>, String>((ref, id) async {
-  final repo = ref.watch(botRepositoryProvider);
-  return await repo.getBotById(id);
+/// Returns the lesson VideoItem for a given levelId.
+final lessonByIdProvider =
+    FutureProvider.family<VideoItem, String>((ref, String levelId) async {
+  final repo = ref.watch(levelRepositoryProvider);
+  final result = await repo.getLevelById(levelId);
+
+  if (result.isError) {
+    throw Exception(result.failure.toString());
+  }
+
+  final level = result.data!;
+  return level.lessonVideo; // ✅ strongly typed, no dynamic hacks
 });
 
-final botRepositoryProvider = Provider<BotRepository>((ref) {
-  return const BotRepository();
+// Hive-backed ProgressRepository provider
+final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
+  final box = Hive.box('progressBox');
+  return ProgressRepository(box);
 });
 
-final puzzleRepositoryProvider = Provider<PuzzleRepository>((ref) {
-  return PuzzleRepository();
-});
+/// Auto-refreshable lesson progress
+final lessonProgressProvider = FutureProvider.family<Progress, Map<String, String>>(
+  (ref, ids) async {
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getLessonProgress(ids['levelId']!, ids['videoId']!);
+  },
+);
+
+/// Command helpers (refresh after write)
+Future<void> markLessonStarted(WidgetRef ref, String levelId, String videoId) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.markLessonStarted(levelId, videoId);
+  ref.invalidate(
+    lessonProgressProvider({'levelId': levelId, 'videoId': videoId}),
+  );
+}
+
+Future<void> markLessonCompleted(WidgetRef ref, String levelId, String videoId) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.markLessonCompleted(levelId, videoId);
+  ref.invalidate(
+    lessonProgressProvider({'levelId': levelId, 'videoId': videoId}),
+  );
+}

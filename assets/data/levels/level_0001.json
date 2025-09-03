@@ -6,7 +6,7 @@
     "video": {
       "id": "moses_intro",
       "title": "Moses and the Burning Bush",
-      "url": "https://example.com/videos/moses_intro.mp4",
+      "url": "assets/videos/sample.mp4",
       "thumbnail": "assets/ui/thumbs/level_0001.png"
     }
   },

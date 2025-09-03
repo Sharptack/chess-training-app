@@ -1,34 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Minimal loading/error/empty wrapper for now (no async lib dependency yet).
-class AsyncValueView extends StatelessWidget {
-  final bool isLoading;
-  final Object? error;
-  final Widget Function() builder;
-  final String emptyMessage;
+/// AsyncValue<T> wrapper: shows loading/error and builds on data.
+class AsyncValueView<T> extends StatelessWidget {
+  final AsyncValue<T> asyncValue;
+  final Widget Function(T data) data;
 
   const AsyncValueView({
     super.key,
-    required this.isLoading,
-    required this.builder,
-    this.error,
-    this.emptyMessage = 'Nothing here yet',
+    required this.asyncValue,
+    required this.data,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (error != null) {
-      return Center(
+    return asyncValue.when(
+      data: data,
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Text('Error: $error'),
+          padding: const EdgeInsets.all(24),
+          child: Text('Error: $e'),
         ),
-      );
-    }
-    final child = builder();
-    return child;
+      ),
+    );
   }
 }
