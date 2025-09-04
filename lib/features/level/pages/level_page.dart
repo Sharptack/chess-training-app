@@ -1,12 +1,18 @@
+// lib/features/level/pages/level_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class LevelPage extends StatelessWidget {
+import '../../../data/models/progress.dart';
+import '../../../state/providers.dart';
+import '../../progress/widgets/progress_badge.dart';
+
+class LevelPage extends ConsumerWidget {
   final String levelId;
   const LevelPage({super.key, required this.levelId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: Text('Level $levelId')),
       body: GridView.count(
@@ -15,9 +21,25 @@ class LevelPage extends StatelessWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         children: [
-          _LevelTile(
-            title: 'Lesson',
-            route: '/level/$levelId/lesson', // videoId can be handled in LessonPage
+          // LESSON TILE – now looks up videoId dynamically
+          Consumer(
+            builder: (context, ref, _) {
+              final asyncLesson = ref.watch(lessonByIdProvider(levelId));
+
+              return asyncLesson.when(
+                loading: () => const _LevelTile(title: 'Lesson', route: ''),
+                error: (_, __) => const _LevelTile(title: 'Lesson', route: ''),
+                data: (video) {
+                  return _LevelTile(
+                    title: 'Lesson',
+                    route: '/level/$levelId/lesson',
+                    progressProvider: lessonProgressProvider,
+                    levelId: levelId,
+                    videoId: video.id, // 👈 dynamic!
+                  );
+                },
+              );
+            },
           ),
           _LevelTile(
             title: 'Puzzles',
@@ -37,24 +59,54 @@ class LevelPage extends StatelessWidget {
   }
 }
 
-class _LevelTile extends StatelessWidget {
+class _LevelTile extends ConsumerWidget {
   final String title;
   final String route;
+  final String? levelId;
+  final String? videoId;
 
-  const _LevelTile({required this.title, required this.route});
+  /// Accept a FutureProviderFamily, so we can call it with parameters
+  final FutureProviderFamily<Progress, Map<String, String>>? progressProvider;
+
+  const _LevelTile({
+    required this.title,
+    required this.route,
+    this.levelId,
+    this.videoId,
+    this.progressProvider,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Widget badge = const SizedBox.shrink();
+
+    if (levelId != null && videoId != null && progressProvider != null) {
+      final asyncProgress = ref.watch(
+        progressProvider!({'levelId': levelId!, 'videoId': videoId!}),
+      );
+
+      badge = asyncProgress.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (progress) => ProgressBadge(progress: progress),
+      );
+    }
+
     return GestureDetector(
       onTap: () => context.push(route),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Center(
-          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
-        ),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            ),
+          ),
+          Positioned(top: 8, right: 8, child: badge),
+        ],
       ),
     );
   }
