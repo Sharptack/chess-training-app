@@ -33,7 +33,6 @@ class LevelPage extends ConsumerWidget {
                   return _LevelTile(
                     title: 'Lesson',
                     route: '/level/$levelId/lesson',
-                    progressProvider: lessonProgressProvider,
                     levelId: levelId,
                     videoId: video.id, // 👈 dynamic!
                   );
@@ -65,25 +64,20 @@ class _LevelTile extends ConsumerWidget {
   final String? levelId;
   final String? videoId;
 
-  /// Accept a FutureProviderFamily, so we can call it with parameters
-  final FutureProviderFamily<Progress, Map<String, String>>? progressProvider;
-
   const _LevelTile({
     required this.title,
     required this.route,
     this.levelId,
     this.videoId,
-    this.progressProvider,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Widget badge = const SizedBox.shrink();
 
-    if (levelId != null && videoId != null && progressProvider != null) {
-      final asyncProgress = ref.watch(
-        progressProvider!({'levelId': levelId!, 'videoId': videoId!}),
-      );
+    if (levelId != null && videoId != null) {
+      final progressKey = '${levelId!}_${videoId!}';
+      final asyncProgress = ref.watch(lessonProgressProvider(progressKey));
 
       badge = asyncProgress.when(
         loading: () => const SizedBox.shrink(),

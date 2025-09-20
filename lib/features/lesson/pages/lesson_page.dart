@@ -200,7 +200,7 @@ class _LessonPlayerState extends State<LessonPlayer> {
   }
 }
 
-/// Shows progress and dev controls.
+/// Shows progress and dev controls with better error handling
 /// Only this widget rebuilds when progress changes.
 class ProgressSection extends ConsumerWidget {
   final String levelId;
@@ -210,36 +210,63 @@ class ProgressSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(lessonProgressProvider({'levelId': levelId, 'videoId': videoId}));
+    final progressKey = '${levelId}_$videoId';
+    print('ProgressSection building with progressKey=$progressKey'); // Debug
+    
+    final async = ref.watch(lessonProgressProvider(progressKey));
 
     return async.when(
-      loading: () => const SizedBox(
-        height: 72,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, st) => Text('Error loading progress: $e'),
-      data: (Progress p) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      loading: () {
+        print('ProgressSection loading...'); // Debug
+        return const SizedBox(
+          height: 72,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      },
+      error: (e, st) {
+        print('ProgressSection error: $e'); // Debug
+        return Column(
           children: [
-            Text(
-              p.completed ? '✅ Completed' : (p.started ? '⏳ In Progress' : '▶️ Not Started'),
-              style: Theme.of(context).textTheme.bodyLarge,
+            Text('Error loading progress: $e', style: TextStyle(color: Colors.red)),
+            Text('Key: $progressKey', style: TextStyle(fontSize: 12)),
+          ],
+        );
+      },
+      data: (Progress p) {
+        print('ProgressSection loaded progress: started=${p.started}, completed=${p.completed}'); // Debug
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  p.completed ? '✅ Completed' : (p.started ? '⏳ In Progress' : '▶️ Not Started'),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                if (kDebugMode) // dev-only buttons
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => markLessonStarted(ref, levelId, videoId),
+                        child: const Text('Start'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => markLessonCompleted(ref, levelId, videoId),
+                        child: const Text('Complete'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => resetLesson(ref, levelId, videoId),
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            if (kDebugMode) // dev-only buttons
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () => markLessonStarted(ref, levelId, videoId),
-                    child: const Text('Mark started'),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () => markLessonCompleted(ref, levelId, videoId),
-                    child: const Text('Mark completed'),
-                  ),
-                ],
-              ),
+            // Debug info
+            if (kDebugMode)
+              Text('Debug: Key=$progressKey', style: TextStyle(fontSize: 10, color: Colors.grey)),
           ],
         );
       },

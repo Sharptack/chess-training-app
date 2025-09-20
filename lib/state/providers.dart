@@ -6,6 +6,14 @@ import '../data/models/progress.dart';
 import '../data/repositories/level_repository.dart';
 import '../data/models/video_item.dart';
 
+/// Command helper to reset a lesson's progress and refresh its state.
+Future<void> resetLesson(WidgetRef ref, String levelId, String videoId) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.resetLesson(levelId, videoId);
+  // Use the stable string key format
+  ref.invalidate(lessonProgressProvider('${levelId}_$videoId'));
+}
+
 // LevelRepository provider
 final levelRepositoryProvider = Provider<LevelRepository>((ref) {
   return LevelRepository();
@@ -22,7 +30,7 @@ final lessonByIdProvider =
   }
 
   final level = result.data!;
-  return level.lessonVideo; // ✅ strongly typed, no dynamic hacks
+  return level.lessonVideo;
 });
 
 // Hive-backed ProgressRepository provider
@@ -31,11 +39,19 @@ final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
   return ProgressRepository(box);
 });
 
-/// Auto-refreshable lesson progress
-final lessonProgressProvider = FutureProvider.family<Progress, Map<String, String>>(
-  (ref, ids) async {
+/// Auto-refreshable lesson progress - using stable string key instead of Map
+final lessonProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String key) async {
+    // Extract levelId and videoId from the key
+    final parts = key.split('_');
+    if (parts.length < 2) {
+      throw ArgumentError('Invalid progress key format. Expected: levelId_videoId');
+    }
+    final levelId = parts[0];
+    final videoId = parts.sublist(1).join('_'); // Handle videoIds that might contain underscores
+    
     final repo = ref.watch(progressRepositoryProvider);
-    return repo.getLessonProgress(ids['levelId']!, ids['videoId']!);
+    return repo.getLessonProgress(levelId, videoId);
   },
 );
 
@@ -43,15 +59,11 @@ final lessonProgressProvider = FutureProvider.family<Progress, Map<String, Strin
 Future<void> markLessonStarted(WidgetRef ref, String levelId, String videoId) async {
   final repo = ref.read(progressRepositoryProvider);
   await repo.markLessonStarted(levelId, videoId);
-  ref.invalidate(
-    lessonProgressProvider({'levelId': levelId, 'videoId': videoId}),
-  );
+  ref.invalidate(lessonProgressProvider('${levelId}_$videoId'));
 }
 
 Future<void> markLessonCompleted(WidgetRef ref, String levelId, String videoId) async {
   final repo = ref.read(progressRepositoryProvider);
   await repo.markLessonCompleted(levelId, videoId);
-  ref.invalidate(
-    lessonProgressProvider({'levelId': levelId, 'videoId': videoId}),
-  );
+  ref.invalidate(lessonProgressProvider('${levelId}_$videoId'));
 }

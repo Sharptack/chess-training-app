@@ -34,8 +34,8 @@ Branch: `phase-1-video-lessons`
 Depends on: Phase 0.5  
 Focus: First interactive learning flow.
 
-- [ ] Build `LevelPage` with `VideoLessonWidget` pulling from JSON
-- [ ] Show progress tracking (`Progress` class, minimal: started, completed)  
+- [x] Build `LevelPage` with `VideoLessonWidget` pulling from JSON
+- [x] Show progress tracking (`Progress` class, minimal: started, completed)  
 **Testing:** Load video lesson, confirm progress saves
 
 ---
