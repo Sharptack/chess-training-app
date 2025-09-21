@@ -46,6 +46,10 @@ class HomePage extends StatelessWidget {
             onPressed: () => context.go('/test-chess'),
             child: const Text('Test Chess Board'),
           ),
+          ElevatedButton(
+            onPressed: () => context.go('/test-chess-package'),
+            child: const Text('Test Chess Package'),
+),
         ],
       ),
     );
