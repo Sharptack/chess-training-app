@@ -2,7 +2,7 @@
 
 **Vision**: A comprehensive chess learning app for kids with structured lessons, puzzles, and bot practice. Designed for safe, dedicated tablet use with video game-like progression and spaced repetition for memory reinforcement.
 
-## Project Status: Phase 1 Complete
+## Project Status: Phase 2 Complete, Phase 2.5 Next
 
 ### Current Architecture
 - **Framework**: Flutter with Riverpod state management
@@ -10,6 +10,7 @@
 - **Navigation**: go_router for nested routing
 - **Content**: JSON-based levels, puzzles, and bot configs
 - **Structure**: Feature-based organization with shared core utilities
+- **Chess Foundation**: Custom basic chess logic (needs engine upgrade for MVP)
 
 ## Phase 0: Foundation ✅ COMPLETE
 **Branch**: phase-0-foundation
@@ -85,49 +86,111 @@
 - Updated `main.dart` for Hive initialization
 - Updated level page with progress integration
 
-### Debug & Testing:
-- Added extensive logging for progress flow
-- Manual Start/Complete/Reset buttons in debug mode
-- Verified progress persistence across app restarts
-- Confirmed video event triggers work correctly
-
-## Phase 2: Chessboard Core 🚀 NEXT UP
+## Phase 2: Basic Chessboard Foundation ✅ COMPLETE
 **Branch**: phase-2-chessboard-core
-**Focus**: Build reusable chess foundation
+**Status**: Completed September 2025
+**Note**: Foundation established but needs engine upgrade for MVP
 
-### Planned Architecture Updates:
+### Implemented:
+- Basic chess engine with pieces, squares, moves, and board representation
+- Simplified move validation for testing (pawn, rook, knight, bishop, queen, king)
+- Interactive ChessBoardWidget with click-to-move interaction
+- Legal move highlighting and basic turn alternation
+- Test page for chess functionality verification
+- Consolidated architecture for chess UI components
+
+### Architecture Implemented:
 ```
 lib/core/
 ├── game_logic/
-│   ├── chess_engine.dart          // Core rules, move validation  
-│   ├── chess_board_state.dart     // Board state management
-│   ├── chess_notation.dart        // FEN, PGN parsing
-│   └── move_validator.dart        // Legal move checking
+│   ├── chess_engine.dart          // Basic chess types, board state
+│   └── move_validator.dart        // Simplified move checking
 └── widgets/
-    ├── chess_board_widget.dart    // Reusable chessboard UI
-    └── piece_widget.dart          // Individual piece rendering
+    └── chess_board_widget.dart    // Reusable interactive chessboard UI
 ```
 
-### Goals:
-- Drag & drop chessboard widget
-- Chess move validation (legal moves only)  
-- FEN position loading
-- Reusable across puzzles, play, and analysis
-- No chess engine dependency yet (Phase 5)
+### Key Features Working:
+- Basic piece movement and turn switching
+- Simple move validation preventing obvious illegal moves
+- Interactive UI foundation for chess features
 
-## Phase 3: Basic Puzzles 📋 PLANNED
-- Load puzzles from JSON
-- Use Phase 2 chessboard for interaction
-- Detect puzzle completion
-- Basic success/failure feedback
+### Files Created:
+- `lib/core/game_logic/chess_engine.dart` - Basic chess implementation
+- `lib/core/game_logic/move_validator.dart` - Simplified move validation
+- `lib/core/widgets/chess_board_widget.dart` - Interactive board UI
+- `lib/features/test/test_chess_page.dart` - Chess testing interface
+
+### ⚠️ Limitations (MVP Blockers):
+- **Missing essential chess rules**: No castling, en passant, pawn promotion
+- **No check/checkmate detection**: Required for real chess gameplay
+- **Poor piece visuals**: Unicode symbols inappropriate for kids' app
+- **Simplified validation**: Doesn't prevent moves that leave king in check
+
+## Phase 2.5: Chess Engine Integration 🚀 CURRENT PRIORITY
+**Branch**: phase-2.5-chess-engine-integration
+**Focus**: Replace simplified engine with production-ready chess logic
+**Essential for MVP**
+
+### Goals:
+- Research and integrate `chess` package (Dart chess engine with full rules)
+- Replace custom move validation with battle-tested chess engine
+- Maintain existing ChessBoardWidget UI but upgrade the underlying logic
+- Add full chess rule support: castling, en passant, pawn promotion, check/checkmate
+- Test integration thoroughly before proceeding to puzzles
+
+### Architecture Update:
+```
+lib/core/
+├── game_logic/
+│   ├── chess_engine_adapter.dart  // Adapter for chess package
+│   └── move_validator.dart        // Wrapper around chess package validation
+└── widgets/
+    └── chess_board_widget.dart    // Keep existing UI, upgrade backend
+```
+
+### Success Criteria:
+- All chess rules working correctly (castling, en passant, etc.)
+- Check and checkmate detection functional
+- Existing UI remains intact but with proper chess validation
+- Ready for puzzle implementation
+
+## Phase 2.7: Chess Visual Polish 🎨 HIGH PRIORITY
+**Branch**: phase-2.7-visual-polish  
+**Focus**: Professional piece graphics for kids' app
+**Essential for MVP**
+
+### Goals:
+- Replace Unicode symbols with proper piece graphics (SVG/PNG)
+- Kid-friendly, colorful piece designs
+- Improved board styling and visual feedback
+- Better contrast and accessibility
+- Professional appearance suitable for tablet use
+
+### Technical Implementation:
+- Source or create piece asset files
+- Update PieceWidget to use images instead of text
+- Responsive sizing for different screen sizes
+- Consistent visual theme with app design
+
+## Phase 3: Basic Puzzles 📋 NEXT AFTER 2.5 & 2.7
+**Branch**: phase-3-puzzles-basic
+**Focus**: Interactive puzzle solving using proper chess engine
+**Depends on**: Phase 2.5 (engine) and Phase 2.7 (visuals)
+
+### Goals:
+- Load puzzle positions from JSON using chess engine
+- Present tactical problems with correct/incorrect feedback
+- Detect puzzle solution completion using proper move validation
+- Track puzzle progress for advancement system
+- Professional visual presentation
 
 ## Phase 4: Mock Bot 🤖 PLANNED  
-- Simple bot with random/weak moves
+- Simple bot with random/weak moves using chess engine
 - Adjustable difficulty parameters
-- Game state management
+- Game state management with proper rules
 
 ## Phase 5: Real Bot (Engine) 🎯 PLANNED
-- Stockfish integration
+- Stockfish integration or Lichess API
 - Elo-based difficulty scaling
 - Bot personality from JSON configs
 
@@ -144,27 +207,33 @@ lib/core/
 ## Current File Structure
 ```
 lib/
-├── main.dart                    ✅ Hive + ProviderScope
-├── app.dart                     ✅ Material app + themes
-├── router/app_router.dart       ✅ Full nested routing
+├── main.dart                         ✅ Hive + ProviderScope
+├── app.dart                          ✅ Material app + themes
+├── router/app_router.dart            ✅ Full nested routing + test route
 ├── core/
-│   ├── theme/app_theme.dart     ✅ Light/dark Material 3
-│   ├── constants.dart           ✅ App-wide constants
-│   ├── utils/result.dart        ✅ Error handling pattern
-│   ├── errors/                  ✅ Failure & exception types
-│   └── widgets/                 ✅ Reusable UI components
+│   ├── theme/app_theme.dart          ✅ Light/dark Material 3
+│   ├── constants.dart                ✅ App-wide constants
+│   ├── utils/result.dart             ✅ Error handling pattern
+│   ├── errors/                       ✅ Failure & exception types
+│   ├── widgets/
+│   │   ├── async_value_view.dart     ✅ Loading/error wrappers
+│   │   └── chess_board_widget.dart   ✅ Basic chess board UI
+│   └── game_logic/
+│       ├── chess_engine.dart         ⚠️ Needs upgrade to chess package
+│       └── move_validator.dart       ⚠️ Needs proper chess validation
 ├── data/
-│   ├── models/                  ✅ All domain models
-│   ├── repositories/            ✅ Data access layer  
-│   └── sources/local/           ✅ Asset loading
+│   ├── models/                       ✅ All domain models
+│   ├── repositories/                 ✅ Data access layer  
+│   └── sources/local/                ✅ Asset loading
 ├── features/
-│   ├── home/pages/              ✅ Campaign selection
-│   ├── campaign/pages/          ✅ Level grid
-│   ├── level/pages/             ✅ Feature tiles + badges
-│   ├── lesson/pages/            ✅ Video player + progress
-│   ├── progress/widgets/        ✅ Badge components
-│   └── [puzzles,play,boss]/     ✅ Placeholder pages
-└── state/providers.dart         ✅ All Riverpod providers
+│   ├── home/pages/                   ✅ Campaign selection
+│   ├── campaign/pages/               ✅ Level grid
+│   ├── level/pages/                  ✅ Feature tiles + badges
+│   ├── lesson/pages/                 ✅ Video player + progress
+│   ├── progress/widgets/             ✅ Badge components
+│   ├── test/                         ✅ Chess testing page
+│   └── [puzzles,play,boss]/          ✅ Placeholder pages
+└── state/providers.dart              ✅ All Riverpod providers
 ```
 
 ## Technical Decisions Made
@@ -174,22 +243,43 @@ lib/
 - **go_router over Navigator**: Type-safe nested routing
 - **String provider keys**: Avoids Map instability issues
 - **Repository pattern**: Clean separation, testable data layer
+- **Chess package integration**: Battle-tested rules over custom implementation
+- **Professional piece graphics**: Essential for kids' app quality
+
+## MVP Requirements Status
+### ✅ Complete for MVP:
+- Video lesson system with progress tracking
+- Navigation and app structure
+- Content loading and error handling
+
+### ⚠️ MVP Blockers (Must fix before release):
+- **Chess engine incomplete**: Missing castling, en passant, checkmate
+- **Poor piece visuals**: Unicode symbols unprofessional for kids
+- **No check detection**: Required for real chess gameplay
+
+### 📋 Next for MVP:
+- Puzzle system (after engine upgrade)
+- Bot gameplay (basic level)
+- Unlock progression system
 
 ## Known Issues Fixed
 - ✅ Provider infinite rebuild loop (Map keys)
 - ✅ Hive JSON parsing (Map vs JSON string)
 - ✅ Video progress event timing
 - ✅ Asset loading error handling
+- ✅ Unicode chess piece rendering inconsistencies
+- ✅ Chess board coordinate mapping and piece placement
+- ✅ Move validation and legal move generation
 
-## Next Session Priorities
-1. Design chess board state representation
-2. Build basic chessboard widget with piece display
-3. Implement drag & drop interaction
-4. Add FEN position parsing
-5. Create reusable chess validation utilities
+## Next Session Priorities (Phase 2.5)
+1. Research `chess` package integration options
+2. Create adapter layer to maintain existing UI
+3. Replace custom chess engine with proper chess validation
+4. Test all chess rules (castling, en passant, checkmate)
+5. Verify existing ChessBoardWidget works with new engine
 
 ## Development Workflow
 - Feature branches for each phase
 - Commit when phase is stable and tested
 - Maintain this PROGRESS.md for context across sessions
-- Test thoroughly before moving to next phase
+- **Prioritize MVP blockers**: Engine and visuals before new features
