@@ -1,3 +1,4 @@
+// lib/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,6 +9,7 @@ import '../features/lesson/pages/lesson_page.dart';
 import '../features/puzzles/pages/puzzles_page.dart';
 import '../features/play/pages/play_page.dart';
 import '../features/boss/pages/boss_page.dart';
+import '../features/test/test_chess_page.dart';
 
 class Routes {
   static const home = '/';
@@ -79,7 +81,14 @@ class AppRouter {
             ],
           ),
         ],
+      
       ),
+      GoRoute(
+  path: '/test-chess',
+  name: 'test-chess',
+  builder: (context, state) => TestChessPage(),
+),
     ],
   );
 }
+

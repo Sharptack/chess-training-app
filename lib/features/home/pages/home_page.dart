@@ -41,6 +41,11 @@ class HomePage extends StatelessWidget {
               onTap: () => context.go('/campaign/intermediate'),
             ),
           ),
+          // In home_page.dart, add this to the children list:
+          ElevatedButton(
+            onPressed: () => context.go('/test-chess'),
+            child: const Text('Test Chess Board'),
+          ),
         ],
       ),
     );
