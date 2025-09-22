@@ -49,7 +49,11 @@ class HomePage extends StatelessWidget {
           ElevatedButton(
             onPressed: () => context.go('/test-chess-package'),
             child: const Text('Test Chess Package'),
-),
+          ),
+          ElevatedButton(
+            onPressed: () => context.go('/chessboard-test'),
+            child: const Text('Test Chessboard'),
+          ),
         ],
       ),
     );
