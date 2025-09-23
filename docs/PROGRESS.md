@@ -2,7 +2,7 @@
 
 **Vision**: A comprehensive chess learning app for kids with structured lessons, puzzles, and bot practice. Designed for safe, dedicated tablet use with video game-like progression and spaced repetition for memory reinforcement.
 
-## Project Status: Phase 2.5 Complete, Phase 2.7 Next
+## Project Status: Phase 2.7 Complete, Phase 3 Next
 
 ### Current Architecture
 - **Framework**: Flutter with Riverpod state management
@@ -202,17 +202,25 @@ lib/core/
 - Consistent with app's overall design language
 - Ready for puzzle and gameplay features
 
-## Phase 3: Basic Puzzles 📋 NEXT AFTER 2.7
+## Phase 3: Basic Puzzles 📋 CURRENT PRIORITY
 **Branch**: phase-3-puzzles-basic
 **Focus**: Interactive puzzle solving using proper chess engine
-**Depends on**: Phase 2.5 (engine) ✅ and Phase 2.7 (visuals)
+**Depends on**: Phase 2.5 (engine) ✅ and Phase 2.7 (visuals) ✅
 
 ### Goals:
-- Load puzzle positions from JSON using chess engine
+- Load puzzle positions from JSON using chess engine foundation
 - Present tactical problems with correct/incorrect feedback
 - Detect puzzle solution completion using proper move validation
 - Track puzzle progress for advancement system
-- Professional visual presentation
+- Professional visual presentation with new SVG pieces
+
+### Ready Foundation:
+- ✅ Complete chess engine with all rules (Phase 2.5)
+- ✅ Professional SVG pieces (Phase 2.7)
+- ✅ Chess position loading and FEN parsing
+- ✅ Move validation and game state detection
+- ✅ Progress tracking system
+- ✅ Interactive chessboard UI
 
 ## Phase 4: Mock Bot 🤖 PLANNED  
 - Simple bot with random/weak moves using chess engine
@@ -226,13 +234,26 @@ lib/core/
 
 ## Phase 6: Unlock System 🔓 PLANNED
 - Requirements checking
-- Level progression gating
+- Level progression gating  
 - Achievement system
+- Campaign/content orchestration repositories (when needed)
 
 ## Phase 7: Spaced Repetition 🧠 PLANNED
 - Puzzle review scheduling
 - Memory-based difficulty adjustment
 - Long-term retention optimization
+
+## 🚀 Future Features (Post-MVP)
+*Tracked for future implementation, not part of current phased rollout:*
+- Remote sync service & user accounts
+- Advanced analytics and learning insights  
+- Parental controls service
+- Notification system
+- Performance optimizations (memory cache, compression)
+- Accessibility enhancements
+- Multiple piece sets and board themes
+- Content management system
+- Multiplayer features
 
 ## Current File Structure (Actual Implementation)
 ```
@@ -351,12 +372,12 @@ lib/
 - ✅ **Check detection and game state management** - RESOLVED ✅
 - ✅ **Poor chess engine foundation** - RESOLVED ✅
 
-## Next Session Priorities (Phase 2.7)
-1. Source or create professional chess piece assets (SVG/PNG)
-2. Update PieceWidget to use image assets instead of Unicode
-3. Improve visual feedback and board styling
-4. Test piece visibility and contrast on different devices
-5. Ensure consistent visual theme with app design
+## Next Session Priorities (Phase 3)
+1. Create `phase-3-puzzles-basic` branch
+2. Design basic puzzle JSON format and sample puzzle data
+3. Implement puzzle loading in `puzzles_page.dart`
+4. Add puzzle state management (correct/incorrect move feedback)
+5. Integrate puzzle completion with progress tracking system
 
 ## Development Workflow
 - Feature branches for each phase
