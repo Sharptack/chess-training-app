@@ -19,6 +19,7 @@ dependencies:
   video_player: ^2.6.0
   chewie: ^1.8.1
   chess: ^0.8.1
+  flutter_svg: ^2.0.9
 
 
 dev_dependencies:
@@ -37,4 +38,5 @@ flutter:
     - assets/data/bots/
     - assets/schemas/
     - assets/videos/sample.mp4
+    - assets/images/pieces/
 

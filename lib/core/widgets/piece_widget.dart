@@ -1,8 +1,9 @@
 // lib/core/widgets/piece_widget.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../game_logic/chess_board_state.dart';
 
-/// Widget that renders a single chess piece
+/// Widget that renders a single chess piece using SVG assets
 class PieceWidget extends StatelessWidget {
   final ChessPiece piece;
   final double size;
@@ -21,29 +22,68 @@ class PieceWidget extends StatelessWidget {
       width: size,
       height: size,
       child: Center(
-        child: Text(
-          _getPieceSymbol(piece),
-          style: TextStyle(
-            fontSize: size * 0.7,
-            fontWeight: FontWeight.normal,
-            color: _getPieceColor(piece, isDragging),
-            shadows: isDragging 
-              ? [
-                  Shadow(
-                    offset: const Offset(2, 2),
-                    blurRadius: 4,
-                    color: Colors.black.withValues(alpha: 0.3),
-                  ),
-                ]
-              : null,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        child: _buildPieceImage(),
       ),
     );
   }
   
-  /// Get the appropriate color for the piece
+  /// Build SVG piece image with proper asset path
+  Widget _buildPieceImage() {
+    final color = piece.isWhite ? 'white' : 'black';
+    final pieceType = _getPieceTypeName(piece.type);
+    final assetPath = 'assets/images/pieces/piece_${color}_$pieceType.svg';
+    
+    return SvgPicture.asset(
+      assetPath,
+      width: size,
+      height: size,
+      colorFilter: isDragging 
+        ? ColorFilter.mode(
+            Colors.grey.withValues(alpha: 0.7), 
+            BlendMode.srcATop,
+          )
+        : null,
+      // Handle missing assets gracefully
+      placeholderBuilder: (context) => _buildFallbackPiece(),
+    );
+  }
+  
+  /// Convert piece type letter to full name
+  String _getPieceTypeName(String type) {
+    switch (type) {
+      case 'k': return 'king';
+      case 'q': return 'queen';
+      case 'r': return 'rook';
+      case 'b': return 'bishop';
+      case 'n': return 'knight';
+      case 'p': return 'pawn';
+      default: return 'pawn';
+    }
+  }
+  
+  /// Fallback for missing assets (using old Unicode approach)
+  Widget _buildFallbackPiece() {
+    return Text(
+      _getPieceSymbol(piece),
+      style: TextStyle(
+        fontSize: size * 0.7,
+        fontWeight: FontWeight.normal,
+        color: _getPieceColor(piece, isDragging),
+        shadows: isDragging 
+          ? [
+              Shadow(
+                offset: const Offset(2, 2),
+                blurRadius: 4,
+                color: Colors.black.withValues(alpha: 0.3),
+              ),
+            ]
+          : null,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+  
+  /// Get the appropriate color for the piece (fallback only)
   Color _getPieceColor(ChessPiece piece, bool isDragging) {
     if (isDragging) {
       return Colors.grey.withValues(alpha: 0.7);
@@ -63,11 +103,10 @@ class PieceWidget extends StatelessWidget {
     return Colors.black;
   }
   
-  /// Get Unicode chess piece symbol with fallback for black pawns
+  /// Get Unicode chess piece symbol (fallback only)
   String _getPieceSymbol(ChessPiece piece) {
     // Handle black pawn Unicode issue with fallback
     if (piece.type == 'p' && !piece.isWhite) {
-      // Use black circle as fallback for black pawns due to Unicode rendering issues
       return '●';  // Solid black circle
     }
     
@@ -87,7 +126,7 @@ class PieceWidget extends StatelessWidget {
       ('r', false): '♜', // Black Rook
       ('b', false): '♝', // Black Bishop
       ('n', false): '♞', // Black Knight
-      ('p', false): '♟', // Black Pawn (fallback handled above)
+      ('p', false): '♟', // Black Pawn
     };
     
     final symbol = pieceSymbols[(piece.type, piece.isWhite)];
