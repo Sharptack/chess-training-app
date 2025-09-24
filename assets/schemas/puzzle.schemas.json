@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chess Puzzle",
+  "description": "Schema for chess training app puzzles",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the puzzle"
+    },
+    "title": {
+      "type": "string",
+      "description": "Main puzzle title (e.g., 'Checkmate in 1')"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Instructional text (e.g., 'Find the winning move for White')"
+    },
+    "fen": {
+      "type": "string",
+      "description": "Chess position in FEN notation"
+    },
+    "toMove": {
+      "type": "string",
+      "enum": ["white", "black"],
+      "description": "Which side to move"
+    },
+    "themes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tactical themes (e.g., 'checkmate', 'fork', 'pin')"
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Difficulty level from 1 (easiest) to 10 (hardest)"
+    },
+    "solutionMoves": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Correct move(s) in algebraic notation"
+    },
+    "hints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional hints for the puzzle"
+    },
+    "successMessage": {
+      "type": "string",
+      "description": "Message shown when puzzle is solved correctly"
+    },
+    "failureMessage": {
+      "type": "string",
+      "description": "Message shown when incorrect move is made"
+    }
+  },
+  "required": [
+    "id",
+    "title", 
+    "subtitle",
+    "fen",
+    "toMove",
+    "themes",
+    "difficulty",
+    "solutionMoves",
+    "successMessage",
+    "failureMessage"
+  ]
+}
