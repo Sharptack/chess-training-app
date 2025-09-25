@@ -29,6 +29,10 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
   bool _showingFeedback = false;
   String _feedbackMessage = '';
   bool _isSuccess = false;
+  
+  // Multi-move puzzle tracking
+  int _currentStepIndex = 0;
+  bool _isComputerMoving = false;
 
   @override
   void initState() {
@@ -68,6 +72,11 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
       if (!success) {
         throw Exception('Invalid FEN: ${puzzle.fen}');
       }
+      
+      // Reset multi-move tracking
+      _currentStepIndex = 0;
+      _isComputerMoving = false;
+      
       setState(() {});
     } catch (e) {
       print('DEBUG: Error loading puzzle position: $e');
@@ -80,32 +89,74 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
   void _onMoveMade(String move) {
     print('DEBUG PuzzlesPage: Move received: "$move"');
     print('DEBUG PuzzlesPage: Current puzzle: ${_currentPuzzle?.id}');
-    print('DEBUG PuzzlesPage: Expected solutions: ${_currentPuzzle?.solutionMoves}');
-    print('DEBUG PuzzlesPage: Puzzle already solved: $_puzzleSolved');
-    print('DEBUG PuzzlesPage: Showing feedback: $_showingFeedback');
+    print('DEBUG PuzzlesPage: Is multi-move? ${_currentPuzzle?.isMultiMove}');
+    print('DEBUG PuzzlesPage: Solution sequence: ${_currentPuzzle?.solutionSequence}');
+    print('DEBUG PuzzlesPage: Current step: $_currentStepIndex');
     
-    if (_puzzleSolved || _showingFeedback) {
-      print('DEBUG PuzzlesPage: Ignoring move - puzzle already solved or showing feedback');
+    if (_puzzleSolved || _showingFeedback || _isComputerMoving) {
+      print('DEBUG PuzzlesPage: Ignoring move - puzzle solved/feedback/computer moving');
       return;
     }
 
-    // The move has already been made by ChessBoardWidget
-    // Check if this move is the solution
     if (_currentPuzzle != null) {
-      final isSolution = _currentPuzzle!.isSolutionMove(move);
-      print('DEBUG PuzzlesPage: Is solution? $isSolution');
+      bool isCorrect = false;
       
-      if (isSolution) {
-        print('DEBUG PuzzlesPage: Calling _handleCorrectMove()');
-        _handleCorrectMove();
+      // Check if this is a multi-move puzzle
+      if (_currentPuzzle!.isMultiMove) {
+        // Debug the expected move at this step
+        if (_currentPuzzle!.solutionSequence != null && 
+            _currentStepIndex < _currentPuzzle!.solutionSequence!.length) {
+          final expectedStep = _currentPuzzle!.solutionSequence![_currentStepIndex];
+          print('DEBUG PuzzlesPage: Expected move at step $_currentStepIndex: ${expectedStep.move}');
+          print('DEBUG PuzzlesPage: Is user move? ${expectedStep.isUserMove}');
+        }
+        
+        isCorrect = _currentPuzzle!.isCorrectMoveAtStep(move, _currentStepIndex);
+        print('DEBUG PuzzlesPage: Multi-move puzzle - move correct at step $_currentStepIndex? $isCorrect');
+        
+        if (isCorrect) {
+          _currentStepIndex++;
+          
+          // Check if there's a computer response needed
+          final computerMove = _currentPuzzle!.getComputerResponseAtStep(_currentStepIndex - 1);
+          if (computerMove != null) {
+            print('DEBUG PuzzlesPage: Computer needs to respond with: $computerMove');
+            _makeComputerMove(computerMove);
+            return; // Don't complete puzzle yet
+          }
+          
+          // Check if puzzle is complete
+          // We've made all the user moves if we've gone through the entire sequence
+          final totalMoves = _currentPuzzle!.solutionSequence!.length;
+          final puzzleComplete = _currentStepIndex >= totalMoves || _boardState.isCheckmate;
+          
+          print('DEBUG PuzzlesPage: Step $_currentStepIndex of $totalMoves, checkmate: ${_boardState.isCheckmate}');
+          
+          if (puzzleComplete) {
+            print('DEBUG PuzzlesPage: Multi-move puzzle complete!');
+            _handleCorrectMove();
+          } else {
+            // Show temporary success feedback but continue puzzle
+            _showTemporaryFeedback('Good move! Continue...', true);
+          }
+        } else {
+          _handleIncorrectMove();
+        }
       } else {
-        // Check if the position is checkmate anyway (might be alternate solution)
-        if (_boardState.isCheckmate) {
-          print('DEBUG PuzzlesPage: Checkmate detected! Accepting as correct solution');
+        // Single-move puzzle
+        isCorrect = _currentPuzzle!.isSolutionMove(move);
+        print('DEBUG PuzzlesPage: Single-move puzzle - is solution? $isCorrect');
+        
+        if (isCorrect) {
           _handleCorrectMove();
         } else {
-          print('DEBUG PuzzlesPage: Calling _handleIncorrectMove()');
-          _handleIncorrectMove();
+          // Check if checkmate achieved anyway
+          if (_boardState.isCheckmate) {
+            print('DEBUG PuzzlesPage: Checkmate detected! Accepting as correct');
+            _handleCorrectMove();
+          } else {
+            _handleIncorrectMove();
+          }
         }
       }
     } else {
@@ -113,6 +164,29 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     }
     
     setState(() {});
+  }
+  
+  Future<void> _makeComputerMove(String move) async {
+    setState(() {
+      _isComputerMoving = true;
+    });
+    
+    // Delay to make it feel like computer is thinking
+    await Future.delayed(const Duration(milliseconds: 800));
+    
+    // Make the computer's move
+    final success = _boardState.makeSanMove(move);
+    
+    if (success) {
+      print('DEBUG PuzzlesPage: Computer moved: $move');
+      _currentStepIndex++;
+    } else {
+      print('DEBUG PuzzlesPage: ERROR - Computer move failed: $move');
+    }
+    
+    setState(() {
+      _isComputerMoving = false;
+    });
   }
 
   void _handleCorrectMove() {
@@ -171,8 +245,17 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
 
   void _markPuzzleCompleted() {
     if (_currentPuzzle != null) {
-      // Use existing progress tracking pattern
-      markPuzzleCompleted(ref, _currentPuzzle!.id);
+      // Mark this specific puzzle as completed
+      markPuzzleCompleted(ref, widget.levelId, _currentPuzzle!.id);
+      
+      // Also mark overall puzzle progress for the level
+      final completedCount = _currentPuzzleIndex + 1;
+      final totalCount = _puzzleSet?.puzzleCount ?? 1;
+      
+      if (completedCount >= totalCount) {
+        // All puzzles in this level completed
+        markLevelPuzzlesCompleted(ref, widget.levelId);
+      }
     }
   }
 
@@ -213,6 +296,8 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
       setState(() {
         _puzzleSolved = false;
         _showingFeedback = false;
+        _currentStepIndex = 0;
+        _isComputerMoving = false;
       });
     }
   }

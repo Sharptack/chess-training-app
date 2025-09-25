@@ -79,19 +79,18 @@ final puzzleRepositoryProvider = Provider<PuzzleRepository>((ref) {
 });
 
 /// Returns a puzzle set for a specific level
-/// Returns a puzzle set for a specific level
 final puzzleSetProvider = FutureProvider.family<PuzzleSet, String>((ref, String levelId) async {
-  print('DEBUG: puzzleSetProvider called with levelId: $levelId'); // Add this
+  print('DEBUG: puzzleSetProvider called with levelId: $levelId');
   final repo = ref.watch(puzzleRepositoryProvider);
-  print('DEBUG: Got repository, calling getPuzzleSetByLevelId'); // Add this
+  print('DEBUG: Got repository, calling getPuzzleSetByLevelId');
   final result = await repo.getPuzzleSetByLevelId(levelId);
 
   if (result.isError) {
-    print('DEBUG: Repository returned error: ${result.failure}'); // Add this
+    print('DEBUG: Repository returned error: ${result.failure}');
     throw Exception(result.failure.toString());
   }
 
-  print('DEBUG: Repository returned success, puzzle set loaded'); // Add this
+  print('DEBUG: Repository returned success, puzzle set loaded');
   return result.data!;
 });
 
@@ -107,10 +106,41 @@ final puzzleProvider = FutureProvider.family<Puzzle, String>((ref, String puzzle
   return result.data!;
 });
 
-/// Command helper to mark puzzle completion
-Future<void> markPuzzleCompleted(WidgetRef ref, String puzzleId) async {
+/// Command helper to mark individual puzzle completion
+Future<void> markPuzzleCompleted(WidgetRef ref, String levelId, String puzzleId) async {
   final repo = ref.read(progressRepositoryProvider);
-  // Using the existing lesson completion pattern
-  await repo.markLessonCompleted('puzzle', puzzleId);
-  ref.invalidate(lessonProgressProvider('puzzle_$puzzleId'));
+  // Use a combined key for puzzle progress
+  await repo.markLessonCompleted('puzzle_${levelId}', puzzleId);
+  ref.invalidate(lessonProgressProvider('puzzle_${levelId}_$puzzleId'));
 }
+
+/// Command helper to mark all puzzles complete for a level
+Future<void> markLevelPuzzlesCompleted(WidgetRef ref, String levelId) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.markLessonCompleted('puzzles', levelId);
+  ref.invalidate(lessonProgressProvider('puzzles_$levelId'));
+}
+
+/// Get puzzle progress for a specific puzzle
+final puzzleProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String key) async {
+    // Key format: levelId_puzzleId
+    final parts = key.split('_');
+    if (parts.length < 2) {
+      throw ArgumentError('Invalid puzzle progress key format');
+    }
+    final levelId = parts[0];
+    final puzzleId = parts.sublist(1).join('_');
+    
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getLessonProgress('puzzle_$levelId', puzzleId);
+  },
+);
+
+/// Get overall puzzle completion for a level
+final levelPuzzleProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String levelId) async {
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getLessonProgress('puzzles', levelId);
+  },
+);

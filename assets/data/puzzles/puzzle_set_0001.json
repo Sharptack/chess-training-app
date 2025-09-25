@@ -18,6 +18,76 @@
     },
     {
       "id": "puzzle_0001_002",
+      "title": "Checkmate in 2",
+      "subtitle": "Find the forcing sequence for White",
+      "fen": "r5rk/5p1p/5R2/4B3/8/8/7P/7K w - - 0 1",
+      "toMove": "white",
+      "themes": ["checkmate", "mating-attack"],
+      "difficulty": 3,
+      "solutionMoves": ["Rxf7"],
+      "solutionSequence": [
+        {
+          "move": "Rxf7",
+          "isUserMove": true,
+          "comment": "Sacrifice the rook to open the king"
+        },
+        {
+          "move": "Rg7",
+          "isUserMove": false,
+          "comment": "Black must recapture with the f8 rook"
+        },
+        {
+          "move": "Bxg7#",
+          "isUserMove": true,
+          "comment": "Checkmate with the bishop!"
+        }
+      ],
+      "hints": ["Sometimes you need to sacrifice material to deliver checkmate", "Look at f7"],
+      "successMessage": "Brilliant! You found the rook sacrifice leading to checkmate!",
+      "failureMessage": "Think about sacrificing material to expose the king."
+    },
+    {
+      "id": "puzzle_0001_003",
+      "title": "Checkmate in 3",
+      "subtitle": "Find the winning combination for White",
+      "fen": "1k1r4/pp1b1R2/3q2pp/4p3/2B5/4Q3/PPP2PPP/2K5 w - - 0 1",
+      "toMove": "white",
+      "themes": ["checkmate", "queen-sacrifice"],
+      "difficulty": 4,
+      "solutionMoves": ["Qxe5+"],
+      "solutionSequence": [
+        {
+          "move": "Qxe5+",
+          "isUserMove": true,
+          "comment": "Queen sacrifice to pull the queen away"
+        },
+        {
+          "move": "Qxe5",
+          "isUserMove": false,
+          "comment": "Black must take the queen"
+        },
+        {
+          "move": "Rf8+",
+          "isUserMove": true,
+          "comment": "Check with the rook"
+        },
+        {
+          "move": "Rxf8",
+          "isUserMove": false,
+          "comment": "Forced recapture"
+        },
+        {
+          "move": "Bg8",
+          "isUserMove": true,
+          "comment": "Checkmate with the bishop!"
+        }
+      ],
+      "hints": ["Look for a forcing sequence starting with a queen sacrifice", "The black king is vulnerable on the back rank"],
+      "successMessage": "Spectacular! You found the beautiful queen sacrifice combination!",
+      "failureMessage": "This is tricky - look for a forcing move that starts with a queen sacrifice."
+    },
+    {
+      "id": "puzzle_0001_004",
       "title": "Win Material",
       "subtitle": "Find the best move for White",
       "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 4",
@@ -26,12 +96,12 @@
       "difficulty": 2,
       "solutionMoves": ["Ng5"],
       "hints": ["Look for a move that attacks two pieces at once", "Knights are great at forking!"],
-      "successMessage": "Great! The knight attacks the weak f7 pawn!",
-      "failureMessage": "Try again. Look for a move that creates multiple threats."
+      "successMessage": "Great! The knight attacks f7 and creates multiple threats!",
+      "failureMessage": "Try again. Look for a move that attacks multiple targets."
     },
     {
-      "id": "puzzle_0001_003",
-      "title": "Checkmate in 1",
+      "id": "puzzle_0001_005",
+      "title": "Simple Endgame",
       "subtitle": "Deliver checkmate with Queen and King",
       "fen": "8/8/8/8/8/2K5/1Q6/7k w - - 0 1",
       "toMove": "white",
