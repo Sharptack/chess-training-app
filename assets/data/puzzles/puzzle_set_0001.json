@@ -1,0 +1,46 @@
+{
+  "levelId": "0001",
+  "title": "Level 1 - Basic Tactics",
+  "description": "Learn fundamental chess tactics",
+  "puzzles": [
+    {
+      "id": "puzzle_0001_001",
+      "title": "Checkmate in 1",
+      "subtitle": "Find the winning move for White",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+      "toMove": "white",
+      "themes": ["checkmate", "back-rank"],
+      "difficulty": 1,
+      "solutionMoves": ["Re8#"],
+      "hints": ["Look for a move that attacks the enemy king on the back rank"],
+      "successMessage": "Excellent! You found the back-rank mate!",
+      "failureMessage": "Not quite right. Look for a move that attacks the king directly."
+    },
+    {
+      "id": "puzzle_0001_002",
+      "title": "Win Material",
+      "subtitle": "Find the best move for White",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 4",
+      "toMove": "white",
+      "themes": ["fork", "knight", "tactics"],
+      "difficulty": 2,
+      "solutionMoves": ["Ng5"],
+      "hints": ["Look for a move that attacks two pieces at once", "Knights are great at forking!"],
+      "successMessage": "Great! The knight attacks the weak f7 pawn!",
+      "failureMessage": "Try again. Look for a move that creates multiple threats."
+    },
+    {
+      "id": "puzzle_0001_003",
+      "title": "Checkmate in 1",
+      "subtitle": "Deliver checkmate with Queen and King",
+      "fen": "8/8/8/8/8/2K5/1Q6/7k w - - 0 1",
+      "toMove": "white",
+      "themes": ["checkmate", "endgame", "queen"],
+      "difficulty": 1,
+      "solutionMoves": ["Qb1#"],
+      "hints": ["Use your queen to cut off the black king's escape squares"],
+      "successMessage": "Perfect! You delivered checkmate with queen and king!",
+      "failureMessage": "Not quite. Try to limit the black king's movement first."
+    }
+  ]
+}
