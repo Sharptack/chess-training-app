@@ -1,18 +1,18 @@
 // lib/data/models/puzzle.dart
-import 'package:equatable/equatable.dart';
 
-class Puzzle extends Equatable {
+/// Individual puzzle with chess position and solution
+class Puzzle {
   final String id;
   final String title;
   final String subtitle;
-  final String fen; // chess position in FEN format
+  final String fen;
   final String toMove; // "white" or "black"
-  final List<String> themes; // tactical themes (e.g., "checkmate", "fork", "pin")
-  final int difficulty; // 1-10 difficulty scale
-  final List<String> solutionMoves; // solution sequence in algebraic notation
-  final List<String> hints; // optional hints for the puzzle
-  final String successMessage; // message shown when solved correctly
-  final String failureMessage; // message shown when incorrect move is made
+  final List<String> themes;
+  final int difficulty;
+  final List<String> solutionMoves; // Can be multiple valid solutions
+  final List<String> hints;
+  final String successMessage;
+  final String failureMessage;
 
   const Puzzle({
     required this.id,
@@ -23,10 +23,64 @@ class Puzzle extends Equatable {
     required this.themes,
     required this.difficulty,
     required this.solutionMoves,
-    this.hints = const [],
+    required this.hints,
     required this.successMessage,
     required this.failureMessage,
   });
+
+  /// Check if a move matches any of the solution moves
+  bool isSolutionMove(String move) {
+    // Clean up the move string (remove special characters that might differ)
+    final cleanMove = _cleanMoveNotation(move);
+    
+    print('DEBUG Puzzle.isSolutionMove: Checking move "$move" (cleaned: "$cleanMove")');
+    print('DEBUG Puzzle.isSolutionMove: Against solutions: $solutionMoves');
+    
+    // Check against each solution move
+    for (final solution in solutionMoves) {
+      final cleanSolution = _cleanMoveNotation(solution);
+      print('DEBUG Puzzle.isSolutionMove: Comparing "$cleanMove" with "$cleanSolution"');
+      
+      // Check for exact match
+      if (cleanMove == cleanSolution) {
+        print('DEBUG Puzzle.isSolutionMove: MATCH FOUND!');
+        return true;
+      }
+      
+      // Also check if the move starts with the solution (for checkmate notation)
+      // e.g., "Re8" matches "Re8#"
+      if (cleanSolution.startsWith(cleanMove) || cleanMove.startsWith(cleanSolution)) {
+        print('DEBUG Puzzle.isSolutionMove: PARTIAL MATCH FOUND!');
+        return true;
+      }
+    }
+    
+    print('DEBUG Puzzle.isSolutionMove: No match found');
+    return false;
+  }
+  
+  /// Clean move notation for comparison
+  String _cleanMoveNotation(String move) {
+    // Remove check (+) and checkmate (#) symbols for comparison
+    // as the chess engine might not always include them in the same way
+    String cleaned = move.replaceAll('+', '').replaceAll('#', '');
+    
+    // Remove spaces
+    cleaned = cleaned.trim();
+    
+    // Handle different move formats
+    // If it's in the format "e1-e8", convert to "e1e8"
+    if (cleaned.contains('-')) {
+      cleaned = cleaned.replaceAll('-', '');
+    }
+    
+    return cleaned;
+  }
+
+  bool get isWhiteToMove => toMove.toLowerCase() == 'white';
+  bool get isBlackToMove => toMove.toLowerCase() == 'black';
+  
+  String get turnDisplay => isWhiteToMove ? 'White to Move' : 'Black to Move';
 
   factory Puzzle.fromJson(Map<String, dynamic> json) {
     return Puzzle(
@@ -35,12 +89,10 @@ class Puzzle extends Equatable {
       subtitle: json['subtitle'] as String,
       fen: json['fen'] as String,
       toMove: json['toMove'] as String,
-      themes: List<String>.from(json['themes'] as List<dynamic>),
+      themes: List<String>.from(json['themes'] as List),
       difficulty: json['difficulty'] as int,
-      solutionMoves: List<String>.from(json['solutionMoves'] as List<dynamic>),
-      hints: json['hints'] != null 
-          ? List<String>.from(json['hints'] as List<dynamic>)
-          : const [],
+      solutionMoves: List<String>.from(json['solutionMoves'] as List),
+      hints: List<String>.from(json['hints'] as List),
       successMessage: json['successMessage'] as String,
       failureMessage: json['failureMessage'] as String,
     );
@@ -62,32 +114,8 @@ class Puzzle extends Equatable {
     };
   }
 
-  /// Convenience getter to determine if it's White's turn
-  bool get isWhiteToMove => toMove.toLowerCase() == 'white';
-
-  /// Get the first (primary) solution move
-  String get primarySolution => solutionMoves.isNotEmpty ? solutionMoves.first : '';
-
-  /// Check if a given move matches any of the solution moves
-  bool isSolutionMove(String move) {
-    return solutionMoves.contains(move);
-  }
-
-  /// Get a display string for whose turn it is
-  String get turnDisplay => isWhiteToMove ? 'White to move' : 'Black to move';
-
   @override
-  List<Object?> get props => [
-    id,
-    title,
-    subtitle,
-    fen,
-    toMove,
-    themes,
-    difficulty,
-    solutionMoves,
-    hints,
-    successMessage,
-    failureMessage,
-  ];
+  String toString() {
+    return 'Puzzle(id: $id, title: $title, difficulty: $difficulty)';
+  }
 }

@@ -78,20 +78,38 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
   }
 
   void _onMoveMade(String move) {
-    print('DEBUG: Move made: $move');
-    if (_puzzleSolved || _showingFeedback) return;
+    print('DEBUG PuzzlesPage: Move received: "$move"');
+    print('DEBUG PuzzlesPage: Current puzzle: ${_currentPuzzle?.id}');
+    print('DEBUG PuzzlesPage: Expected solutions: ${_currentPuzzle?.solutionMoves}');
+    print('DEBUG PuzzlesPage: Puzzle already solved: $_puzzleSolved');
+    print('DEBUG PuzzlesPage: Showing feedback: $_showingFeedback');
+    
+    if (_puzzleSolved || _showingFeedback) {
+      print('DEBUG PuzzlesPage: Ignoring move - puzzle already solved or showing feedback');
+      return;
+    }
 
     // The move has already been made by ChessBoardWidget
     // Check if this move is the solution
     if (_currentPuzzle != null) {
-      print('DEBUG: Checking if $move is solution: ${_currentPuzzle!.solutionMoves}');
-      if (_currentPuzzle!.isSolutionMove(move)) {
-        print('DEBUG: Correct move!');
+      final isSolution = _currentPuzzle!.isSolutionMove(move);
+      print('DEBUG PuzzlesPage: Is solution? $isSolution');
+      
+      if (isSolution) {
+        print('DEBUG PuzzlesPage: Calling _handleCorrectMove()');
         _handleCorrectMove();
       } else {
-        print('DEBUG: Incorrect move');
-        _handleIncorrectMove();
+        // Check if the position is checkmate anyway (might be alternate solution)
+        if (_boardState.isCheckmate) {
+          print('DEBUG PuzzlesPage: Checkmate detected! Accepting as correct solution');
+          _handleCorrectMove();
+        } else {
+          print('DEBUG PuzzlesPage: Calling _handleIncorrectMove()');
+          _handleIncorrectMove();
+        }
       }
+    } else {
+      print('DEBUG PuzzlesPage: ERROR - No current puzzle!');
     }
     
     setState(() {});

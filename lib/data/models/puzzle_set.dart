@@ -1,8 +1,9 @@
-//lib/data/models/puzzle_set.dart
-import 'package:equatable/equatable.dart';
+// lib/data/models/puzzle_set.dart
+
 import 'puzzle.dart';
 
-class PuzzleSet extends Equatable {
+/// A collection of puzzles for a specific level
+class PuzzleSet {
   final String levelId;
   final String title;
   final String description;
@@ -15,12 +16,29 @@ class PuzzleSet extends Equatable {
     required this.puzzles,
   });
 
+  int get puzzleCount => puzzles.length;
+
+  Puzzle? getPuzzleAt(int index) {
+    if (index >= 0 && index < puzzles.length) {
+      return puzzles[index];
+    }
+    return null;
+  }
+
+  Puzzle? getPuzzleById(String id) {
+    try {
+      return puzzles.firstWhere((puzzle) => puzzle.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   factory PuzzleSet.fromJson(Map<String, dynamic> json) {
     return PuzzleSet(
       levelId: json['levelId'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
-      puzzles: (json['puzzles'] as List<dynamic>)
+      puzzles: (json['puzzles'] as List)
           .map((puzzleJson) => Puzzle.fromJson(puzzleJson as Map<String, dynamic>))
           .toList(),
     );
@@ -35,17 +53,8 @@ class PuzzleSet extends Equatable {
     };
   }
 
-  /// Get puzzle by index
-  Puzzle? getPuzzleAt(int index) {
-    if (index >= 0 && index < puzzles.length) {
-      return puzzles[index];
-    }
-    return null;
-  }
-
-  /// Total number of puzzles in this set
-  int get puzzleCount => puzzles.length;
-
   @override
-  List<Object?> get props => [levelId, title, description, puzzles];
+  String toString() {
+    return 'PuzzleSet(levelId: $levelId, title: $title, puzzleCount: $puzzleCount)';
+  }
 }

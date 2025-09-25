@@ -129,7 +129,7 @@ class ChessBoardState extends ChangeNotifier {
   
   // === MOVE OPERATIONS ===
   
-  /// Select a square (for move input)
+  /// Select a square for move input (UI only - doesn't make moves)
   void selectSquare(String square) {
     final piece = getPieceAt(square);
     
@@ -139,13 +139,16 @@ class ChessBoardState extends ChangeNotifier {
       _highlightedSquares = _getDestinationSquares(square);
       notifyListeners();
     }
-    // If clicking on highlighted square, try to make move
+    // If a piece is selected and clicking on a highlighted square, 
+    // DON'T make the move here - let the widget handle it
     else if (_selectedSquare != null && _highlightedSquares.contains(square)) {
-      makeMove(_selectedSquare!, square);
+      // The widget will handle the actual move
+      // Just keep the selection for now
     }
     // Otherwise, clear selection
     else {
       _clearSelection();
+      notifyListeners();
     }
   }
   

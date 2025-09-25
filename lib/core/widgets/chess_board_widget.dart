@@ -52,35 +52,84 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   
   @override
   Widget build(BuildContext context) {
+    // Show checkmate/stalemate/draw status
+    Widget? statusOverlay;
+    if (widget.boardState.isCheckmate) {
+      statusOverlay = _buildStatusOverlay('Checkmate!', Colors.red);
+    } else if (widget.boardState.isStalemate) {
+      statusOverlay = _buildStatusOverlay('Stalemate!', Colors.orange);
+    } else if (widget.boardState.isDraw) {
+      statusOverlay = _buildStatusOverlay('Draw!', Colors.blue);
+    } else if (widget.boardState.isInCheck) {
+      statusOverlay = _buildStatusOverlay('Check!', Colors.amber);
+    }
+    
     return SizedBox(
       width: widget.size,
       height: widget.size,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.brown, width: 2),
-        ),
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 8,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.brown, width: 2),
             ),
-            itemCount: 64,
-            itemBuilder: (context, index) {
-              final file = index % 8;
-              final displayRank = index ~/ 8;
-              final chessRank = 7 - displayRank;
-              
-              final square = ChessNotation.indicesToSquare(file, chessRank);
-              final squareSize = widget.size / 8;
-              
-              return _buildSquare(square, squareSize, file, chessRank);
-            },
+            child: AspectRatio(
+              aspectRatio: 1.0,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 8,
+                  childAspectRatio: 1.0,
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
+                ),
+                itemCount: 64,
+                itemBuilder: (context, index) {
+                  final file = index % 8;
+                  final displayRank = index ~/ 8;
+                  final chessRank = 7 - displayRank;
+                  
+                  final square = ChessNotation.indicesToSquare(file, chessRank);
+                  final squareSize = widget.size / 8;
+                  
+                  return _buildSquare(square, squareSize, file, chessRank);
+                },
+              ),
+            ),
+          ),
+          if (statusOverlay != null) statusOverlay,
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildStatusOverlay(String text, Color color) {
+    return Positioned(
+      top: widget.size / 2 - 30,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -222,7 +271,17 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _onSquareTapped(String square) {
-    widget.boardState.selectSquare(square);
+    final currentSelected = widget.boardState.selectedSquare;
+    final highlightedSquares = widget.boardState.highlightedSquares;
+    
+    // If we have a piece selected and click on a highlighted square, make the move
+    if (currentSelected != null && highlightedSquares.contains(square)) {
+      // Make the move through our widget method to trigger callback
+      _attemptMove(currentSelected, square);
+    } else {
+      // Otherwise, just select the square
+      widget.boardState.selectSquare(square);
+    }
   }
   
   void _onDragStarted(String square) {
@@ -251,16 +310,30 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _attemptMove(String from, String to, {String? promotion}) {
+    // Store the move count before attempting the move
     final moveCountBefore = widget.boardState.moveHistory.length;
     
-    // Direct call to chess package via simplified state
+    // Make the move using the chess package
     final success = widget.boardState.makeMove(from, to, promotion: promotion);
     
     if (success) {
-      final lastMove = widget.boardState.moveHistory.isNotEmpty 
-          ? widget.boardState.moveHistory.last 
-          : '$from-$to';
-      widget.onMoveMade?.call(lastMove);
+      // Get the last move in SAN notation from move history
+      String moveNotation;
+      if (widget.boardState.moveHistory.length > moveCountBefore) {
+        // The chess package added a move to history, get it in SAN format
+        moveNotation = widget.boardState.moveHistory.last;
+      } else {
+        // Fallback to simple notation
+        moveNotation = '$from$to';
+      }
+      
+      // Debug output to see what format we're getting
+      print('DEBUG ChessBoardWidget: Move made from $from to $to');
+      print('DEBUG ChessBoardWidget: Move in SAN notation: $moveNotation');
+      print('DEBUG ChessBoardWidget: Move history: ${widget.boardState.moveHistory}');
+      
+      // Call the callback with the SAN notation
+      widget.onMoveMade?.call(moveNotation);
     } else {
       widget.onIllegalMove?.call();
     }
