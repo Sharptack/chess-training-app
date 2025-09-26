@@ -63,7 +63,22 @@
 │   │   │   └── level_0002.json
 │   │   └── puzzles
 │   │       ├── index.json
-│   │       └── puzzles_set_001.json
+│   │       ├── puzzle_set_0001.json
+│   │       └── puzzle_set_0002.json
+│   ├── images
+│   │   └── pieces
+│   │       ├── piece_black_bishop.svg
+│   │       ├── piece_black_king.svg
+│   │       ├── piece_black_knight.svg
+│   │       ├── piece_black_pawn.svg
+│   │       ├── piece_black_queen.svg
+│   │       ├── piece_black_rook.svg
+│   │       ├── piece_white_bishop.svg
+│   │       ├── piece_white_king.svg
+│   │       ├── piece_white_knight.svg
+│   │       ├── piece_white_pawn.svg
+│   │       ├── piece_white_queen.svg
+│   │       └── piece_white_rook.svg
 │   ├── schemas
 │   │   └── level.schemas.json
 │   └── videos
@@ -160,6 +175,7 @@
 │   │   │   ├── level.dart
 │   │   │   ├── progress.dart
 │   │   │   ├── puzzle.dart
+│   │   │   ├── puzzle_set.dart
 │   │   │   └── video_item.dart
 │   │   ├── repositories
 │   │   │   ├── bot_repository.dart
@@ -200,8 +216,7 @@
 │   │       ├── bot_repository_test.dart
 │   │       ├── chess_package_test.dart
 │   │       ├── chessboard_test_page.dart
-│   │       ├── level_repository_test.dart
-│   │       └── puzzle_repository_test.dart
+│   │       └── level_repository_test.dart
 │   ├── main.dart
 │   ├── router
 │   │   └── app_router.dart
@@ -302,4 +317,4 @@
         ├── win32_window.cpp
         └── win32_window.h
 
-115 directories, 188 files
+117 directories, 201 files
