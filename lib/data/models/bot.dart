@@ -1,3 +1,4 @@
+// lib/data/models/bot.dart
 import 'package:equatable/equatable.dart';
 
 class Bot extends Equatable {
