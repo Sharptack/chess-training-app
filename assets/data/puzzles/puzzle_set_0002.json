@@ -1,0 +1,102 @@
+{
+  "levelId": "0002",
+  "title": "Level 2 - Mixed Tactics",
+  "description": "Review basics and learn new tactical patterns",
+  "puzzles": [
+    {
+      "id": "puzzle_0001_001",
+      "title": "Review: Checkmate in 1",
+      "subtitle": "Find the winning move for White",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+      "toMove": "white",
+      "themes": ["checkmate", "back-rank"],
+      "difficulty": 1,
+      "solutionMoves": ["Re8#"],
+      "hints": ["Look for a move that attacks the enemy king on the back rank"],
+      "successMessage": "Good review! Back-rank mates are fundamental!",
+      "failureMessage": "Remember: Look for moves that attack the king directly."
+    },
+    {
+      "id": "puzzle_0002_001",
+      "title": "Pin and Win",
+      "subtitle": "White to win material",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4",
+      "toMove": "white",
+      "themes": ["pin", "tactics"],
+      "difficulty": 2,
+      "solutionMoves": ["Bb5"],
+      "hints": ["Look for a piece that can't move without exposing something valuable"],
+      "successMessage": "Excellent! The knight is pinned to the king!",
+      "failureMessage": "Look for a way to attack a piece that can't move."
+    },
+    {
+      "id": "puzzle_0002_002",
+      "title": "Discovered Attack",
+      "subtitle": "White to win material",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/8/3pP3/3P1N2/PPP2PPP/RNBQKB1R w KQkq - 0 5",
+      "toMove": "white",
+      "themes": ["discovered-attack", "tactics"],
+      "difficulty": 3,
+      "solutionMoves": ["e5"],
+      "hints": ["Moving one piece can reveal an attack from another"],
+      "successMessage": "Great! The knight must move and the bishop attacks the queen!",
+      "failureMessage": "Think about what happens when the knight has to move."
+    },
+    {
+      "id": "puzzle_0001_004",
+      "title": "Review: Knight Fork",
+      "subtitle": "Find the best move for White",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 4",
+      "toMove": "white",
+      "themes": ["fork", "knight", "tactics"],
+      "difficulty": 2,
+      "solutionMoves": ["Ng5"],
+      "hints": ["Knights are great at attacking multiple pieces", "Look at f7"],
+      "successMessage": "Good review! Knight forks are powerful tactics!",
+      "failureMessage": "Look for a knight move that creates multiple threats."
+    },
+    {
+      "id": "puzzle_0002_003",
+      "title": "Skewer the Rooks",
+      "subtitle": "White to win material",
+      "fen": "6k1/5ppp/8/8/8/8/1r3PPP/R5K1 w - - 0 1",
+      "toMove": "white",
+      "themes": ["skewer", "endgame"],
+      "difficulty": 2,
+      "solutionMoves": ["Ra8+"],
+      "hints": ["A skewer forces a valuable piece to move and exposes a piece behind it"],
+      "successMessage": "Perfect! After the king moves, you win the rook!",
+      "failureMessage": "Look for a check that forces the king to abandon the rook."
+    },
+    {
+      "id": "puzzle_0002_004",
+      "title": "Mate in 2 - Queen Sacrifice",
+      "subtitle": "Find the brilliant combination",
+      "fen": "r1b1kb1r/pppp1ppp/8/4n3/2B1P2q/2N5/PPPP1PPP/R1BQK2R w KQkq - 0 7",
+      "toMove": "white",
+      "themes": ["checkmate", "queen-sacrifice"],
+      "difficulty": 4,
+      "solutionMoves": ["Qh5"],
+      "solutionSequence": [
+        {
+          "move": "Qh5",
+          "isUserMove": true,
+          "comment": "Threatening the knight and checkmate on f7"
+        },
+        {
+          "move": "Nxc4",
+          "isUserMove": false,
+          "comment": "Black tries to create counterplay"
+        },
+        {
+          "move": "Qxf7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ],
+      "hints": ["Control key squares", "Sometimes the best defense is a strong offense"],
+      "successMessage": "Brilliant! You found the forcing sequence!",
+      "failureMessage": "Look for moves that create multiple threats."
+    }
+  ]
+}

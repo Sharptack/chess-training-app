@@ -33,6 +33,9 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
   // Multi-move puzzle tracking
   int _currentStepIndex = 0;
   bool _isComputerMoving = false;
+  
+  // Track completed puzzles in this session
+  Set<String> _completedPuzzleIds = {};
 
   @override
   void initState() {
@@ -40,24 +43,62 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     _boardState = ChessBoardState();
   }
 
-  void _onPuzzleSetLoaded(PuzzleSet puzzleSet) {
-    print('DEBUG: PuzzlesPage received puzzle set with ${puzzleSet.puzzleCount} puzzles');
+  void _onPuzzleSetLoaded(PuzzleSet puzzleSet) async {
+    // print('DEBUG: PuzzlesPage received puzzle set with ${puzzleSet.puzzleCount} puzzles');
     setState(() {
       _puzzleSet = puzzleSet;
       _currentPuzzleIndex = 0;
-      _loadCurrentPuzzle();
     });
+    
+    // Load completed puzzles from progress storage
+    await _loadCompletedPuzzles();
+    
+    // Find first incomplete puzzle or start from beginning
+    _findNextIncompletePuzzle();
+    _loadCurrentPuzzle();
+  }
+  
+  Future<void> _loadCompletedPuzzles() async {
+    _completedPuzzleIds.clear();
+    if (_puzzleSet != null) {
+      for (final puzzle in _puzzleSet!.puzzles) {
+        final progressKey = '${widget.levelId}_${puzzle.id}';
+        final progressAsync = await ref.read(puzzleProgressProvider(progressKey).future);
+        // Fix: Use the correct property name from Progress model
+        // Progress likely has 'completed' or 'completedAt' instead of 'isCompleted'
+        if (progressAsync.completed) {  // Changed from isCompleted to completed
+          _completedPuzzleIds.add(puzzle.id);
+        }
+      }
+    }
+    // print('DEBUG: Loaded ${_completedPuzzleIds.length} completed puzzles');
+  }
+  
+  void _findNextIncompletePuzzle() {
+    if (_puzzleSet == null) return;
+    
+    for (int i = 0; i < _puzzleSet!.puzzleCount; i++) {
+      final puzzle = _puzzleSet!.getPuzzleAt(i);
+      if (puzzle != null && !_completedPuzzleIds.contains(puzzle.id)) {
+        _currentPuzzleIndex = i;
+        // print('DEBUG: Starting at puzzle index $i (first incomplete)');
+        return;
+      }
+    }
+    
+    // All puzzles completed, start at last puzzle
+    _currentPuzzleIndex = _puzzleSet!.puzzleCount - 1;
   }
 
   void _loadCurrentPuzzle() {
-    print('DEBUG: Loading puzzle at index $_currentPuzzleIndex');
+    // print('DEBUG: Loading puzzle at index $_currentPuzzleIndex');
     if (_puzzleSet != null && _currentPuzzleIndex < _puzzleSet!.puzzleCount) {
       final puzzle = _puzzleSet!.getPuzzleAt(_currentPuzzleIndex);
       if (puzzle != null) {
-        print('DEBUG: Loading puzzle: ${puzzle.title}');
+        // print('DEBUG: Loading puzzle: ${puzzle.title}');
         setState(() {
           _currentPuzzle = puzzle;
-          _puzzleSolved = false;
+          _puzzleSolved = _completedPuzzleIds.contains(puzzle.id);
           _showingFeedback = false;
           _loadPuzzlePosition(puzzle);
         });
@@ -195,6 +236,11 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
       _isSuccess = true;
       _feedbackMessage = _currentPuzzle?.successMessage ?? 'Correct!';
       _showingFeedback = true;
+      
+      // Add to completed set
+      if (_currentPuzzle != null) {
+        _completedPuzzleIds.add(_currentPuzzle!.id);
+      }
     });
 
     // Mark puzzle as completed in progress tracking
@@ -243,17 +289,24 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     });
   }
 
-  void _markPuzzleCompleted() {
+void _markPuzzleCompleted() {
     if (_currentPuzzle != null) {
+      // Add to completed set first
+      _completedPuzzleIds.add(_currentPuzzle!.id);
+      
       // Mark this specific puzzle as completed
       markPuzzleCompleted(ref, widget.levelId, _currentPuzzle!.id);
       
-      // Also mark overall puzzle progress for the level
-      final completedCount = _currentPuzzleIndex + 1;
-      final totalCount = _puzzleSet?.puzzleCount ?? 1;
+      // Check if ALL puzzles in the level are now completed
+      // Count actual completed puzzles, not just current index
+      final totalCompleted = _completedPuzzleIds.length;
+      final totalPuzzles = _puzzleSet?.puzzleCount ?? 0;
       
-      if (completedCount >= totalCount) {
+      print('DEBUG: Completed $totalCompleted of $totalPuzzles puzzles');
+      
+      if (totalCompleted >= totalPuzzles && totalPuzzles > 0) {
         // All puzzles in this level completed
+        print('DEBUG: Marking level ${widget.levelId} puzzles as complete');
         markLevelPuzzlesCompleted(ref, widget.levelId);
       }
     }
@@ -478,7 +531,6 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
               final screenWidth = constraints.maxWidth;
               
               // Estimate space needed for other widgets
-              const appBarHeight = kToolbarHeight;
               const progressBarHeight = 80.0; // Approximate
               const headerHeight = 100.0; // Approximate  
               const buttonHeight = 80.0; // Approximate

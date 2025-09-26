@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../data/models/progress.dart';
 import '../../../state/providers.dart';
 import '../../progress/widgets/progress_badge.dart';
 
@@ -33,6 +32,7 @@ class LevelPage extends ConsumerWidget {
                   return _LevelTile(
                     title: 'Lesson',
                     route: '/level/$levelId/lesson',
+                    progressType: _ProgressType.lesson,
                     levelId: levelId,
                     videoId: video.id, // 👈 dynamic!
                   );
@@ -43,6 +43,8 @@ class LevelPage extends ConsumerWidget {
           _LevelTile(
             title: 'Puzzles',
             route: '/level/$levelId/puzzles',
+            progressType: _ProgressType.puzzle,
+            levelId: levelId,
           ),
           _LevelTile(
             title: 'Play',
@@ -58,15 +60,19 @@ class LevelPage extends ConsumerWidget {
   }
 }
 
+enum _ProgressType { none, lesson, puzzle }
+
 class _LevelTile extends ConsumerWidget {
   final String title;
   final String route;
+  final _ProgressType progressType;
   final String? levelId;
   final String? videoId;
 
   const _LevelTile({
     required this.title,
     required this.route,
+    this.progressType = _ProgressType.none,
     this.levelId,
     this.videoId,
   });
@@ -75,9 +81,21 @@ class _LevelTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Widget badge = const SizedBox.shrink();
 
-    if (levelId != null && videoId != null) {
+    // Handle lesson progress
+    if (progressType == _ProgressType.lesson && levelId != null && videoId != null) {
       final progressKey = '${levelId!}_${videoId!}';
       final asyncProgress = ref.watch(lessonProgressProvider(progressKey));
+
+      badge = asyncProgress.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (progress) => ProgressBadge(progress: progress),
+      );
+    }
+    
+    // Handle puzzle progress
+    else if (progressType == _ProgressType.puzzle && levelId != null) {
+      final asyncProgress = ref.watch(levelPuzzleProgressProvider(levelId!));
 
       badge = asyncProgress.when(
         loading: () => const SizedBox.shrink(),

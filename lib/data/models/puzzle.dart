@@ -41,68 +41,45 @@ class Puzzle {
 
   /// Check if a move matches any of the solution moves (for single-move puzzles)
   bool isSolutionMove(String move) {
-    // Clean up the move string (remove special characters that might differ)
     final cleanMove = _cleanMoveNotation(move);
-    
-    print('DEBUG Puzzle.isSolutionMove: Checking move "$move" (cleaned: "$cleanMove")');
-    print('DEBUG Puzzle.isSolutionMove: Against solutions: $solutionMoves');
     
     // Check against each solution move
     for (final solution in solutionMoves) {
       final cleanSolution = _cleanMoveNotation(solution);
-      print('DEBUG Puzzle.isSolutionMove: Comparing "$cleanMove" with "$cleanSolution"');
       
-      // Check for exact match
-      if (cleanMove == cleanSolution) {
-        print('DEBUG Puzzle.isSolutionMove: MATCH FOUND!');
-        return true;
-      }
-      
-      // Also check if the move starts with the solution (for checkmate notation)
-      // e.g., "Re8" matches "Re8#"
-      if (cleanSolution.startsWith(cleanMove) || cleanMove.startsWith(cleanSolution)) {
-        print('DEBUG Puzzle.isSolutionMove: PARTIAL MATCH FOUND!');
+      // Check for exact match or partial match (for checkmate notation)
+      if (cleanMove == cleanSolution || 
+          cleanSolution.startsWith(cleanMove) || 
+          cleanMove.startsWith(cleanSolution)) {
         return true;
       }
     }
     
-    print('DEBUG Puzzle.isSolutionMove: No match found');
     return false;
   }
   
   /// Check if a move is correct for multi-move puzzle at given step
   bool isCorrectMoveAtStep(String move, int stepIndex) {
-    print('DEBUG Puzzle.isCorrectMoveAtStep: Checking move "$move" at step $stepIndex');
-    
     if (!isMultiMove) {
-      print('DEBUG: Not a multi-move puzzle, using single-move check');
       return isSolutionMove(move);
     }
     
     if (stepIndex >= solutionSequence!.length) {
-      print('DEBUG: Step index $stepIndex is out of bounds (sequence length: ${solutionSequence!.length})');
       return false;
     }
     
     final expectedStep = solutionSequence![stepIndex];
-    print('DEBUG: Expected at step $stepIndex: ${expectedStep.move} (isUserMove: ${expectedStep.isUserMove})');
     
     if (!expectedStep.isUserMove) {
-      print('DEBUG: This step is for computer, not user');
       return false;
     }
     
     final cleanMove = _cleanMoveNotation(move);
     final cleanExpected = _cleanMoveNotation(expectedStep.move);
     
-    print('DEBUG: Comparing cleaned moves: "$cleanMove" vs "$cleanExpected"');
-    
-    final matches = cleanMove == cleanExpected || 
+    return cleanMove == cleanExpected || 
            cleanExpected.startsWith(cleanMove) || 
            cleanMove.startsWith(cleanExpected);
-           
-    print('DEBUG: Match result: $matches');
-    return matches;
   }
   
   /// Get computer's response move at given step

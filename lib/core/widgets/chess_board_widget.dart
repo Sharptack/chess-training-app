@@ -327,11 +327,6 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
         moveNotation = '$from$to';
       }
       
-      // Debug output to see what format we're getting
-      print('DEBUG ChessBoardWidget: Move made from $from to $to');
-      print('DEBUG ChessBoardWidget: Move in SAN notation: $moveNotation');
-      print('DEBUG ChessBoardWidget: Move history: ${widget.boardState.moveHistory}');
-      
       // Call the callback with the SAN notation
       widget.onMoveMade?.call(moveNotation);
     } else {

@@ -1,28 +1,26 @@
 {
-  "id": "level_0001",
-  "title": "God’s Call to Moses",
-  "description": "Learn how God prepared Moses for leadership and the lessons of faith.",
+  "id": "level_0002",
+  "title": "Mixed Tactics",
+  "description": "Review fundamentals and learn new tactical patterns",
   "lesson": {
     "video": {
-      "id": "moses_intro",
-      "title": "Moses and the Burning Bush",
-      "url": "https://example.com/videos/moses_intro.mp4",
-      "thumbnail": "assets/ui/thumbs/level_0001.png"
+      "id": "lesson_0002",
+      "title": "Introduction to Pins and Skewers",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
     }
   },
   "puzzles": [
-    "puzzle_0001",
-    "puzzle_0002",
-    "puzzle_0003"
+    "puzzle_set_0002"
   ],
   "play": {
-    "botIds": ["bot_001", "bot_002"],
+    "botIds": ["bot_0002"],
     "gamesRequired": 3
   },
   "boss": {
-    "id": "pharaoh_boss",
-    "name": "Pharaoh’s Challenge",
-    "elo": 900,
-    "style": "defensive"
+    "id": "boss_0002",
+    "name": "Pin Master Paul",
+    "elo": 700,
+    "style": "positional"
   }
 }

@@ -80,17 +80,13 @@ final puzzleRepositoryProvider = Provider<PuzzleRepository>((ref) {
 
 /// Returns a puzzle set for a specific level
 final puzzleSetProvider = FutureProvider.family<PuzzleSet, String>((ref, String levelId) async {
-  print('DEBUG: puzzleSetProvider called with levelId: $levelId');
   final repo = ref.watch(puzzleRepositoryProvider);
-  print('DEBUG: Got repository, calling getPuzzleSetByLevelId');
   final result = await repo.getPuzzleSetByLevelId(levelId);
 
   if (result.isError) {
-    print('DEBUG: Repository returned error: ${result.failure}');
     throw Exception(result.failure.toString());
   }
 
-  print('DEBUG: Repository returned success, puzzle set loaded');
   return result.data!;
 });
 
