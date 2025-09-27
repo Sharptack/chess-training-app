@@ -157,7 +157,9 @@
 │   │   │   └── failure.dart
 │   │   ├── game_logic
 │   │   │   ├── chess_board_state.dart
-│   │   │   └── chess_notation.dart
+│   │   │   ├── chess_notation.dart
+│   │   │   ├── game_state.dart
+│   │   │   └── mock_bot.dart
 │   │   ├── theme
 │   │   │   └── app_theme.dart
 │   │   ├── utils
@@ -317,4 +319,4 @@
         ├── win32_window.cpp
         └── win32_window.h
 
-117 directories, 201 files
+117 directories, 203 files
