@@ -1,3 +1,4 @@
+// lib/core/utils/result.dart
 class Result<T> {
 final T? data;
 final Failure? failure;

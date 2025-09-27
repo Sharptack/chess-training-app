@@ -1,3 +1,4 @@
+// lib/core/errors/failure.dart
 import '../utils/result.dart';
 
 

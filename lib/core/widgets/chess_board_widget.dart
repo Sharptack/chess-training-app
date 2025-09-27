@@ -271,18 +271,18 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _onSquareTapped(String square) {
-    final currentSelected = widget.boardState.selectedSquare;
-    final highlightedSquares = widget.boardState.highlightedSquares;
-    
-    // If we have a piece selected and click on a highlighted square, make the move
-    if (currentSelected != null && highlightedSquares.contains(square)) {
-      // Make the move through our widget method to trigger callback
-      _attemptMove(currentSelected, square);
-    } else {
-      // Otherwise, just select the square
-      widget.boardState.selectSquare(square);
-    }
+  final currentSelected = widget.boardState.selectedSquare;
+  final highlightedSquares = widget.boardState.highlightedSquares;
+  
+  // If we have a piece selected and click on a highlighted square, make the move
+  if (currentSelected != null && highlightedSquares.contains(square)) {
+    // Make the move through our widget method to trigger callback
+    _attemptMove(currentSelected, square);
+  } else {
+    // Otherwise, just select the square
+    widget.boardState.selectSquare(square);
   }
+}
   
   void _onDragStarted(String square) {
     widget.boardState.selectSquare(square);
@@ -310,29 +310,34 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _attemptMove(String from, String to, {String? promotion}) {
-    // Store the move count before attempting the move
-    final moveCountBefore = widget.boardState.moveHistory.length;
-    
-    // Make the move using the chess package
-    final success = widget.boardState.makeMove(from, to, promotion: promotion);
-    
-    if (success) {
-      // Get the last move in SAN notation from move history
-      String moveNotation;
-      if (widget.boardState.moveHistory.length > moveCountBefore) {
-        // The chess package added a move to history, get it in SAN format
-        moveNotation = widget.boardState.moveHistory.last;
-      } else {
-        // Fallback to simple notation
-        moveNotation = '$from$to';
-      }
-      
-      // Call the callback with the SAN notation
-      widget.onMoveMade?.call(moveNotation);
+  print('DEBUG: _attemptMove called: $from -> $to'); // ADD THIS LINE
+  
+  // Store the move count before attempting the move
+  final moveCountBefore = widget.boardState.moveHistory.length;
+  
+  // Make the move using the chess package
+  final success = widget.boardState.makeMove(from, to, promotion: promotion);
+  
+  if (success) {
+    // Get the last move in SAN notation from move history
+    String moveNotation;
+    if (widget.boardState.moveHistory.length > moveCountBefore) {
+      // The chess package added a move to history, get it in SAN format
+      moveNotation = widget.boardState.moveHistory.last;
     } else {
-      widget.onIllegalMove?.call();
+      // Fallback to simple notation
+      moveNotation = '$from$to';
     }
+    
+    print('DEBUG: Move successful, calling callback: $moveNotation'); // ADD THIS LINE
+    
+    // Call the callback with the SAN notation
+    widget.onMoveMade?.call(moveNotation);
+  } else {
+    print('DEBUG: Move failed'); // ADD THIS LINE
+    widget.onIllegalMove?.call();
   }
+}
   
   void _showPromotionDialog(String from, String to) {
     showDialog<String>(

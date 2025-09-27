@@ -2,6 +2,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
+import '../core/game_logic/game_state.dart';
+import '../core/game_logic/chess_board_state.dart';
+import '../data/repositories/bot_repository.dart';
+import '../data/models/bot.dart';
+
 import '../data/repositories/progress_repository.dart';
 import '../data/models/progress.dart';
 import '../data/repositories/level_repository.dart';
@@ -140,3 +145,93 @@ final levelPuzzleProgressProvider = FutureProvider.family<Progress, String>(
     return repo.getLessonProgress('puzzles', levelId);
   },
 );
+
+// Bot repository provider
+final botRepositoryProvider = Provider<BotRepository>((ref) {
+  return BotRepository();
+});
+
+/// Get all available bots
+final botsProvider = FutureProvider<List<Bot>>((ref) async {
+  final repo = ref.watch(botRepositoryProvider);
+  final result = await repo.getAllBots();
+  
+  if (result.isError) {
+    throw Exception(result.failure.toString());
+  }
+  
+  return result.data!;
+});
+
+/// Get a specific bot by ID
+final botProvider = FutureProvider.family<Bot, String>((ref, String botId) async {
+  final repo = ref.watch(botRepositoryProvider);
+  final result = await repo.getBotById(botId);
+  
+  if (result.isError) {
+    throw Exception(result.failure.toString());
+  }
+  
+  return result.data!;
+});
+
+/// Chess board state provider - creates a new instance per game
+final chessBoardStateProvider = Provider.family<ChessBoardState, String>((ref, String gameId) {
+  final boardState = ChessBoardState();
+  ref.onDispose(() => boardState.dispose());
+  return boardState;
+});
+
+/// State notifier for managing game state
+final gameStateNotifierProvider = StateNotifierProvider.family<GameStateNotifier, GameState?, String>(
+  (ref, gameId) => GameStateNotifier(),
+);
+
+class GameStateNotifier extends StateNotifier<GameState?> {
+  GameStateNotifier() : super(null);
+  
+  void startGame({
+    required Bot bot,
+    required bool humanPlaysWhite,
+  }) {
+    // Clean up previous game
+    state?.dispose();
+    state?.removeListener(_onGameStateChanged);
+    
+    // Create new game
+    final boardState = ChessBoardState();
+    final gameState = GameState(
+      boardState: boardState,
+      botConfig: bot,
+      humanPlaysWhite: humanPlaysWhite,
+    );
+    
+    // Listen to GameState changes and trigger UI rebuilds
+    gameState.addListener(_onGameStateChanged);
+    
+    state = gameState;
+  }
+  
+  void _onGameStateChanged() {
+    print('DEBUG: GameStateNotifier._onGameStateChanged called');
+    // Force rebuild by creating a new reference
+    final currentState = state;
+    if (currentState != null) {
+      state = null;  // Clear first
+      state = currentState;  // Then reassign
+    }
+  }
+  
+  void endGame() {
+    state?.removeListener(_onGameStateChanged);
+    state?.dispose();
+    state = null;
+  }
+  
+  @override
+  void dispose() {
+    state?.removeListener(_onGameStateChanged);
+    state?.dispose();
+    super.dispose();
+  }
+}

@@ -6,12 +6,14 @@ class Bot extends Equatable {
   final String name;
   final int elo;
   final String style;
+  final List<String> weaknesses;
 
   const Bot({
     required this.id,
     required this.name,
     required this.elo,
     required this.style,
+    this.weaknesses = const [],
   });
 
   factory Bot.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,9 @@ class Bot extends Equatable {
       name: json['name'] as String,
       elo: json['elo'] as int,
       style: json['style'] as String,
+      weaknesses: json['weaknesses'] != null 
+          ? List<String>.from(json['weaknesses'] as List)
+          : [],
     );
   }
 
@@ -29,9 +34,19 @@ class Bot extends Equatable {
       'name': name,
       'elo': elo,
       'style': style,
+      'weaknesses': weaknesses,
     };
   }
 
+  /// Convert ELO to difficulty level (1-5)
+  int get difficultyLevel {
+    if (elo <= 400) return 1;
+    if (elo <= 600) return 2; 
+    if (elo <= 800) return 3;
+    if (elo <= 1000) return 4;
+    return 5;
+  }
+
   @override
-  List<Object?> get props => [id, name, elo, style];
+  List<Object?> get props => [id, name, elo, style, weaknesses];
 }
