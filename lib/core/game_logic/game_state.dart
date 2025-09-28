@@ -1,7 +1,6 @@
 // lib/core/game_logic/game_state.dart
 import 'package:flutter/foundation.dart';
 import 'chess_board_state.dart';
-import 'mock_bot.dart';
 import '../../data/models/bot.dart';
 import 'bot_factory.dart';
 
@@ -30,7 +29,7 @@ class GameState extends ChangeNotifier {
     required Bot botConfig,
     required bool humanPlaysWhite,
   }) : _boardState = boardState,
-       _bot = BotFactory.createBot(difficulty: botConfig.difficultyLevel), // Use factory
+       _bot = BotFactory.createBot(botConfig: botConfig),
        _botConfig = botConfig,
        _humanPlaysWhite = humanPlaysWhite {
     

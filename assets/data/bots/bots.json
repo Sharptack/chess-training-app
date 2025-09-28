@@ -1,16 +1,30 @@
 {
   "bot_001": {
     "id": "bot_001",
-    "name": "Beginner Bot",
+    "name": "Clumsy Carl",
     "elo": 400,
-    "style": "aggressive",
-    "weaknesses": ["tactics", "openings"]
+    "style": "random",
+    "engineSettings": {
+      "skillLevel": 0,
+      "moveTime": 50,
+      "limitStrength": true,
+      "uciElo": 600,
+      "randomBlunderChance": 0.2
+    },
+    "weaknesses": ["hangs_pieces", "no_planning"]
   },
   "bot_002": {
     "id": "bot_002",
-    "name": "Intermediate Bot",
+    "name": "Careful Casey",
     "elo": 600,
     "style": "defensive",
-    "weaknesses": ["endgames"]
+    "engineSettings": {
+      "skillLevel": 3,
+      "moveTime": 200,
+      "limitStrength": true,
+      "uciElo": 800,
+      "contempt": -30
+    },
+    "weaknesses": ["too_passive"]
   }
 }

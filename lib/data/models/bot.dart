@@ -7,6 +7,8 @@ class Bot extends Equatable {
   final int elo;
   final String style;
   final List<String> weaknesses;
+  final Map<String, dynamic>? engineSettings;
+
 
   const Bot({
     required this.id,
@@ -14,6 +16,7 @@ class Bot extends Equatable {
     required this.elo,
     required this.style,
     this.weaknesses = const [],
+    this.engineSettings,
   });
 
   factory Bot.fromJson(Map<String, dynamic> json) {
@@ -25,6 +28,7 @@ class Bot extends Equatable {
       weaknesses: json['weaknesses'] != null 
           ? List<String>.from(json['weaknesses'] as List)
           : [],
+          engineSettings: json['engineSettings'] as Map<String, dynamic>?,
     );
   }
 
@@ -35,6 +39,7 @@ class Bot extends Equatable {
       'elo': elo,
       'style': style,
       'weaknesses': weaknesses,
+      'engineSettings': engineSettings,
     };
   }
 
@@ -48,5 +53,5 @@ class Bot extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, elo, style, weaknesses];
+  List<Object?> get props => [id, name, elo, style, weaknesses, engineSettings];
 }

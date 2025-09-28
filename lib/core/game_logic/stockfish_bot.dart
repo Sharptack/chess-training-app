@@ -1,16 +1,18 @@
 // lib/core/game_logic/stockfish_bot.dart
 import 'dart:async';
+import 'dart:math';
 import 'package:stockfish/stockfish.dart';
 import 'chess_board_state.dart';
+import '../../data/models/bot.dart';
 
 class StockfishBot {
-  final int difficulty;
+  final Bot botConfig;
   late Stockfish _stockfish;
   Completer<String?>? _currentMoveCompleter;
   StreamSubscription? _outputSubscription;
+  final Random _random = Random();
   
-  StockfishBot({required this.difficulty}) {
-    assert(difficulty >= 1 && difficulty <= 5, 'Difficulty must be 1-5');
+  StockfishBot({required this.botConfig}) {
     _initializeStockfish();
   }
   
@@ -24,15 +26,40 @@ class StockfishBot {
     
     // Send UCI initialization
     _stockfish.stdin = 'uci';
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 200));
     
-    // Configure skill level
-    final skillLevel = _getSkillLevel();
+    // Get settings from JSON or use defaults
+    final settings = botConfig.engineSettings ?? {};
+    
+    // Apply skill level
+    final skillLevel = settings['skillLevel'] ?? _getDefaultSkillLevel();
     _stockfish.stdin = 'setoption name Skill Level value $skillLevel';
+    
+    // Apply ELO limiting if specified
+    if (settings['limitStrength'] == true) {
+      _stockfish.stdin = 'setoption name UCI_LimitStrength value true';
+      final uciElo = settings['uciElo'] ?? botConfig.elo;
+      _stockfish.stdin = 'setoption name UCI_Elo value $uciElo';
+    }
+    
+    // Apply contempt if specified (affects playing style)
+    if (settings['contempt'] != null) {
+      _stockfish.stdin = 'setoption name Contempt value ${settings['contempt']}';
+    }
+    
+    // Apply other settings for weaker play
+    if (botConfig.elo <= 600) {
+      _stockfish.stdin = 'setoption name MultiPV value 1';
+      _stockfish.stdin = 'setoption name Threads value 1';
+      _stockfish.stdin = 'setoption name Hash value 1';
+    }
     
     // Listen to output
     _outputSubscription = _stockfish.stdout.listen((line) {
-      print('Stockfish: $line'); // Debug output
+      // Only log important messages to reduce console spam
+      if (line.startsWith('bestmove') || line.contains('error')) {
+        print('Stockfish: $line');
+      }
       _handleStockfishOutput(line);
     });
     
@@ -42,12 +69,24 @@ class StockfishBot {
   }
   
   Future<String?> getNextMove(ChessBoardState boardState) async {
-    print('DEBUG: Getting move for position: ${boardState.fen}');
+    print('DEBUG: ${botConfig.name} thinking...');
     
     // Ensure ready
     if (_stockfish.state.value != StockfishState.ready) {
       print('WARNING: Stockfish not ready, reinitializing...');
       await _initializeStockfish();
+    }
+    
+    // Check for random blunder (for weak bots)
+    final settings = botConfig.engineSettings ?? {};
+    final blunderChance = settings['randomBlunderChance'] ?? 0.0;
+    if (blunderChance > 0 && _random.nextDouble() < blunderChance) {
+      print('DEBUG: ${botConfig.name} makes a random move!');
+      final allLegalMoves = boardState.getLegalMoves();
+      if (allLegalMoves.isNotEmpty) {
+        await Future.delayed(Duration(milliseconds: _getMoveTime())); // Simulate thinking
+        return allLegalMoves[_random.nextInt(allLegalMoves.length)];
+      }
     }
     
     // Cancel pending requests
@@ -57,8 +96,7 @@ class StockfishBot {
     
     _currentMoveCompleter = Completer<String?>();
     
-    // CRITICAL: Always start fresh from initial position
-    // This prevents position confusion
+    // Start fresh position
     _stockfish.stdin = 'ucinewgame';
     await Future.delayed(const Duration(milliseconds: 50));
     
@@ -77,15 +115,13 @@ class StockfishBot {
         Duration(milliseconds: moveTime + 2000),
         onTimeout: () {
           print('ERROR: Stockfish timeout!');
-          _stockfish.stdin = 'stop'; // Force stop
+          _stockfish.stdin = 'stop';
           return null;
         },
       );
       
       if (move != null) {
-        print('DEBUG: Got UCI move: $move');
-        // For now, just return the UCI move directly
-        // The chess package can handle UCI format
+        print('DEBUG: ${botConfig.name} plays: $move');
         return move;
       }
     } catch (e) {
@@ -107,25 +143,35 @@ class StockfishBot {
     }
   }
   
-  int _getSkillLevel() {
+  // Fallback skill level based on ELO
+  int _getDefaultSkillLevel() {
+    final difficulty = botConfig.difficultyLevel;
     switch (difficulty) {
-      case 1: return 1;
-      case 2: return 5;
-      case 3: return 10;
-      case 4: return 15;
-      case 5: return 20;
-      default: return 10;
+      case 1: return 0;   // Weakest
+      case 2: return 3;
+      case 3: return 6;
+      case 4: return 10;
+      case 5: return 15;
+      default: return 8;
     }
   }
   
+  // Get move time from settings or calculate from difficulty
   int _getMoveTime() {
+    final settings = botConfig.engineSettings ?? {};
+    if (settings['moveTime'] != null) {
+      return settings['moveTime'] as int;
+    }
+    
+    // Fallback based on difficulty
+    final difficulty = botConfig.difficultyLevel;
     switch (difficulty) {
-      case 1: return 100;
-      case 2: return 300;
-      case 3: return 500;
-      case 4: return 1000;
-      case 5: return 1500;
-      default: return 500;
+      case 1: return 50;
+      case 2: return 100;
+      case 3: return 300;
+      case 4: return 500;
+      case 5: return 1000;
+      default: return 300;
     }
   }
   

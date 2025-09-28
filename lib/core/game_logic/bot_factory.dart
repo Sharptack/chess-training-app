@@ -2,17 +2,18 @@
 import 'mock_bot.dart';
 import 'stockfish_bot.dart';
 import 'chess_board_state.dart';
+import '../../data/models/bot.dart';
 
 /// Factory for creating chess bots
 class BotFactory {
   static const bool USE_STOCKFISH = true; // Toggle this for testing
   
   /// Create a bot with the specified difficulty (1-5)
-  static ChessBot createBot({required int difficulty}) {
+  static ChessBot createBot({required Bot botConfig}) {
     if (USE_STOCKFISH) {
-      return StockfishBotAdapter(difficulty: difficulty);
+      return StockfishBotAdapter(botConfig: botConfig);
     } else {
-      return MockBotAdapter(difficulty: difficulty);
+      return MockBotAdapter(difficulty: botConfig.difficultyLevel);
     }
   }
 }
@@ -27,8 +28,8 @@ abstract class ChessBot {
 class StockfishBotAdapter implements ChessBot {
   final StockfishBot _bot;
   
-  StockfishBotAdapter({required int difficulty}) 
-    : _bot = StockfishBot(difficulty: difficulty);
+  StockfishBotAdapter({required Bot botConfig}) 
+    : _bot = StockfishBot(botConfig: botConfig);
   
   @override
   Future<String?> getNextMove(ChessBoardState boardState) {
