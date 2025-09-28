@@ -172,6 +172,17 @@ class ChessBoardState extends ChangeNotifier {
     
     return success;
   }
+
+  /// Make a move using UCI notation (e.g., "e2e4")
+  bool makeUciMove(String uciMove) {
+    if (uciMove.length < 4) return false;
+    
+    final from = uciMove.substring(0, 2);
+    final to = uciMove.substring(2, 4);
+    final promotion = uciMove.length > 4 ? uciMove.substring(4, 5) : null;
+    
+    return makeMove(from, to, promotion: promotion);
+  }
   
   /// Make a move using SAN notation
   bool makeSanMove(String san) {

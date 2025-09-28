@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'chess_board_state.dart';
 import 'mock_bot.dart';
 import '../../data/models/bot.dart';
+import 'bot_factory.dart';
 
 enum GameStatus {
   waitingForHuman,
@@ -16,7 +17,7 @@ enum GameStatus {
 /// Manages a human vs bot chess game
 class GameState extends ChangeNotifier {
   final ChessBoardState _boardState;
-  final MockBot _bot;
+  final ChessBot _bot;
   final Bot _botConfig;
   final bool _humanPlaysWhite;
   
@@ -29,7 +30,7 @@ class GameState extends ChangeNotifier {
     required Bot botConfig,
     required bool humanPlaysWhite,
   }) : _boardState = boardState,
-       _bot = MockBot(difficulty: botConfig.difficultyLevel),
+       _bot = BotFactory.createBot(difficulty: botConfig.difficultyLevel), // Use factory
        _botConfig = botConfig,
        _humanPlaysWhite = humanPlaysWhite {
     
@@ -42,6 +43,7 @@ class GameState extends ChangeNotifier {
   
   @override
   void dispose() {
+    _bot.dispose(); // Properly dispose of bot
     _boardState.removeListener(_onBoardStateChanged);
     super.dispose();
   }
@@ -143,9 +145,13 @@ void onHumanMove(String moveNotation) {
     return;
   }
   
-  // Make the bot's move
-  final success = _boardState.makeSanMove(botMove);
-  print('DEBUG: Bot move success: $success');
+  // Make the bot's move - try SAN first, then UCI
+bool success = _boardState.makeSanMove(botMove);
+if (!success && botMove.length >= 4) {
+  // Try as UCI move
+  success = _boardState.makeUciMove(botMove);
+}
+print('DEBUG: Bot move success: $success');
   
   if (success) {
     // Record bot move

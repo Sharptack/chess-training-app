@@ -20,6 +20,8 @@ dependencies:
   chewie: ^1.8.1
   chess: ^0.8.1
   flutter_svg: ^2.0.9
+  stockfish: ^1.7.0
+
 
 
 dev_dependencies:
