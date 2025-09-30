@@ -25,8 +25,6 @@ class _PlayPageState extends ConsumerState<PlayPage> {
 
     // Listen for game completion
     ref.listen(gameStateNotifierProvider(widget.levelId), (previous, current) {
-      print('DEBUG: Game state changed from ${previous?.status} to ${current?.status}');
-
       // Track the last known status, handling null transitions
       GameStatus? previousStatus = previous?.status ?? _lastKnownStatus;
 
@@ -37,10 +35,7 @@ class _PlayPageState extends ConsumerState<PlayPage> {
                          current.status == GameStatus.botWin ||
                          current.status == GameStatus.draw;
 
-        print('DEBUG: Previous status: $previousStatus, Was playing: $wasPlaying, Game ended: $gameEnded, Completed normally: ${current.gameCompletedNormally}');
-
         if (wasPlaying && gameEnded && current.gameCompletedNormally && !_hasRecordedCompletion) {
-          print('DEBUG: Calling _handleGameComplete');
           _hasRecordedCompletion = true;
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -155,48 +150,30 @@ class _PlayPageState extends ConsumerState<PlayPage> {
   }
   
   void _handleGameComplete(GameState gameState) async {
-  print('DEBUG: Game complete - recording...');
-  print('DEBUG: Level: ${widget.levelId}, Bot: ${gameState.botConfig.id}');
-  
-  // Record the game
-  final levelResult = await ref.read(levelRepositoryProvider)
-    .getLevelById(widget.levelId);
-  
-  if (levelResult.isSuccess) {
-    final level = levelResult.data!;
-    print('DEBUG: Required games: ${level.requiredGames}');
-    
-    // Check progress BEFORE recording
-    final progressBefore = await ref.read(
-      botProgressProvider('${widget.levelId}_${gameState.botConfig.id}').future
-    );
-    print('DEBUG: Games BEFORE: ${progressBefore.gamesPlayed}/${progressBefore.gamesRequired}');
-    
-    await recordBotGameCompleted(
-      ref,
-      widget.levelId,
-      gameState.botConfig.id,
-      gameState.humanWon,
-      level.requiredGames,
-    );
-    
-    // Check progress AFTER recording
-    final progressAfter = await ref.read(
-      botProgressProvider('${widget.levelId}_${gameState.botConfig.id}').future
-    );
-    print('DEBUG: Games AFTER: ${progressAfter.gamesPlayed}/${progressAfter.gamesRequired}');
-    
-    // Force EVERYTHING to refresh
-    ref.invalidate(botProgressProvider);
-    ref.invalidate(botsProvider);
-    
-    if (mounted) {
-      setState(() {}); // Force local rebuild
+    // Record the game
+    final levelResult = await ref.read(levelRepositoryProvider)
+      .getLevelById(widget.levelId);
+
+    if (levelResult.isSuccess) {
+      final level = levelResult.data!;
+
+      await recordBotGameCompleted(
+        ref,
+        widget.levelId,
+        gameState.botConfig.id,
+        gameState.humanWon,
+        level.requiredGames,
+      );
+
+      // Force refresh
+      ref.invalidate(botProgressProvider);
+      ref.invalidate(botsProvider);
+
+      if (mounted) {
+        setState(() {});
+      }
     }
-  } else {
-    print('ERROR: Failed to load level: ${levelResult.failure}');
   }
-}
   
   void _showGameOverOptions(GameState gameState) {
     showModalBottomSheet(

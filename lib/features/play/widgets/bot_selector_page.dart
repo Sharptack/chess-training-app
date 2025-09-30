@@ -109,13 +109,12 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
     );
   }
   
- Widget _buildBotCard(Bot bot) {
-  return Consumer(
-    builder: (context, ref, child) {
-      return ref.watch(botProgressProvider('${widget.levelId}_${bot.id}')).when(
-        data: (progress) {
-          print('DEBUG: Bot ${bot.name} - Games: ${progress.gamesPlayed}');
-          return Card(
+  Widget _buildBotCard(Bot bot) {
+    return Consumer(
+      builder: (context, ref, child) {
+        return ref.watch(botProgressProvider('${widget.levelId}_${bot.id}')).when(
+          data: (progress) {
+            return Card(
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: _getDifficultyColor(bot.difficultyLevel),

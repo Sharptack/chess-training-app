@@ -34,8 +34,7 @@ class StockfishBot {
     // Apply skill level (clamp to valid range -20 to +20)
     final skillLevel = (settings['skillLevel'] ?? _getDefaultSkillLevel()).clamp(-20, 20);
     _stockfish.stdin = 'setoption name Skill Level value $skillLevel';
-    print('DEBUG: ${botConfig.name} using Skill Level = $skillLevel (ELO: ${botConfig.elo})');
-    
+
     // Apply ELO limiting if specified (only for bots >= 1320 ELO)
     if (settings['limitStrength'] == true) {
       final uciElo = settings['uciElo'] ?? botConfig.elo;
@@ -43,9 +42,6 @@ class StockfishBot {
       if (uciElo >= 1320) {
         _stockfish.stdin = 'setoption name UCI_LimitStrength value true';
         _stockfish.stdin = 'setoption name UCI_Elo value $uciElo';
-        print('DEBUG: Using UCI_Elo = $uciElo');
-      } else {
-        print('DEBUG: Ignoring UCI_Elo $uciElo (below minimum 1320), using skill level instead');
       }
     }
     
@@ -76,66 +72,56 @@ class StockfishBot {
   }
   
   Future<String?> getNextMove(ChessBoardState boardState) async {
-    print('DEBUG: ${botConfig.name} thinking...');
-    
     // Ensure ready
     if (_stockfish.state.value != StockfishState.ready) {
-      print('WARNING: Stockfish not ready, reinitializing...');
       await _initializeStockfish();
     }
-    
+
     // Check for random blunder (for weak bots)
     final settings = botConfig.engineSettings ?? {};
     final blunderChance = settings['randomBlunderChance'] ?? 0.0;
     if (blunderChance > 0 && _random.nextDouble() < blunderChance) {
-      print('DEBUG: ${botConfig.name} makes a random move!');
       final allLegalMoves = boardState.getLegalMoves();
       if (allLegalMoves.isNotEmpty) {
-        await Future.delayed(Duration(milliseconds: _getMoveTime())); // Simulate thinking
+        await Future.delayed(Duration(milliseconds: _getMoveTime()));
         return allLegalMoves[_random.nextInt(allLegalMoves.length)];
       }
     }
-    
+
     // Cancel pending requests
     if (_currentMoveCompleter != null && !_currentMoveCompleter!.isCompleted) {
       _currentMoveCompleter!.complete(null);
     }
-    
+
     _currentMoveCompleter = Completer<String?>();
-    
+
     // Start fresh position
     _stockfish.stdin = 'ucinewgame';
     await Future.delayed(const Duration(milliseconds: 50));
-    
+
     // Send current position
     final fen = boardState.fen;
     _stockfish.stdin = 'position fen $fen';
     await Future.delayed(const Duration(milliseconds: 50));
-    
+
     // Request move
     final moveTime = _getMoveTime();
     _stockfish.stdin = 'go movetime $moveTime';
-    
+
     // Wait with timeout
     try {
       final move = await _currentMoveCompleter!.future.timeout(
         Duration(milliseconds: moveTime + 2000),
         onTimeout: () {
-          print('ERROR: Stockfish timeout!');
           _stockfish.stdin = 'stop';
           return null;
         },
       );
-      
-      if (move != null) {
-        print('DEBUG: ${botConfig.name} plays: $move');
-        return move;
-      }
+
+      return move;
     } catch (e) {
-      print('ERROR in getNextMove: $e');
+      return null;
     }
-    
-    return null;
   }
   
   void _handleStockfishOutput(String line) {

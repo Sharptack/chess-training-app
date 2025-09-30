@@ -8,8 +8,6 @@ import '../features/lesson/pages/lesson_page.dart';
 import '../features/puzzles/pages/puzzles_page.dart';
 import '../features/play/pages/play_page.dart';
 import '../features/boss/pages/boss_page.dart';
-import '../features/test/chessboard_test_page.dart';
-import '../features/test/chess_package_test.dart';
 
 class Routes {
   static const home = '/';
@@ -81,17 +79,6 @@ class AppRouter {
             ],
           ),
         ],
-      ),
-      // Add this route alongside your existing test route
-      GoRoute(
-        path: '/test-chess-package',
-        name: 'test-chess-package',
-        builder: (context, state) => const ChessPackageTestPage(),
-      ),
-      // In lib/router/app_router.dart, add:
-      GoRoute(
-        path: '/chessboard-test',
-        builder: (context, state) => const ChessboardTestPage(),
       ),
     ],
   );
