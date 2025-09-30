@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../state/providers.dart';
+import '../../../core/widgets/locked_badge.dart';
 import '../../progress/widgets/progress_badge.dart';
 
 class LevelPage extends ConsumerWidget {
@@ -55,6 +56,8 @@ class LevelPage extends ConsumerWidget {
           _LevelTile(
             title: 'Boss',
             route: '/level/$levelId/boss',
+            progressType: _ProgressType.boss,
+            levelId: levelId,
           ),
         ],
       ),
@@ -62,7 +65,7 @@ class LevelPage extends ConsumerWidget {
   }
 }
 
-enum _ProgressType { none, lesson, puzzle, play }
+enum _ProgressType { none, lesson, puzzle, play, boss }
 
 class _LevelTile extends ConsumerWidget {
   final String title;
@@ -82,6 +85,7 @@ class _LevelTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Widget badge = const SizedBox.shrink();
+    Widget? lockOverlay;
 
     // Handle lesson progress
     if (progressType == _ProgressType.lesson && levelId != null && videoId != null) {
@@ -94,7 +98,7 @@ class _LevelTile extends ConsumerWidget {
         data: (progress) => ProgressBadge(progress: progress),
       );
     }
-    
+
     // Handle puzzle progress
     else if (progressType == _ProgressType.puzzle && levelId != null) {
       final asyncProgress = ref.watch(levelPuzzleProgressProvider(levelId!));
@@ -117,6 +121,79 @@ class _LevelTile extends ConsumerWidget {
       );
     }
 
+    // Handle boss unlock and progress
+    else if (progressType == _ProgressType.boss && levelId != null) {
+      final unlockRequirementsAsync = ref.watch(bossUnlockRequirementsProvider(levelId!));
+      final bossProgressAsync = ref.watch(bossProgressProvider(levelId!));
+
+      return unlockRequirementsAsync.when(
+        loading: () => _buildTileContainer(context, null),
+        error: (_, __) => _buildTileContainer(context, null),
+        data: (requirements) {
+          if (requirements.isUnlocked) {
+            // Boss is unlocked, show progress badge
+            badge = bossProgressAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (progress) => ProgressBadge(progress: progress),
+            );
+            return _buildTileContainer(context, badge);
+          } else {
+            // Boss is locked, show requirements overlay
+            lockOverlay = LockedBadge(
+              locked: true,
+              message: 'Complete requirements to unlock',
+              requirements: [
+                RequirementItem(
+                  label: 'Lesson',
+                  status: requirements.lessonStatus,
+                  completed: requirements.lessonComplete,
+                ),
+                RequirementItem(
+                  label: 'Puzzles',
+                  status: requirements.puzzleStatus,
+                  completed: requirements.puzzlesComplete,
+                ),
+                RequirementItem(
+                  label: 'Play',
+                  status: requirements.playStatus,
+                  completed: requirements.playComplete,
+                ),
+              ],
+            );
+            return GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Complete all requirements to unlock the boss!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Center(
+                      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+                    ),
+                  ),
+                  lockOverlay!,
+                ],
+              ),
+            );
+          }
+        },
+      );
+    }
+
+    return _buildTileContainer(context, badge);
+  }
+
+  Widget _buildTileContainer(BuildContext context, Widget? badge) {
     return GestureDetector(
       onTap: () => context.push(route),
       child: Stack(
@@ -130,7 +207,7 @@ class _LevelTile extends ConsumerWidget {
               child: Text(title, style: Theme.of(context).textTheme.titleLarge),
             ),
           ),
-          Positioned(top: 8, right: 8, child: badge),
+          if (badge != null) Positioned(top: 8, right: 8, child: badge),
         ],
       ),
     );

@@ -1,14 +1,288 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/chess_board_widget.dart';
+import '../../../core/game_logic/game_state.dart';
+import '../../../data/models/bot.dart';
+import '../../../state/providers.dart';
 
-class BossPage extends StatelessWidget {
+class BossPage extends ConsumerStatefulWidget {
   final String levelId;
   const BossPage({super.key, required this.levelId});
 
   @override
+  ConsumerState<BossPage> createState() => _BossPageState();
+}
+
+class _BossPageState extends ConsumerState<BossPage> {
+  bool _hasRecordedCompletion = false;
+  GameStatus? _lastKnownStatus;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Boss - Level $levelId')),
-      body: const Center(child: Text('Boss battle coming soon')),
+    // Watch the game state and listen for changes
+    final gameState = ref.watch(gameStateNotifierProvider('boss_${widget.levelId}'));
+
+    // Listen for game completion
+    ref.listen(gameStateNotifierProvider('boss_${widget.levelId}'), (previous, current) {
+      GameStatus? previousStatus = previous?.status ?? _lastKnownStatus;
+
+      if (current != null) {
+        final wasPlaying = previousStatus == GameStatus.waitingForHuman ||
+                          previousStatus == GameStatus.waitingForBot;
+        final gameEnded = current.status == GameStatus.humanWin ||
+                         current.status == GameStatus.botWin ||
+                         current.status == GameStatus.draw;
+
+        if (wasPlaying && gameEnded && current.gameCompletedNormally && !_hasRecordedCompletion) {
+          _hasRecordedCompletion = true;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _handleGameComplete(current);
+          });
+        }
+
+        _lastKnownStatus = current.status;
+      }
+    });
+
+    // Load level data
+    final levelAsync = ref.watch(levelRepositoryProvider).getLevelById(widget.levelId);
+
+    return FutureBuilder(
+      future: levelAsync,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.isError) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Boss Battle')),
+            body: const Center(child: Text('Error loading boss')),
+          );
+        }
+
+        final level = snapshot.data!.data!;
+        final boss = level.boss;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Boss: ${boss.name}'),
+            actions: gameState != null ? [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Center(
+                  child: Text(
+                    '${boss.elo} ELO',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+            ] : null,
+          ),
+          body: gameState == null
+            ? _buildBossIntro(boss)
+            : _buildGame(gameState, boss),
+        );
+      },
     );
+  }
+
+  Widget _buildBossIntro(boss) {
+    _hasRecordedCompletion = false;
+    _lastKnownStatus = null;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.shield,
+              size: 120,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              boss.name,
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${boss.elo} ELO • ${boss.style.toUpperCase()}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Defeat the boss to complete this level!',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 48),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _startBossBattle(boss, true),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Play as White'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: () => _startBossBattle(boss, false),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Play as Black'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _startBossBattle(boss, bool humanPlaysWhite) {
+    // Convert Boss to Bot for game state
+    final bossAsBot = Bot(
+      id: boss.id,
+      name: boss.name,
+      elo: boss.elo,
+      style: boss.style,
+      engineSettings: boss.engineSettings,
+      weaknesses: [],
+    );
+
+    ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier)
+      .startGame(bot: bossAsBot, humanPlaysWhite: humanPlaysWhite);
+  }
+
+  Widget _buildGame(GameState gameState, boss) {
+    final isGameOver = gameState.status == GameStatus.humanWin ||
+                      gameState.status == GameStatus.botWin ||
+                      gameState.status == GameStatus.draw;
+
+    return Column(
+      children: [
+        // Status bar
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: Theme.of(context).colorScheme.surfaceVariant,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(_getStatusText(gameState)),
+              if (isGameOver)
+                ElevatedButton(
+                  onPressed: () => _showGameOverOptions(gameState),
+                  child: const Text('Next'),
+                ),
+            ],
+          ),
+        ),
+
+        // Chess board
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final size = (constraints.maxWidth < constraints.maxHeight
+                    ? constraints.maxWidth
+                    : constraints.maxHeight) - 32;
+
+                  return ChessBoardWidget(
+                    boardState: gameState.boardState,
+                    size: size,
+                    onMoveMade: gameState.onHumanMove,
+                    onIllegalMove: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Illegal move!'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getStatusText(GameState gameState) {
+    switch (gameState.status) {
+      case GameStatus.waitingForHuman:
+        return 'Your turn';
+      case GameStatus.waitingForBot:
+        return '${gameState.botConfig.name} is thinking...';
+      case GameStatus.humanWin:
+        return '🎉 Victory! You defeated the boss!';
+      case GameStatus.botWin:
+        return '${gameState.botConfig.name} wins. Try again!';
+      case GameStatus.draw:
+        return 'Draw! Try again to defeat the boss.';
+      default:
+        return '';
+    }
+  }
+
+  void _showGameOverOptions(GameState gameState) {
+    final won = gameState.status == GameStatus.humanWin;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(won ? '🎉 Boss Defeated!' : 'Game Over'),
+        content: Text(
+          won
+            ? 'Congratulations! You have completed this level.'
+            : 'Keep trying! You can defeat this boss.',
+        ),
+        actions: [
+          if (!won)
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _restartBattle();
+              },
+              child: const Text('Try Again'),
+            ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Go back to level page
+            },
+            child: Text(won ? 'Continue' : 'Back to Level'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _restartBattle() {
+    _hasRecordedCompletion = false;
+    _lastKnownStatus = null;
+    ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier).endGame();
+  }
+
+  Future<void> _handleGameComplete(GameState gameState) async {
+    final won = gameState.status == GameStatus.humanWin;
+
+    print('DEBUG: Boss game completed. Won: $won');
+
+    if (won) {
+      // Mark boss as complete
+      await markBossCompleted(ref, widget.levelId);
+      print('DEBUG: Boss marked as completed for level ${widget.levelId}');
+    }
   }
 }

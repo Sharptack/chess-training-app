@@ -21,8 +21,14 @@
   },
   "boss": {
     "id": "pharaoh_boss",
-    "name": "Pharaoh’s Challenge",
+    "name": "Pharaoh's Challenge",
     "elo": 900,
-    "style": "defensive"
+    "style": "defensive",
+    "engineSettings": {
+      "skillLevel": 5,
+      "moveTime": 200,
+      "limitStrength": false,
+      "randomBlunderChance": 0.15
+    }
   }
 }

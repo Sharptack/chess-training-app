@@ -4,12 +4,14 @@ class Boss {
   final String name;
   final int elo;
   final String style;
+  final Map<String, dynamic>? engineSettings;
 
   Boss({
     required this.id,
     required this.name,
     required this.elo,
     required this.style,
+    this.engineSettings,
   });
 
   factory Boss.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class Boss {
       name: json['name'] as String,
       elo: json['elo'] as int,
       style: json['style'] as String,
+      engineSettings: json['engineSettings'] as Map<String, dynamic>?,
     );
   }
 }

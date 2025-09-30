@@ -77,6 +77,7 @@ Future<void> markLessonCompleted(WidgetRef ref, String levelId, String videoId) 
   final repo = ref.read(progressRepositoryProvider);
   await repo.markLessonCompleted(levelId, videoId);
   ref.invalidate(lessonProgressProvider('${levelId}_$videoId'));
+  ref.invalidate(bossUnlockRequirementsProvider(levelId));
 }
 
 // PuzzleRepository provider
@@ -121,6 +122,8 @@ Future<void> markLevelPuzzlesCompleted(WidgetRef ref, String levelId) async {
   final repo = ref.read(progressRepositoryProvider);
   await repo.markLessonCompleted('puzzles', levelId);
   ref.invalidate(lessonProgressProvider('puzzles_$levelId'));
+  ref.invalidate(levelPuzzleProgressProvider(levelId));
+  ref.invalidate(bossUnlockRequirementsProvider(levelId));
 }
 
 /// Get puzzle progress for a specific puzzle
@@ -262,6 +265,7 @@ Future<void> recordBotGameCompleted(
   await repo.recordBotGame(levelId, botId, won, requiredGames);
   ref.invalidate(botProgressProvider('${levelId}_$botId'));
   ref.invalidate(playProgressProvider(levelId));
+  ref.invalidate(bossUnlockRequirementsProvider(levelId));
 }
 
 /// Get overall play progress for a level (checks if all bots have completed required games)
@@ -311,3 +315,104 @@ final playProgressProvider = FutureProvider.family<Progress, String>(
     );
   },
 );
+
+/// Model for boss unlock requirements status
+class BossUnlockRequirements {
+  final bool lessonComplete;
+  final bool puzzlesComplete;
+  final bool playComplete;
+  final bool isUnlocked;
+  final String lessonStatus;
+  final String puzzleStatus;
+  final String playStatus;
+
+  BossUnlockRequirements({
+    required this.lessonComplete,
+    required this.puzzlesComplete,
+    required this.playComplete,
+    required this.lessonStatus,
+    required this.puzzleStatus,
+    required this.playStatus,
+  }) : isUnlocked = lessonComplete && puzzlesComplete && playComplete;
+}
+
+/// Check if boss is unlocked for a level
+final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequirements, String>(
+  (ref, String levelId) async {
+    // Get level to know requirements
+    final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
+
+    if (levelResult.isError) {
+      return BossUnlockRequirements(
+        lessonComplete: false,
+        puzzlesComplete: false,
+        playComplete: false,
+        lessonStatus: 'Error loading level',
+        puzzleStatus: 'Error loading level',
+        playStatus: 'Error loading level',
+      );
+    }
+
+    final level = levelResult.data!;
+    final progressRepo = ref.watch(progressRepositoryProvider);
+
+    // Check lesson progress
+    final lessonProgress = await progressRepo.getLessonProgress(levelId, level.lessonVideo.id);
+    final lessonComplete = lessonProgress.completed;
+    final lessonStatus = lessonComplete ? 'Complete' : 'Not started';
+
+    // Check puzzle progress
+    final puzzleProgress = await progressRepo.getLessonProgress('puzzles', levelId);
+    final puzzlesComplete = puzzleProgress.completed;
+
+    // Count completed puzzles
+    int completedPuzzles = 0;
+    for (final puzzleId in level.puzzleIds) {
+      final progress = await progressRepo.getLessonProgress('puzzle_$levelId', puzzleId);
+      if (progress.completed) completedPuzzles++;
+    }
+    final puzzleStatus = puzzlesComplete
+        ? 'Complete'
+        : '${level.puzzleIds.length - completedPuzzles} remaining';
+
+    // Check play progress
+    final playProgress = await ref.watch(playProgressProvider(levelId).future);
+    final playComplete = playProgress.completed;
+
+    // Count total games needed
+    int totalGamesPlayed = 0;
+    for (final botId in level.playBotIds) {
+      final botProgress = await progressRepo.getBotProgress(levelId, botId);
+      totalGamesPlayed += botProgress.gamesPlayed;
+    }
+    final totalRequired = level.requiredGames * level.playBotIds.length;
+    final gamesRemaining = totalRequired - totalGamesPlayed;
+    final playStatus = playComplete
+        ? 'Complete'
+        : '$gamesRemaining more ${gamesRemaining == 1 ? 'game' : 'games'}';
+
+    return BossUnlockRequirements(
+      lessonComplete: lessonComplete,
+      puzzlesComplete: puzzlesComplete,
+      playComplete: playComplete,
+      lessonStatus: lessonStatus,
+      puzzleStatus: puzzleStatus,
+      playStatus: playStatus,
+    );
+  },
+);
+
+/// Get boss progress for a level (simple: completed or not)
+final bossProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String levelId) async {
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getLessonProgress('boss', levelId);
+  },
+);
+
+/// Mark boss as completed
+Future<void> markBossCompleted(WidgetRef ref, String levelId) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.markLessonCompleted('boss', levelId);
+  ref.invalidate(bossProgressProvider(levelId));
+}
