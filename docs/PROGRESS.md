@@ -267,10 +267,158 @@ lib/core/
 
 ---
 
-## Phase 5: Real Bot (Engine) 🎯 PLANNED
-- Stockfish integration or Lichess API
-- Elo-based difficulty scaling
-- Bot personality from JSON configs
+## Phase 5: Stockfish Integration & Bot Progress Tracking ✅ COMPLETE
+**Branch**: phase-5-real-bot **Status**: Completed December 2024
+**Focus**: Real chess engine integration with Stockfish and comprehensive progress tracking
+
+### Implemented Features
+
+**1. Stockfish Chess Engine Integration**
+- Full integration of `stockfish` package (v1.7.0) for real chess AI
+- JSON-driven bot configuration system (engineSettings controls all bot behavior)
+- Negative skill levels (-10 to -5) for true beginner-level play
+- Random blunder chance system for realistic weak play (0.0-1.0 probability)
+- UCI_Elo enforcement (ignores values below 1320 minimum, uses skill levels instead)
+- Skill level validation (clamped to -20 to +20 range)
+- Proper bot factory pattern with real engine support
+- Complete game flow from start to finish with checkmate/stalemate detection
+
+**2. Bot Progress Tracking System**
+- Created `BotProgress` model separate from existing Progress model
+- Tracks games played, games won, and games required per level
+- Progress persists in Hive storage with proper JSON serialization
+- Repository methods for recording bot games: `recordBotGame()`, `getBotProgress()`
+- Per-bot progress tracking across multiple levels
+
+**3. UI Components**
+- `BotSelectorPage` widget showing bot list with individual progress bars
+- Progress indicators showing X/Y games completed per bot
+- Win tracking display
+- Visual completion indicators matching lesson/puzzle system
+- In-game progress display in app bar showing current bot progress
+
+**4. Progress Badge Integration**
+- Play section now shows progress badges on level page (▶️/⏳/✅)
+- Green checkmark appears when all required games across all bots are completed
+- Progress badges match existing lesson and puzzle badge system
+- Automatic UI refresh when progress updates
+
+**5. Game Recording & State Management**
+- Automatic progress recording on game completion (checkmate/stalemate/draw only)
+- Resignation excluded from progress tracking
+- Fixed Riverpod state change detection issue (forced state reference update)
+- Enhanced listener with duplicate prevention flag (`_hasRecordedCompletion`)
+- Proper reset of completion flag on game restart ("Play Again" button)
+- State invalidation triggers UI refresh across all progress displays
+
+### Technical Achievements
+
+**State Management Fixes**:
+- Fixed `GameStateNotifier._onGameStateChanged()` to properly trigger Riverpod listeners
+  - Changed from `state = state` to `state = null; state = currentState` pattern
+  - Forces Riverpod to detect change with new object reference
+- Added `_hasRecordedCompletion` flag to prevent duplicate recordings
+- Flag resets on "Play Again" and when returning to bot selector
+- `WidgetsBinding.instance.addPostFrameCallback()` for safe async operations
+
+**Bot Difficulty System**:
+- JSON `engineSettings` is the source of truth (not hardcoded values)
+- Supports negative Stockfish skill levels for weak play (-10 to -5 for beginners)
+- Random blunder logic: bots make completely random moves at specified probability
+- Fallback system ensures bots work even if JSON settings are missing
+- Debug logging shows which settings are active for troubleshooting
+- Example configuration for 200 ELO bot: `skillLevel: -10, randomBlunderChance: 0.9`
+
+**Level Configuration**:
+- Fixed Level model to read `gamesRequired` from `play.gamesRequired` in JSON
+- Fallback chain: `play.gamesRequired` → root `requiredGames` → default 3
+- Per-level bot configuration with flexible game requirements
+- Example: Level 1 requires 3 games per bot × 2 bots = 6 total games
+
+**Progress Calculation**:
+- Created `playProgressProvider` that checks all bots in a level
+- Calculates total games played across all level bots
+- Marks as completed when `totalGamesPlayed >= (requiredGames × numberOfBots)`
+- Returns standard `Progress` object compatible with `ProgressBadge` widget
+- Automatic invalidation when bot games are recorded
+
+### Files Created/Modified
+
+**New Files**:
+- `lib/data/models/bot_progress.dart` - Bot-specific progress tracking model
+- `lib/features/play/widgets/bot_selector_page.dart` - Bot selection UI with progress
+- `lib/core/game_logic/bot_factory.dart` - Factory for creating bot instances
+- `lib/core/game_logic/stockfish_bot.dart` - Stockfish engine integration
+
+**Modified Files**:
+- `lib/features/play/pages/play_page.dart` - Complete restructure with progress tracking
+- `lib/data/repositories/progress_repository.dart` - Added bot progress methods
+- `lib/state/providers.dart` - Added bot progress providers and playProgressProvider
+- `lib/features/level/pages/level_page.dart` - Added play progress badge
+- `lib/data/models/level.dart` - Fixed gamesRequired JSON parsing
+- `lib/core/game_logic/game_state.dart` - Added gameCompletedNormally flag
+
+**Configuration Files**:
+- `assets/data/bots/bots.json` - Bot definitions with Stockfish settings
+- `assets/data/levels/level_0001.json` - Updated with play.gamesRequired
+
+### Key Features Working
+
+✅ Real chess engine plays at 5 distinct difficulty levels
+✅ Games complete properly with checkmate/stalemate/draw detection
+✅ Progress automatically recorded after each completed game
+✅ Progress bars update immediately after recording
+✅ Play section shows completion badges on level page
+✅ Multiple games with same bot accumulate correctly
+✅ Different bots track progress independently
+✅ Progress persists across app restarts
+✅ "Play Again" button properly resets for next game recording
+✅ JSON-based configuration allows per-level game requirements
+
+### Technical Details
+
+**Progress Flow**:
+```
+Game Completes (checkmate/stalemate)
+  ↓
+GameState sets gameCompletedNormally = true
+  ↓
+GameStateNotifier._onGameStateChanged() forces state update
+  ↓
+PlayPage ref.listen() detects change
+  ↓
+_handleGameComplete() calls recordBotGameCompleted()
+  ↓
+Progress saved to Hive + providers invalidated
+  ↓
+BotSelectorPage & LevelPage progress bars auto-refresh
+```
+
+**Configuration Example**:
+```json
+"play": {
+  "botIds": ["bot_001", "bot_002"],
+  "gamesRequired": 3
+}
+```
+Requires: 3 games per bot × 2 bots = 6 total games to complete
+
+### Debug Logging
+
+Added comprehensive debug output for tracking:
+- Game state transitions
+- Progress recording events
+- Before/after game counts
+- Total games calculation
+- Completion status checks
+
+### Bugs Fixed
+
+✅ State change detection not triggering Riverpod listeners
+✅ Only first game per bot being recorded (completion flag not resetting)
+✅ Level model reading gamesRequired from wrong JSON location
+✅ Progress badges not appearing on play section
+✅ UI not refreshing after progress updates
 
 ---
 

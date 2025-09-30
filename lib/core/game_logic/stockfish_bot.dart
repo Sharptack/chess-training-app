@@ -31,15 +31,22 @@ class StockfishBot {
     // Get settings from JSON or use defaults
     final settings = botConfig.engineSettings ?? {};
     
-    // Apply skill level
-    final skillLevel = settings['skillLevel'] ?? _getDefaultSkillLevel();
+    // Apply skill level (clamp to valid range -20 to +20)
+    final skillLevel = (settings['skillLevel'] ?? _getDefaultSkillLevel()).clamp(-20, 20);
     _stockfish.stdin = 'setoption name Skill Level value $skillLevel';
+    print('DEBUG: ${botConfig.name} using Skill Level = $skillLevel (ELO: ${botConfig.elo})');
     
-    // Apply ELO limiting if specified
+    // Apply ELO limiting if specified (only for bots >= 1320 ELO)
     if (settings['limitStrength'] == true) {
-      _stockfish.stdin = 'setoption name UCI_LimitStrength value true';
       final uciElo = settings['uciElo'] ?? botConfig.elo;
-      _stockfish.stdin = 'setoption name UCI_Elo value $uciElo';
+      // UCI_Elo minimum is ~1320, ignore if below that
+      if (uciElo >= 1320) {
+        _stockfish.stdin = 'setoption name UCI_LimitStrength value true';
+        _stockfish.stdin = 'setoption name UCI_Elo value $uciElo';
+        print('DEBUG: Using UCI_Elo = $uciElo');
+      } else {
+        print('DEBUG: Ignoring UCI_Elo $uciElo (below minimum 1320), using skill level instead');
+      }
     }
     
     // Apply contempt if specified (affects playing style)
@@ -147,12 +154,12 @@ class StockfishBot {
   int _getDefaultSkillLevel() {
     final difficulty = botConfig.difficultyLevel;
     switch (difficulty) {
-      case 1: return 0;   // Weakest
-      case 2: return 3;
-      case 3: return 6;
-      case 4: return 10;
-      case 5: return 15;
-      default: return 8;
+      case 1: return -10;  // Much weaker for true beginners
+      case 2: return -5;   // Still weak but slightly better
+      case 3: return 0;    // Occasional mistakes
+      case 4: return 8;    // Competent
+      case 5: return 15;   // Strong
+      default: return 0;
     }
   }
   

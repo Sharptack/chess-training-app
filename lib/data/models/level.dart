@@ -1,3 +1,4 @@
+// lib/data/models/level.dart
 import 'package:ChessTrainerApp/data/models/video_item.dart';
 import 'package:ChessTrainerApp/data/models/boss.dart';
 
@@ -9,6 +10,7 @@ class Level {
   final List<String> puzzleIds;
   final List<String> playBotIds;
   final Boss boss;
+  final int requiredGames;
 
   Level({
     required this.id,
@@ -18,6 +20,7 @@ class Level {
     required this.puzzleIds,
     required this.playBotIds,
     required this.boss,
+    this.requiredGames = 3,
   });
 
   factory Level.fromJson(Map<String, dynamic> json) {
@@ -49,6 +52,11 @@ class Level {
             .toList() ??
         [];
 
+    // Parse required games from play object, fallback to root level
+    final requiredGames = play?['gamesRequired'] as int? ??
+                          json['requiredGames'] as int? ??
+                          3;
+
     // Parse boss
     final bossJson = json['boss'] as Map<String, dynamic>?;
     if (bossJson == null) {
@@ -64,6 +72,7 @@ class Level {
       puzzleIds: puzzleIds,
       playBotIds: playBotIds,
       boss: boss,
+      requiredGames: requiredGames,
     );
   }
 }

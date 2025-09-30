@@ -14,6 +14,7 @@ import '../data/models/video_item.dart';
 import '../data/repositories/puzzle_repository.dart';
 import '../data/models/puzzle.dart';
 import '../data/models/puzzle_set.dart';
+import '../data/models/bot_progress.dart';
 
 
 /// Command helper to reset a lesson's progress and refresh its state.
@@ -213,14 +214,12 @@ class GameStateNotifier extends StateNotifier<GameState?> {
   }
   
   void _onGameStateChanged() {
-    print('DEBUG: GameStateNotifier._onGameStateChanged called');
-    // Force rebuild by creating a new reference
-    final currentState = state;
-    if (currentState != null) {
-      state = null;  // Clear first
-      state = currentState;  // Then reassign
-    }
-  }
+  print('DEBUG: GameStateNotifier._onGameStateChanged called');
+  // Force Riverpod to detect the change by creating a new reference
+  final currentState = state;
+  state = null;
+  state = currentState;
+}
   
   void endGame() {
     state?.removeListener(_onGameStateChanged);
@@ -235,3 +234,80 @@ class GameStateNotifier extends StateNotifier<GameState?> {
     super.dispose();
   }
 }
+
+/// Get bot progress for a level
+final botProgressProvider = FutureProvider.family<BotProgress, String>(
+  (ref, String key) async {
+    final parts = key.split('_');
+    if (parts.length < 2) {
+      throw ArgumentError('Invalid bot progress key format');
+    }
+    final levelId = parts[0];
+    final botId = parts.sublist(1).join('_');
+    
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getBotProgress(levelId, botId);
+  },
+);
+
+/// Record a completed bot game
+Future<void> recordBotGameCompleted(
+  WidgetRef ref,
+  String levelId,
+  String botId,
+  bool won,
+  int requiredGames,
+) async {
+  final repo = ref.read(progressRepositoryProvider);
+  await repo.recordBotGame(levelId, botId, won, requiredGames);
+  ref.invalidate(botProgressProvider('${levelId}_$botId'));
+  ref.invalidate(playProgressProvider(levelId));
+}
+
+/// Get overall play progress for a level (checks if all bots have completed required games)
+final playProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String levelId) async {
+    print('DEBUG playProgressProvider: Checking progress for level $levelId');
+
+    // Get level to know which bots and how many games required
+    final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
+
+    if (levelResult.isError) {
+      print('DEBUG playProgressProvider: Error loading level');
+      return Progress(levelId: levelId, videoId: 'play', started: false, completed: false);
+    }
+
+    final level = levelResult.data!;
+    final progressRepo = ref.watch(progressRepositoryProvider);
+
+    print('DEBUG playProgressProvider: Level has ${level.playBotIds.length} bots, ${level.requiredGames} games required per bot');
+
+    // Check progress for each bot
+    int totalGamesPlayed = 0;
+    bool anyStarted = false;
+
+    for (final botId in level.playBotIds) {
+      final botProgress = await progressRepo.getBotProgress(levelId, botId);
+      print('DEBUG playProgressProvider: Bot $botId has ${botProgress.gamesPlayed} games played');
+      totalGamesPlayed += botProgress.gamesPlayed;
+      if (botProgress.gamesPlayed > 0) {
+        anyStarted = true;
+      }
+    }
+
+    // Calculate total required games (requiredGames per bot * number of bots)
+    final totalRequired = level.requiredGames * level.playBotIds.length;
+    final completed = totalGamesPlayed >= totalRequired;
+
+    print('DEBUG playProgressProvider: Total games played: $totalGamesPlayed, Total required: $totalRequired, Completed: $completed');
+
+    return Progress(
+      levelId: levelId,
+      videoId: 'play',
+      started: anyStarted,
+      completed: completed,
+      startedAt: anyStarted ? DateTime.now() : null,
+      completedAt: completed ? DateTime.now() : null,
+    );
+  },
+);

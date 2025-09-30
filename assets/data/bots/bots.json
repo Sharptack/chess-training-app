@@ -1,15 +1,28 @@
 {
+  "bot_test": {
+    "id": "bot_test",
+    "name": "Random Randy",
+    "elo": 200,
+    "style": "random",
+    "engineSettings": {
+      "skillLevel": -10,
+      "moveTime": 10,
+      "limitStrength": false,
+      "randomBlunderChance": 0.9
+    },
+    "weaknesses": ["plays_randomly", "testing_bot"]
+  },
+
   "bot_001": {
     "id": "bot_001",
     "name": "Clumsy Carl",
     "elo": 400,
     "style": "random",
     "engineSettings": {
-      "skillLevel": 0,
+      "skillLevel": -5,
       "moveTime": 50,
-      "limitStrength": true,
-      "uciElo": 600,
-      "randomBlunderChance": 0.2
+      "limitStrength": false,
+      "randomBlunderChance": 0.7
     },
     "weaknesses": ["hangs_pieces", "no_planning"]
   },
@@ -19,10 +32,10 @@
     "elo": 600,
     "style": "defensive",
     "engineSettings": {
-      "skillLevel": 3,
-      "moveTime": 200,
-      "limitStrength": true,
-      "uciElo": 800,
+      "skillLevel": 0,
+      "moveTime": 100,
+      "limitStrength": false,
+      "randomBlunderChance": 0.3,
       "contempt": -30
     },
     "weaknesses": ["too_passive"]

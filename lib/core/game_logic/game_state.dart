@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'chess_board_state.dart';
 import '../../data/models/bot.dart';
 import 'bot_factory.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum GameStatus {
   waitingForHuman,
@@ -15,10 +16,12 @@ enum GameStatus {
 
 /// Manages a human vs bot chess game
 class GameState extends ChangeNotifier {
+  
   final ChessBoardState _boardState;
   final ChessBot _bot;
   final Bot _botConfig;
   final bool _humanPlaysWhite;
+  bool _gameCompletedNormally = false;
   
   GameStatus _status = GameStatus.notStarted;
   String? _gameOverReason;
@@ -60,6 +63,8 @@ class GameState extends ChangeNotifier {
                          (!_humanPlaysWhite && !_boardState.isWhiteTurn);
   
   bool get isBotTurn => !isHumanTurn;
+  bool get gameCompletedNormally => _gameCompletedNormally;
+  bool get humanWon => _status == GameStatus.humanWin;
   
   // === GAME CONTROL ===
   
@@ -88,7 +93,8 @@ class GameState extends ChangeNotifier {
     _startGame();
   }
   
-  void resignGame() {
+void resignGame() {
+    _gameCompletedNormally = false; // Mark as resigned
     _status = GameStatus.botWin;
     _gameOverReason = 'Human resigned';
     notifyListeners();
@@ -180,16 +186,19 @@ print('DEBUG: Bot move success: $success');
   
   bool _checkGameOver() {
     if (_boardState.isCheckmate) {
+      _gameCompletedNormally = true;
       _status = isHumanTurn ? GameStatus.botWin : GameStatus.humanWin;
       _gameOverReason = 'Checkmate';
     } else if (_boardState.isStalemate) {
+      _gameCompletedNormally = true;
       _status = GameStatus.draw;
       _gameOverReason = 'Stalemate';
     } else if (_boardState.isDraw) {
+      _gameCompletedNormally = true;
       _status = GameStatus.draw;
       _gameOverReason = 'Draw by repetition or 50-move rule';
     } else {
-      return false; // Game continues
+      return false;
     }
     
     notifyListeners();
@@ -200,4 +209,4 @@ print('DEBUG: Bot move success: $success');
     // Board state changed, notify listeners
     notifyListeners();
   }
-}
+} // This closes the class

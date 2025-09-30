@@ -1,6 +1,7 @@
 // lib/data/repositories/progress_repository.dart
 import 'package:hive/hive.dart';
 import '../models/progress.dart';
+import '../models/bot_progress.dart';
 
 class ProgressRepository {
   final Box _box;
@@ -75,5 +76,37 @@ class ProgressRepository {
     print('ProgressRepository.resetLesson: $levelId, $videoId'); // Debug
     await _box.delete(_key(levelId, videoId));
     print('ProgressRepository.resetLesson: deleted progress'); // Debug
+  }
+
+  Future<BotProgress> getBotProgress(String levelId, String botId) async {
+    final key = 'bot_${levelId}_$botId';
+    final data = _box.get(key);
+    
+    if (data == null) {
+      return BotProgress(
+        levelId: levelId,
+        botId: botId,
+        gamesRequired: 3, // Default, should come from level config
+      );
+    }
+    
+    return BotProgress.fromJson(Map<String, dynamic>.from(data));
+  }
+
+  Future<void> recordBotGame(String levelId, String botId, bool won, int requiredGames) async {
+    final key = 'bot_${levelId}_$botId';
+    final current = await getBotProgress(levelId, botId);
+    
+    final updated = BotProgress(
+      levelId: levelId,
+      botId: botId,
+      gamesPlayed: current.gamesPlayed + 1,
+      gamesWon: current.gamesWon + (won ? 1 : 0),
+      gamesRequired: requiredGames,
+      firstPlayedAt: current.firstPlayedAt ?? DateTime.now(),
+      lastPlayedAt: DateTime.now(),
+    );
+    
+    await _box.put(key, updated.toJson());
   }
 }

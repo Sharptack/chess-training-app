@@ -17,7 +17,7 @@
   ],
   "play": {
     "botIds": ["bot_001", "bot_002"],
-    "gamesRequired": 3
+    "gamesRequired": 1
   },
   "boss": {
     "id": "pharaoh_boss",

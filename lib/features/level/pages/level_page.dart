@@ -49,6 +49,8 @@ class LevelPage extends ConsumerWidget {
           _LevelTile(
             title: 'Play',
             route: '/level/$levelId/play',
+            progressType: _ProgressType.play,
+            levelId: levelId,
           ),
           _LevelTile(
             title: 'Boss',
@@ -60,7 +62,7 @@ class LevelPage extends ConsumerWidget {
   }
 }
 
-enum _ProgressType { none, lesson, puzzle }
+enum _ProgressType { none, lesson, puzzle, play }
 
 class _LevelTile extends ConsumerWidget {
   final String title;
@@ -96,6 +98,17 @@ class _LevelTile extends ConsumerWidget {
     // Handle puzzle progress
     else if (progressType == _ProgressType.puzzle && levelId != null) {
       final asyncProgress = ref.watch(levelPuzzleProgressProvider(levelId!));
+
+      badge = asyncProgress.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (progress) => ProgressBadge(progress: progress),
+      );
+    }
+
+    // Handle play progress
+    else if (progressType == _ProgressType.play && levelId != null) {
+      final asyncProgress = ref.watch(playProgressProvider(levelId!));
 
       badge = asyncProgress.when(
         loading: () => const SizedBox.shrink(),

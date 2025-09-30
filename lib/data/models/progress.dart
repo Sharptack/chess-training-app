@@ -1,3 +1,4 @@
+//lib/data/models/progress.dart
 class Progress {
   final String levelId;
   final String videoId;
