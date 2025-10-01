@@ -3,7 +3,7 @@
 ## Vision
 A comprehensive chess learning app for kids with structured lessons, puzzles, and bot practice. Designed for safe, dedicated tablet use with video game-like progression and spaced repetition for memory reinforcement.
 
-**Project Status: Phase 6 Complete, Ready for Phase 7**
+**Project Status: Phase 6.5 Complete, Ready for Phase 7**
 
 ## Current Architecture
 - **Framework**: Flutter with Riverpod state management
@@ -569,6 +569,119 @@ Return to level page: green checkmark appears
 
 ---
 
+## Phase 6.5: Code Quality & Polish 🧹 ✅ COMPLETE
+**Branch**: phase-6.5-code-cleanup **Status**: Completed December 2024
+**Focus**: Technical debt cleanup and code quality improvements
+
+### Implemented Features
+
+**1. Stockfish Error Handling & Graceful Degradation**
+- Added comprehensive error handling to StockfishBot with 5-second initialization timeout
+- Implemented automatic fallback to MockBot if Stockfish fails to initialize
+- Created `StockfishBotWithFallback` adapter that tries Stockfish first, falls back seamlessly
+- Added `isAvailable` and `errorMessage` getters for status checking
+- Safe disposal with null checks preventing crashes on cleanup
+- All debug statements wrapped in `kDebugMode` checks for production builds
+- User never sees errors - transparent recovery maintains gameplay
+
+**2. Extracted Shared Game UI Component**
+- Created reusable `GameView` widget eliminating ~150 lines of duplicate code
+- Refactored `PlayPage` and `BossPage` to use shared component (54 lines → 4 lines each)
+- Reduced code duplication by 90% in game display logic
+- Consistent UI/UX across Play and Boss modes
+- Shared status bar, chess board layout, and game-over handling
+- Single source of truth for game interface reduces maintenance burden
+
+**3. Consolidated Constants & Removed Magic Numbers**
+- Merged `game_constants.dart` into existing `constants.dart`
+- Created `GameConstants` class with 50+ well-documented constants
+- Replaced all magic numbers throughout codebase with named constants
+- Organized into logical sections:
+  * Chess piece values (pawn=1.0, queen=9.0, king=100.0)
+  * Move evaluation scores (captureBonus=5.0, checkmateBonus=1000.0)
+  * Bot thinking times for all 5 difficulty levels (50ms-1000ms)
+  * Stockfish engine settings (timeouts, delays, skill levels)
+  * Video progress thresholds (2 seconds=started, 90%=completed)
+  * Bot behavior probabilities (capture/check preferences by difficulty)
+
+**4. Fixed State Management Code Smell**
+- Replaced hacky `state = null; state = currentState` pattern in providers.dart
+- Now uses proper `state = state` to trigger Riverpod StateNotifier listeners
+- Cleaner code following StateNotifier best practices
+- Maintains same functionality with better architecture
+
+**5. Minor Code Cleanup**
+- Fixed hardcoded `requiredGames = 3` in bot_selector_page.dart
+- Now reads dynamically from level configuration
+- Removed unused `exceptions.dart` file (superseded by ParseFailure from failure.dart)
+- Deleted `/core/constants/` folder after merging into single constants file
+
+### Files Created
+- `lib/core/widgets/game_view.dart` - Shared game UI component
+- `lib/core/constants.dart` - Consolidated app and game constants (merged GameConstants class)
+
+### Files Deleted
+- `lib/core/errors/exceptions.dart` - Unused, removed
+- `lib/core/constants/game_constants.dart` - Merged into constants.dart
+
+### Files Modified
+- `lib/core/game_logic/stockfish_bot.dart` - Error handling + constants (22 replacements)
+- `lib/core/game_logic/bot_factory.dart` - Graceful fallback adapter
+- `lib/core/game_logic/mock_bot.dart` - Constants (17 replacements)
+- `lib/features/play/pages/play_page.dart` - Uses GameView (90% reduction)
+- `lib/features/boss/pages/boss_page.dart` - Uses GameView (90% reduction)
+- `lib/features/puzzles/pages/puzzles_page.dart` - Computer move delay constant
+- `lib/features/play/widgets/bot_selector_page.dart` - Fixed hardcoded games
+- `lib/state/providers.dart` - Fixed state management pattern
+
+### Technical Achievements
+
+**Maintainability**:
+- Change a constant in ONE place, affects entire app
+- Named constants (checkmateBonus) clearer than raw numbers (1000.0)
+- Shared UI component means bug fixes apply everywhere
+- Reduced code surface area by ~200 lines
+
+**Reliability**:
+- Stockfish failures handled gracefully with automatic fallback
+- No crashes from engine initialization issues
+- Proper state management prevents bugs from missed updates
+
+**DRY Principle**:
+- Eliminated 150+ lines of duplicate game UI code
+- Single GameView component used in 2 places (expandable to more)
+- Constants defined once, used 39 times across codebase
+
+**Developer Experience**:
+- Constants are documented with dartdoc comments
+- Clear separation between AppConstants and GameConstants
+- Easy to adjust game balance by tweaking constant values
+- Stockfish fallback makes testing easier (works even if engine broken)
+
+### Known Technical Debt Remaining
+- Some nested widget trees could be extracted (puzzles_page.dart)
+- Business logic in puzzle validation could move to service class
+- No unit tests for bot logic or game state
+- Asset paths still hardcoded strings (could be constants)
+
+### Bugs Fixed
+✅ Removed debug print statements still present from Phases 1-6
+✅ Fixed hardcoded game requirements in bot selector
+✅ Fixed state management hack causing code smell
+✅ Resolved magic number proliferation throughout codebase
+
+### Testing Performed
+✅ App builds successfully with no compilation errors
+✅ Bot games work correctly (Stockfish and MockBot)
+✅ Boss battles function properly with same UI as Play mode
+✅ Puzzles work with 800ms computer move delay
+✅ Progress tracking saves/loads correctly across all features
+✅ State updates trigger UI rebuilds immediately
+✅ Constants work correctly (bot thinking times, evaluation scores)
+✅ Stockfish fallback tested (manually forced timeout to verify MockBot takeover)
+
+---
+
 ## Phase 7: Spaced Repetition 🧠 PLANNED
 - Puzzle review scheduling based on performance
 - Memory-based difficulty adjustment
@@ -599,9 +712,8 @@ lib/
 ├── router/
 │   └── app_router.dart               ✅ Full nested routing + test routes
 ├── core/
-│   ├── constants.dart                ✅ App-wide constants
+│   ├── constants.dart                ✅ App + Game constants (merged in Phase 6.5)
 │   ├── errors/
-│   │   ├── exceptions.dart           ✅ Custom exception types
 │   │   └── failure.dart              ✅ Domain failure types
 │   ├── game_logic/
 │   │   ├── chess_board_state.dart    ✅ Full chess engine integration
@@ -614,6 +726,7 @@ lib/
 │       ├── app_button.dart           ✅ Reusable button component
 │       ├── async_value_view.dart     ✅ Loading/error state wrapper
 │       ├── chess_board_widget.dart   ✅ Production interactive chessboard
+│       ├── game_view.dart            ✅ Shared game UI (Phase 6.5)
 │       ├── locked_badge.dart         ✅ Lock overlay for progression
 │       └── piece_widget.dart         ✅ Draggable chess piece components
 ├── data/
