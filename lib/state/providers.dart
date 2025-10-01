@@ -217,12 +217,11 @@ class GameStateNotifier extends StateNotifier<GameState?> {
   }
   
   void _onGameStateChanged() {
-  print('DEBUG: GameStateNotifier._onGameStateChanged called');
-  // Force Riverpod to detect the change by creating a new reference
-  final currentState = state;
-  state = null;
-  state = currentState;
-}
+    // Force Riverpod to detect the change by creating a new reference
+    final currentState = state;
+    state = null;
+    state = currentState;
+  }
   
   void endGame() {
     state?.removeListener(_onGameStateChanged);

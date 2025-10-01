@@ -22,53 +22,39 @@ class PuzzleRepository {
 
     // Return from cache if available
     if (_puzzleSetCache.containsKey(levelId)) {
-      print('DEBUG: Returning cached puzzle set for level $levelId');
       return Result.success(_puzzleSetCache[levelId]!);
     }
 
     try {
       // Try different file naming conventions
       final possiblePaths = [
-        'assets/data/puzzles/puzzle_set_$levelId.json',  // puzzle_set_0001.json
-        'assets/data/puzzles/puzzle_set_${levelId.padLeft(4, '0')}.json',  // Ensure 4 digits
-        'assets/data/puzzles/puzzle_set_${int.parse(levelId).toString().padLeft(3, '0')}.json',  // puzzle_set_001.json
+        'assets/data/puzzles/puzzle_set_$levelId.json',
+        'assets/data/puzzles/puzzle_set_${levelId.padLeft(4, '0')}.json',
+        'assets/data/puzzles/puzzle_set_${int.parse(levelId).toString().padLeft(3, '0')}.json',
       ];
 
       Result<Map<String, dynamic>>? successfulResult;
       String? successfulPath;
 
       for (final path in possiblePaths) {
-        print('DEBUG: Trying to load puzzle set from: $path');
         final result = await _assetSource.readJson(path);
-        
         if (result.isSuccess) {
           successfulResult = result;
           successfulPath = path;
-          print('DEBUG: Successfully loaded from $path');
           break;
         }
       }
 
       if (successfulResult == null) {
-        print('DEBUG: Failed to load puzzle set from any path for level $levelId');
         return Result.error(NotFoundFailure('Puzzle set not found for level $levelId'));
       }
-      
       final puzzleSet = PuzzleSet.fromJson(successfulResult.data!);
-      
-      // Cache the puzzle set
       _puzzleSetCache[levelId] = puzzleSet;
-      
-      // Also cache individual puzzles for quick access
       for (final puzzle in puzzleSet.puzzles) {
         _puzzleCache[puzzle.id] = puzzle;
       }
-      
-      print('DEBUG: Loaded ${puzzleSet.puzzles.length} puzzles for level $levelId');
       return Result.success(puzzleSet);
     } catch (e, stackTrace) {
-      print('DEBUG: Exception loading puzzle set: $e');
-      print('DEBUG: Stack trace: $stackTrace');
       return Result.error(UnexpectedFailure('Failed to load puzzle set for level $levelId: $e'));
     }
   }
