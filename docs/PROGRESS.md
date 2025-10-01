@@ -682,6 +682,131 @@ Return to level page: green checkmark appears
 
 ---
 
+## Phase 6.6: Final Polish 🎨 PLANNED
+**Branch**: phase-6.6-final-polish **Status**: In Progress
+**Focus**: High-priority cleanup items before Phase 7
+
+### Planned Changes
+
+**High Priority (Must Do Before Phase 7)**:
+1. ⏳ **Video Player Timeout** (~15 min)
+   - Add `.timeout()` to network video loading in lesson_page.dart
+   - Prevent app hanging on slow networks
+   - Graceful error message on timeout
+
+2. ⏳ **Asset Path Constants** (~15 min)
+   - Create `AssetPaths` class in constants.dart
+   - Replace hardcoded asset strings throughout codebase
+   - Currently: `'assets/images/pieces/piece_${color}_$pieceType.svg'`
+   - After: `AssetPaths.chessPiece(color, pieceType)`
+
+3. ⏳ **FutureBuilder → FutureProvider** (~20 min)
+   - Convert boss_page.dart:49-84 to use Riverpod FutureProvider
+   - Improves performance and aligns with architecture
+   - Prevents unnecessary rebuilds
+
+**Medium Priority (Can Wait Until Phase 7.5+)**:
+- Extract puzzle validation logic to separate service class
+- Add dartdoc comments to public APIs
+- Split large widgets (puzzles_page, level_page)
+
+**Low Priority (Post-MVP)**:
+- Hive migration strategy for schema changes
+- Puzzle repository cache management
+- GameState disposal race condition prevention
+- Null safety consistency improvements
+- Unit tests for game logic
+- Image caching for piece SVGs
+- Provider memoization for performance
+- Dynamic Stockfish switching based on device
+
+---
+
+## Phase 6.7: Play Section Enhancements 🎮 PLANNED
+**Branch**: phase-6.7-play-enhancements **Status**: Planned
+**Focus**: Major improvements to Play/Practice section before Phase 7
+
+### Planned Features
+
+**1. Cloud Video Storage Migration** 🎥 (HIGH PRIORITY)
+- Migrate from local video storage to cloud hosting (YouTube/Vimeo)
+- Update VideoItem model to support external URLs
+- Add network error handling and retry logic
+- Consider offline caching strategy
+- Update lesson_page.dart to handle external video sources
+
+**2. Custom Starting Positions** ♟️ (HIGH PRIORITY)
+- Add `startingFen` field to Bot/Game configuration
+- Allow custom board positions per game
+- Update GameState to initialize from FEN
+- UI for selecting/displaying starting position
+- Example use cases: endgame practice, opening-specific training
+
+**3. Move Restriction System** 📋 (HIGH PRIORITY)
+- Add `allowedMoves` or `openingRestriction` to game config
+- Restrict legal moves based on desired opening (e.g., Ruy Lopez only)
+- Validate moves against restriction rules
+- Show hints/feedback when player tries restricted move
+- Examples: force specific openings, practice tactical patterns
+
+**4. Terminology Change: "Bots" → "Games"** 📝 (HIGH PRIORITY)
+- Rename throughout UI and code
+- `bot_selector_page.dart` → `game_selector_page.dart`
+- "Play against Bot X" → "Play Game X"
+- Update JSON: `bots.json` → `games.json`
+- More accurate terminology for educational games vs AI opponents
+
+**5. Game Controls Enhancement** 🎛️ (HIGH PRIORITY)
+- Add **Resign** button to play_page and boss_page
+- Add **Undo Move** button (take back last move)
+- Show move history panel
+- Proper button placement in game UI
+
+**6. Completion Requirements Update** ✅ (MEDIUM PRIORITY)
+- Change from "must win" to "must play X moves"
+- Add `minMovesRequired` field to game config (default: 10)
+- Track move count, mark complete if game reaches threshold
+- Loss counts as complete if >= 10 moves (or configured value)
+- Win always counts as complete regardless of move count
+- Update progress tracking logic in providers.dart
+- Allows learning from losses, less frustrating for beginners
+
+### Technical Changes Needed
+
+**Data Models**:
+```dart
+// Bot/Game model enhancements
+class Game {  // renamed from Bot
+  final String startingFen;  // NEW
+  final List<String>? allowedMoves;  // NEW
+  final int minMovesForCompletion;  // NEW (default: 10)
+  // ... existing fields
+}
+```
+
+**Game State**:
+- Add move counter tracking
+- Add move restriction validation
+- Add undo functionality
+- Add resign handling
+
+**UI Components**:
+- Game controls widget (resign/undo buttons)
+- Move history display
+- Starting position preview
+- Restriction indicator
+
+### Files to Create/Modify
+- `lib/data/models/game.dart` (renamed from bot.dart)
+- `lib/features/play/widgets/game_controls.dart` (NEW)
+- `lib/features/play/widgets/game_selector_page.dart` (renamed)
+- `lib/features/play/pages/play_page.dart` (add controls)
+- `lib/core/game_logic/game_state.dart` (undo, resign, restrictions)
+- `lib/state/providers.dart` (update completion logic)
+- `assets/data/games.json` (renamed, enhanced schema)
+
+---
+
 ## Phase 7: Spaced Repetition 🧠 PLANNED
 - Puzzle review scheduling based on performance
 - Memory-based difficulty adjustment
