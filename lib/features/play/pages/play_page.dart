@@ -1,7 +1,7 @@
 // lib/features/play/pages/play_page.dart (simplified)
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/widgets/chess_board_widget.dart';
+import '../../../core/widgets/game_view.dart';
 import '../../../core/game_logic/game_state.dart';
 import '../../../state/providers.dart';
 import '../widgets/bot_selector_page.dart';
@@ -93,59 +93,10 @@ class _PlayPageState extends ConsumerState<PlayPage> {
   }
   
   Widget _buildGame(GameState gameState) {
-    final isGameOver = gameState.status == GameStatus.humanWin ||
-                      gameState.status == GameStatus.botWin ||
-                      gameState.status == GameStatus.draw;
-    
-    return Column(
-      children: [
-        // Status bar
-        Container(
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.surfaceVariant,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(_getStatusText(gameState)),
-              if (isGameOver)
-                ElevatedButton(
-                  onPressed: () => _showGameOverOptions(gameState),
-                  child: const Text('Next'),
-                ),
-            ],
-          ),
-        ),
-        
-        // Chess board
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final size = (constraints.maxWidth < constraints.maxHeight
-                    ? constraints.maxWidth
-                    : constraints.maxHeight) - 32;
-                  
-                  return ChessBoardWidget(
-                    boardState: gameState.boardState,
-                    size: size,
-                    onMoveMade: gameState.onHumanMove,
-                    onIllegalMove: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Illegal move!'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ],
+    return GameView(
+      gameState: gameState,
+      getStatusText: _getStatusText,
+      onGameOverPressed: () => _showGameOverOptions(gameState),
     );
   }
   

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/chess_board_widget.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/game_logic/chess_board_state.dart';
+import '../../../core/constants.dart';
 import '../../../data/models/puzzle.dart';
 import '../../../data/models/puzzle_set.dart';
 import '../../../state/providers.dart';
@@ -211,9 +212,9 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     setState(() {
       _isComputerMoving = true;
     });
-    
+
     // Delay to make it feel like computer is thinking
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(Duration(milliseconds: GameConstants.computerMoveDelayMs));
     
     // Make the computer's move
     final success = _boardState.makeSanMove(move);

@@ -72,7 +72,7 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
   }
   
   Widget _buildOverallProgress() {
-    // Show combined progress for all bots
+    // Show combined progress for all bots, using requiredGames from Level config
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -84,22 +84,38 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            // Calculate total games across all bots
-            FutureBuilder<int>(
-              future: _calculateTotalGames(),
-              builder: (context, snapshot) {
-                final totalGames = snapshot.data ?? 0;
-                final requiredGames = 3; // Get from level
-                
-                return Column(
-                  children: [
-                    LinearProgressIndicator(
-                      value: (totalGames / requiredGames).clamp(0.0, 1.0),
-                      minHeight: 8,
-                    ),
-                    const SizedBox(height: 4),
-                    Text('$totalGames / $requiredGames games completed'),
-                  ],
+            Consumer(
+              builder: (context, ref, _) {
+                final levelAsync = ref.watch(levelRepositoryProvider).getLevelById(widget.levelId);
+                return FutureBuilder(
+                  future: levelAsync,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const LinearProgressIndicator(minHeight: 8);
+                    }
+                    final result = snapshot.data;
+                    if (result == null || result.isError) {
+                      return const Text('Error loading level config');
+                    }
+                    final level = result.data!;
+                    return FutureBuilder<int>(
+                      future: _calculateTotalGames(),
+                      builder: (context, gamesSnapshot) {
+                        final totalGames = gamesSnapshot.data ?? 0;
+                        final totalRequired = level.requiredGames * widget.bots.length;
+                        return Column(
+                          children: [
+                            LinearProgressIndicator(
+                              value: (totalGames / totalRequired).clamp(0.0, 1.0),
+                              minHeight: 8,
+                            ),
+                            const SizedBox(height: 4),
+                            Text('$totalGames / $totalRequired games completed'),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 );
               },
             ),
