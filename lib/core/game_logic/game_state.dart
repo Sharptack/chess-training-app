@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'chess_board_state.dart';
 import '../../data/models/bot.dart';
 import 'bot_factory.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum GameStatus {
   waitingForHuman,

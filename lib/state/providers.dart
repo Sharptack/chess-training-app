@@ -44,6 +44,19 @@ final lessonByIdProvider =
   return level.lessonVideo;
 });
 
+/// Returns the full Level model for a given levelId.
+final levelProvider =
+    FutureProvider.family((ref, String levelId) async {
+  final repo = ref.watch(levelRepositoryProvider);
+  final result = await repo.getLevelById(levelId);
+
+  if (result.isError) {
+    throw Exception(result.failure!.message);
+  }
+
+  return result.data!;
+});
+
 // Hive-backed ProgressRepository provider
 final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
   final box = Hive.box('progressBox');

@@ -23,7 +23,7 @@ class ProgressRepository {
       map['videoId'] = videoId;
       final progress = Progress.fromJson(map);
       return progress;
-    } catch (e, stackTrace) {
+    } catch (e) {
       return Progress(levelId: levelId, videoId: videoId, started: false, completed: false);
     }
   }

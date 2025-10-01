@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../game_logic/chess_board_state.dart';
+import '../constants.dart';
 
 /// Widget that renders a single chess piece using SVG assets
 class PieceWidget extends StatelessWidget {
@@ -31,8 +32,8 @@ class PieceWidget extends StatelessWidget {
   Widget _buildPieceImage() {
     final color = piece.isWhite ? 'white' : 'black';
     final pieceType = _getPieceTypeName(piece.type);
-    final assetPath = 'assets/images/pieces/piece_${color}_$pieceType.svg';
-    
+    final assetPath = AssetPaths.chessPiece(color, pieceType);
+
     return SvgPicture.asset(
       assetPath,
       width: size,

@@ -34,13 +34,11 @@ class PuzzleRepository {
       ];
 
       Result<Map<String, dynamic>>? successfulResult;
-      String? successfulPath;
 
       for (final path in possiblePaths) {
         final result = await _assetSource.readJson(path);
         if (result.isSuccess) {
           successfulResult = result;
-          successfulPath = path;
           break;
         }
       }
@@ -54,7 +52,7 @@ class PuzzleRepository {
         _puzzleCache[puzzle.id] = puzzle;
       }
       return Result.success(puzzleSet);
-    } catch (e, stackTrace) {
+    } catch (e) {
       return Result.error(UnexpectedFailure('Failed to load puzzle set for level $levelId: $e'));
     }
   }

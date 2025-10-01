@@ -1,4 +1,5 @@
 // lib/features/lesson/pages/lesson_page.dart
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,7 +121,14 @@ class _LessonPlayerState extends State<LessonPlayer> {
 
       _videoController.addListener(_handleVideoEvents);
 
-      await _videoController.initialize();
+      // Add timeout for network videos to prevent hanging
+      await _videoController.initialize().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw TimeoutException('Video failed to load within 30 seconds. Please check your internet connection.');
+        },
+      );
+
       if (_videoController.value.hasError) {
         _initError = _videoController.value.errorDescription ?? 'Unknown player error';
       } else {
@@ -133,6 +141,9 @@ class _LessonPlayerState extends State<LessonPlayer> {
               : const ColoredBox(color: Colors.black),
         );
       }
+    } on TimeoutException catch (e) {
+      _initError = e.message ?? 'Video loading timeout';
+      debugPrint('[LessonPlayer] Timeout: ${e.message}');
     } catch (e, st) {
       _initError = e.toString();
       debugPrintStack(stackTrace: st);

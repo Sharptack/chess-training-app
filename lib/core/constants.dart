@@ -191,3 +191,57 @@ class GameConstants {
   /// Stockfish ready check interval
   static const int stockfishReadyCheckIntervalMs = 100;
 }
+
+/// Asset path constants for images, data files, and other resources
+class AssetPaths {
+  AssetPaths._();
+
+  // ============================================================================
+  // CHESS PIECE IMAGES
+  // ============================================================================
+
+  /// Base directory for piece images
+  static const String _piecesDir = 'assets/images/pieces';
+
+  /// Get path for a chess piece SVG
+  /// [color] - 'white' or 'black'
+  /// [pieceType] - 'pawn', 'knight', 'bishop', 'rook', 'queen', 'king'
+  static String chessPiece(String color, String pieceType) {
+    return '$_piecesDir/piece_${color}_$pieceType.svg';
+  }
+
+  // ============================================================================
+  // DATA FILES
+  // ============================================================================
+
+  /// Base directory for JSON data
+  static const String _dataDir = 'assets/data';
+
+  /// Directory for level configurations
+  static const String levelsDir = '$_dataDir/levels';
+
+  /// Directory for puzzle sets
+  static const String puzzlesDir = '$_dataDir/puzzles';
+
+  /// Directory for bot/game configurations
+  static const String botsDir = '$_dataDir/bots';
+
+  /// Get path for a specific level JSON file
+  static String level(String levelId) => '$levelsDir/level_$levelId.json';
+
+  /// Get path for a specific puzzle set JSON file
+  static String puzzleSet(String setId) => '$puzzlesDir/puzzle_set_$setId.json';
+
+  /// Path to bots configuration file
+  static const String botsConfig = '$botsDir/bots.json';
+
+  // ============================================================================
+  // PLACEHOLDER IMAGES
+  // ============================================================================
+
+  /// Placeholder for missing video thumbnails
+  static const String videoPlaceholder = 'assets/images/video_placeholder.png';
+
+  /// App logo/icon
+  static const String appLogo = 'assets/images/app_logo.png';
+}

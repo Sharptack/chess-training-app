@@ -45,20 +45,11 @@ class _BossPageState extends ConsumerState<BossPage> {
       }
     });
 
-    // Load level data
-    final levelAsync = ref.watch(levelRepositoryProvider).getLevelById(widget.levelId);
+    // Load level data using FutureProvider
+    final levelAsync = ref.watch(levelProvider(widget.levelId));
 
-    return FutureBuilder(
-      future: levelAsync,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.isError) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Boss Battle')),
-            body: const Center(child: Text('Error loading boss')),
-          );
-        }
-
-        final level = snapshot.data!.data!;
+    return levelAsync.when(
+      data: (level) {
         final boss = level.boss;
 
         return Scaffold(
@@ -81,6 +72,14 @@ class _BossPageState extends ConsumerState<BossPage> {
             : _buildGame(gameState, boss),
         );
       },
+      loading: () => Scaffold(
+        appBar: AppBar(title: const Text('Boss Battle')),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        appBar: AppBar(title: const Text('Boss Battle')),
+        body: Center(child: Text('Error loading boss: $error')),
+      ),
     );
   }
 
