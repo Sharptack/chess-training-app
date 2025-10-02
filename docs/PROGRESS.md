@@ -781,8 +781,8 @@ Return to level page: green checkmark appears
 
 ---
 
-## Phase 6.7: Play Section Enhancements 🎮 IN PROGRESS
-**Branch**: phase-6.7-play-enhancements **Status**: Round 1 Complete & Tested ✅
+## Phase 6.7: Play Section Enhancements 🎮 COMPLETE
+**Branch**: phase-6.7-play-enhancements **Status**: Rounds 1 & 2 Complete & Tested ✅
 **Focus**: Major improvements to Play/Practice section before Phase 7
 
 ### Round 1: Core Game Mechanics ✅ COMPLETE & TESTED
@@ -855,31 +855,55 @@ Return to level page: green checkmark appears
 }
 ```
 
-### Round 2: Remaining Features (PLANNED)
+### Round 2: Additional Game Enhancements ✅ COMPLETE & TESTED
 
-**1. Cloud Video Storage Migration** 🎥 (HIGH PRIORITY)
-- Migrate from local video storage to cloud hosting (YouTube/Vimeo)
-- Update VideoItem model to support external URLs
-- Add network error handling and retry logic
-- Consider offline caching strategy
-- Update lesson_page.dart to handle external video sources
+**Implemented Features:**
 
-**2. Undo Move Button** 🎛️ (MEDIUM PRIORITY)
-- Add undo/take-back functionality to game_state.dart
-- Add undo button to GameView widget
-- Proper handling of undo during bot's turn
-- Consider limiting undos per game (educational purpose)
+**1. Undo Move Functionality** 🎛️ ✅
+- Added undoMove() and canUndo to game_state.dart
+- Undoes last 2 moves (human + bot) when it's human's turn
+- Undoes last 1 move when bot is thinking
+- Undo button in GameView with proper disabled state
+- Configurable per-game via allowUndo field (default: true)
+- Italian Opening bot has undo disabled for learning enforcement
 
-**3. Move History Panel** 📜 (LOW PRIORITY)
-- Display move history in algebraic notation
-- Show move pairs (1. e4 e5 2. Nf3 Nc6)
-- Scrollable history panel
-- Integration with GameView
+**2. Move History Panel** 📜 ✅
+- Horizontal scrollable chip display in status bar
+- Shows all moves in SAN notation as move pairs
+- Auto-updates as game progresses
+- Clean, compact display integrated into GameView
 
-**4. Starting Position Preview** 🔍 (LOW PRIORITY)
-- Show starting position before game begins
-- Visual indicator when custom FEN is used
-- Optional board preview in bot selector
+**3. Starting Position/Restriction Preview** 🔍 ✅
+- Visual badges in bot selector showing game features:
+  - 🔵 "Custom position" badge for startingFen
+  - 🟣 "Move restrictions" badge for allowedMoves
+- Helps users understand game type before starting
+- No full board preview needed - badges sufficient
+
+**4. Bot Move Restrictions (Enhanced)** 🤖 ✅
+- Bot now follows allowedMoves restrictions same as human
+- Deterministic behavior (plays first allowed move, not random)
+- Example: Italian Opening bot forces BOTH players to follow sequence
+- Updated bot_004_opening: e4/e5, Nf3/Nc6, Bc4/Bc5
+
+**5. JSON Schema Documentation** 📋 ✅
+- Created bot.schema.json with all fields documented
+- Created bots.schema.json for bot collections
+- Enables IDE autocomplete and validation
+- Includes examples and descriptions for all fields
+
+**Files Modified (Round 2): 9 files**
+- 4 model/logic files (game_state, bot, boss, game_view)
+- 2 UI files (boss_page, bot_selector_page)
+- 1 config file (bots.json)
+- 2 new schema files (bot.schema.json, bots.schema.json)
+
+### Round 3: Deferred Features
+
+**Cloud Video Storage Migration** 🎥 (DEFERRED - Separate Phase)
+- Move to dedicated Phase 6.8 or later
+- Requires infrastructure changes
+- Not critical for current game mechanics
 
 ### Testing Results ✅ ALL TESTS PASSED
 
