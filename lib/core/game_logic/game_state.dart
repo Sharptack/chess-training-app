@@ -100,12 +100,65 @@ class GameState extends ChangeNotifier {
   void restart() {
     _startGame();
   }
-  
-void resignGame() {
+
+  void resignGame() {
     _gameCompletedNormally = false; // Mark as resigned
     _status = GameStatus.botWin;
     _gameOverReason = 'Human resigned';
     notifyListeners();
+  }
+
+  /// Undo the last move (or last 2 moves if bot just moved)
+  bool undoMove() {
+    // Can't undo if game is over or not started
+    if (_status == GameStatus.humanWin ||
+        _status == GameStatus.botWin ||
+        _status == GameStatus.draw ||
+        _status == GameStatus.notStarted) {
+      return false;
+    }
+
+    // If it's bot's turn, undo the human's last move (and bot hasn't moved yet)
+    // If it's human's turn, undo both bot's last move AND human's last move
+    final movesToUndo = isBotTurn ? 1 : 2;
+
+    for (int i = 0; i < movesToUndo; i++) {
+      if (_moveCount == 0) break; // No more moves to undo
+
+      final success = _boardState.undoMove();
+      if (!success) break;
+
+      _moveCount--;
+
+      // Remove from move log
+      if (_moveLog.isNotEmpty) {
+        final lastEntry = _moveLog.last;
+        // Check if this entry has both moves (e.g., "1. e4 e5") or just one
+        if (lastEntry.contains(' ') && lastEntry.split(' ').length > 2) {
+          // Has both moves, remove the last move from the string
+          final parts = lastEntry.split(' ');
+          _moveLog[_moveLog.length - 1] = parts.sublist(0, parts.length - 1).join(' ');
+        } else {
+          // Only one move, remove the entire entry
+          _moveLog.removeLast();
+        }
+      }
+    }
+
+    // Clear any restriction errors
+    _lastMoveRestrictionError = null;
+
+    // Reset to human's turn
+    _status = GameStatus.waitingForHuman;
+    notifyListeners();
+    return true;
+  }
+
+  /// Check if undo is available
+  bool get canUndo {
+    // Can undo if game is in progress and at least one move has been made
+    return (_status == GameStatus.waitingForHuman || _status == GameStatus.waitingForBot) &&
+           _moveCount > 0;
   }
   
   // === MOVE HANDLING ===
@@ -168,11 +221,43 @@ void resignGame() {
   Future<void> _makeBotMove() async {
     if (_status != GameStatus.waitingForBot) return;
 
-    final botMove = await _bot.getNextMove(_boardState);
+    String? botMove = await _bot.getNextMove(_boardState);
 
     if (botMove == null) {
       _checkGameOver();
       return;
+    }
+
+    // Check if bot move needs to follow restrictions
+    if (_botConfig.allowedMoves != null) {
+      final fullMoveNumber = (_moveCount ~/ 2) + 1;
+      final allowedForThisMove = _botConfig.allowedMoves![fullMoveNumber];
+
+      if (allowedForThisMove != null) {
+        // Get all legal moves in SAN notation
+        final legalMoves = _boardState.getLegalMoves();
+
+        // Filter to only allowed moves
+        final allowedLegalMoves = legalMoves.where((move) {
+          // Try the move temporarily to get its SAN notation
+          final tempSuccess = _boardState.makeSanMove(move);
+          if (!tempSuccess) return false;
+
+          final moveSan = _boardState.moveHistory.isNotEmpty
+              ? _boardState.moveHistory.last
+              : move;
+          _boardState.undoMove();
+
+          return allowedForThisMove.contains(moveSan);
+        }).toList();
+
+        // Use the first (and ideally only) allowed move
+        // Bot should be configured to have only one allowed move per turn
+        if (allowedLegalMoves.isNotEmpty) {
+          botMove = allowedLegalMoves.first;
+        }
+        // Otherwise, let the bot play its original move (fallback)
+      }
     }
 
     // Make the bot's move - try SAN first, then UCI

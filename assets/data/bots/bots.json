@@ -1,4 +1,5 @@
 {
+  "$schema": "../../schemas/bots.schema.json",
   "bot_test": {
     "id": "bot_test",
     "name": "Random Randy",
@@ -73,9 +74,11 @@
     "weaknesses": [],
     "minMovesForCompletion": 15,
     "allowedMoves": {
-      "1": ["e4"],
-      "2": ["Bc4", "Nf3"]
+      "1": ["e4", "e5"],
+      "2": ["Nf3", "Nc6"],
+      "3": ["Bc4", "Bc5"]
     },
-    "comment": "Example: Forces player to play e4 on move 1, then Bc4 or Nf3 on move 2 (Italian Opening)"
+    "allowUndo": false,
+    "comment": "Italian Opening: 1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 - Both human and bot restricted to Italian Opening moves. Undo disabled to enforce learning."
   }
 }

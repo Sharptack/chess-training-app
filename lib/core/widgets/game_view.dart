@@ -28,38 +28,60 @@ class GameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Status bar
+        // Status bar with game controls
         Container(
           padding: const EdgeInsets.all(16),
           color: Theme.of(context).colorScheme.surfaceVariant,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(getStatusText(gameState)),
-                    Text(
-                      'Moves: ${gameState.moveCount}',
-                      style: Theme.of(context).textTheme.bodySmall,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(getStatusText(gameState)),
+                        Text(
+                          'Moves: ${gameState.moveCount}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              if (_isGameOver && onGameOverPressed != null)
-                ElevatedButton(
-                  onPressed: onGameOverPressed,
-                  child: const Text('Next'),
-                )
-              else if (!_isGameOver && onResign != null)
-                TextButton.icon(
-                  onPressed: onResign,
-                  icon: const Icon(Icons.flag, size: 16),
-                  label: const Text('Resign'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.error,
                   ),
+                  if (_isGameOver && onGameOverPressed != null)
+                    ElevatedButton(
+                      onPressed: onGameOverPressed,
+                      child: const Text('Next'),
+                    )
+                  else if (!_isGameOver) ...[
+                    // Undo button (only if allowed for this game)
+                    if (gameState.botConfig.allowUndo)
+                      IconButton(
+                        onPressed: gameState.canUndo ? () => gameState.undoMove() : null,
+                        icon: const Icon(Icons.undo),
+                        tooltip: 'Undo move',
+                      ),
+                    if (gameState.botConfig.allowUndo)
+                      const SizedBox(width: 8),
+                    // Resign button
+                    if (onResign != null)
+                      TextButton.icon(
+                        onPressed: onResign,
+                        icon: const Icon(Icons.flag, size: 16),
+                        label: const Text('Resign'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                  ],
+                ],
+              ),
+              // Move history
+              if (gameState.moveLog.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _buildMoveHistory(context),
                 ),
             ],
           ),
@@ -126,6 +148,36 @@ class GameView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMoveHistory(BuildContext context) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
+      ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: gameState.moveLog.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Chip(
+              label: Text(
+                gameState.moveLog[index],
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+            ),
+          );
+        },
+      ),
     );
   }
 }

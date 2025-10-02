@@ -172,6 +172,7 @@ class _BossPageState extends ConsumerState<BossPage> {
       startingFen: boss.startingFen,
       allowedMoves: boss.allowedMoves,
       minMovesForCompletion: boss.minMovesForCompletion ?? 10,
+      allowUndo: boss.allowUndo ?? true,
     );
 
     ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier)

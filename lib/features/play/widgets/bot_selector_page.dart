@@ -144,6 +144,34 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('ELO: ${bot.elo} • Style: ${bot.style}'),
+                  if (bot.startingFen != null)
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 14, color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Custom position',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (bot.allowedMoves != null)
+                    Row(
+                      children: [
+                        Icon(Icons.lock_outline, size: 14, color: Theme.of(context).colorScheme.secondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Move restrictions',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
                   if (progress.gamesPlayed > 0)
                     Text(
                       'Completed: ${progress.gamesPlayed} (${progress.gamesWon} wins)',

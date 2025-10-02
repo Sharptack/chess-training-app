@@ -8,6 +8,7 @@ class Boss {
   final String? startingFen;
   final Map<int, List<String>>? allowedMoves;
   final int? minMovesForCompletion;
+  final bool? allowUndo;
 
   Boss({
     required this.id,
@@ -18,6 +19,7 @@ class Boss {
     this.startingFen,
     this.allowedMoves,
     this.minMovesForCompletion,
+    this.allowUndo,
   });
 
   factory Boss.fromJson(Map<String, dynamic> json) {
@@ -45,6 +47,7 @@ class Boss {
       startingFen: json['startingFen'] as String?,
       allowedMoves: allowedMoves,
       minMovesForCompletion: json['minMovesForCompletion'] as int?,
+      allowUndo: json['allowUndo'] as bool?,
     );
   }
 }

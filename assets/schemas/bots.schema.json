@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bots Collection",
+  "description": "Collection of bot/game configurations",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    }
+  },
+  "patternProperties": {
+    "^bot_[a-zA-Z0-9_]+$": {
+      "$ref": "bot.schema.json"
+    }
+  },
+  "additionalProperties": false
+}

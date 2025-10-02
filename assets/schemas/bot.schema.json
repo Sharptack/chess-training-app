@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bot",
+  "description": "Chess bot/game configuration with optional custom positions, move restrictions, and completion requirements",
+  "type": "object",
+  "required": ["id", "name", "elo", "style"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the bot"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the bot/game"
+    },
+    "elo": {
+      "type": "integer",
+      "description": "ELO rating of the bot (determines difficulty level)",
+      "minimum": 0,
+      "maximum": 3000
+    },
+    "style": {
+      "type": "string",
+      "description": "Playing style of the bot",
+      "enum": ["random", "defensive", "tactical", "aggressive", "positional"]
+    },
+    "weaknesses": {
+      "type": "array",
+      "description": "List of bot weaknesses (for educational purposes)",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "engineSettings": {
+      "type": "object",
+      "description": "Stockfish engine configuration",
+      "properties": {
+        "skillLevel": {
+          "type": "integer",
+          "description": "Stockfish skill level (-10 to 20)",
+          "minimum": -10,
+          "maximum": 20
+        },
+        "moveTime": {
+          "type": "integer",
+          "description": "Time in milliseconds for bot to think",
+          "minimum": 1
+        },
+        "limitStrength": {
+          "type": "boolean",
+          "description": "Whether to limit engine strength"
+        },
+        "randomBlunderChance": {
+          "type": "number",
+          "description": "Probability of bot making a random move (0.0 to 1.0)",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "contempt": {
+          "type": "integer",
+          "description": "Contempt factor for playing style"
+        }
+      }
+    },
+    "startingFen": {
+      "type": "string",
+      "description": "Custom FEN string for starting position (if null, uses standard starting position)",
+      "pattern": "^([rnbqkpRNBQKP1-8]+\\/){7}[rnbqkpRNBQKP1-8]+ [wb] [KQkq-]+ [a-h][1-8]|\\- \\d+ \\d+$"
+    },
+    "allowedMoves": {
+      "type": "object",
+      "description": "Move restrictions per move number. Key is move number (string), value is array of allowed SAN moves.",
+      "patternProperties": {
+        "^[1-9][0-9]*$": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "SAN notation move (e.g., 'e4', 'Nf3', 'Bc4')"
+          },
+          "minItems": 1
+        }
+      },
+      "examples": [
+        {
+          "1": ["e4", "e5"],
+          "2": ["Nf3", "Nc6"],
+          "3": ["Bc4", "Bc5"]
+        }
+      ]
+    },
+    "minMovesForCompletion": {
+      "type": "integer",
+      "description": "Minimum number of moves required to count as completed (for losses)",
+      "minimum": 1,
+      "default": 10
+    },
+    "allowUndo": {
+      "type": "boolean",
+      "description": "Whether the undo button is available for this game",
+      "default": true
+    },
+    "comment": {
+      "type": "string",
+      "description": "Developer comment explaining the bot's purpose (not used in app)"
+    }
+  },
+  "examples": [
+    {
+      "id": "bot_001",
+      "name": "Clumsy Carl",
+      "elo": 400,
+      "style": "random",
+      "engineSettings": {
+        "skillLevel": -5,
+        "moveTime": 50,
+        "randomBlunderChance": 0.7
+      },
+      "minMovesForCompletion": 10
+    },
+    {
+      "id": "bot_endgame",
+      "name": "Endgame Practice",
+      "elo": 500,
+      "style": "tactical",
+      "startingFen": "8/5k2/8/8/8/8/4K3/6R1 w - - 0 1",
+      "minMovesForCompletion": 5,
+      "comment": "King and Rook vs King endgame"
+    },
+    {
+      "id": "bot_italian",
+      "name": "Italian Opening Practice",
+      "elo": 500,
+      "style": "tactical",
+      "allowedMoves": {
+        "1": ["e4", "e5"],
+        "2": ["Nf3", "Nc6"],
+        "3": ["Bc4", "Bc5"]
+      },
+      "minMovesForCompletion": 15,
+      "allowUndo": false,
+      "comment": "Forces Italian Opening sequence for both players"
+    }
+  ]
+}
