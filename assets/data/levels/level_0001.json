@@ -16,7 +16,7 @@
     "puzzle_0003"
   ],
   "play": {
-    "botIds": ["bot_001", "bot_002"],
+    "botIds": ["bot_001", "bot_002", "bot_003_endgame", "bot_004_opening"],
     "gamesRequired": 1
   },
   "boss": {

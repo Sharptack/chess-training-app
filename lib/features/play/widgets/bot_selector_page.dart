@@ -36,7 +36,7 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
           const SizedBox(height: 24),
           
           Text(
-            'Choose Your Opponent',
+            'Select Your Game',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
@@ -110,7 +110,7 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
                               minHeight: 8,
                             ),
                             const SizedBox(height: 4),
-                            Text('$totalGames / $totalRequired games completed'),
+                            Text('$totalGames / $totalRequired completions'),
                           ],
                         );
                       },
@@ -146,7 +146,7 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
                   Text('ELO: ${bot.elo} • Style: ${bot.style}'),
                   if (progress.gamesPlayed > 0)
                     Text(
-                      'Games: ${progress.gamesPlayed} (${progress.gamesWon} wins)',
+                      'Completed: ${progress.gamesPlayed} (${progress.gamesWon} wins)',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                 ],

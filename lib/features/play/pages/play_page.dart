@@ -18,35 +18,61 @@ class PlayPage extends ConsumerStatefulWidget {
 class _PlayPageState extends ConsumerState<PlayPage> {
   bool _hasRecordedCompletion = false;
   GameStatus? _lastKnownStatus;
+  GameState? _currentGameState;
+
+  @override
+  void dispose() {
+    _currentGameState?.removeListener(_onGameStateChanged);
+    super.dispose();
+  }
+
+  void _onGameStateChanged() {
+    final gameState = _currentGameState;
+    if (gameState == null) return;
+
+    print('DEBUG PlayPage _onGameStateChanged: status: ${gameState.status}');
+
+    final previousStatus = _lastKnownStatus;
+    final currentStatus = gameState.status;
+
+    final wasPlaying = previousStatus == GameStatus.waitingForHuman ||
+                      previousStatus == GameStatus.waitingForBot;
+    final gameEnded = currentStatus == GameStatus.humanWin ||
+                     currentStatus == GameStatus.botWin ||
+                     currentStatus == GameStatus.draw;
+
+    print('DEBUG PlayPage: wasPlaying=$wasPlaying, gameEnded=$gameEnded, gameCompletedNormally=${gameState.gameCompletedNormally}, hasRecordedCompletion=$_hasRecordedCompletion');
+
+    if (wasPlaying && gameEnded && gameState.gameCompletedNormally && !_hasRecordedCompletion) {
+      // Only record if: (1) human won, OR (2) human lost but met minimum move requirement
+      final shouldRecord = gameState.humanWon || gameState.meetsMinMoveRequirement;
+
+      print('DEBUG PlayPage: Game ended. Won: ${gameState.humanWon}, MoveCount: ${gameState.moveCount}, MinRequired: ${gameState.botConfig.minMovesForCompletion}, ShouldRecord: $shouldRecord');
+
+      if (shouldRecord) {
+        _hasRecordedCompletion = true;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _handleGameComplete(gameState);
+        });
+      }
+    }
+
+    // Update last known status
+    _lastKnownStatus = currentStatus;
+  }
 
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateNotifierProvider(widget.levelId));
 
-    // Listen for game completion
-    ref.listen(gameStateNotifierProvider(widget.levelId), (previous, current) {
-      // Track the last known status, handling null transitions
-      GameStatus? previousStatus = previous?.status ?? _lastKnownStatus;
-
-      if (current != null) {
-        final wasPlaying = previousStatus == GameStatus.waitingForHuman ||
-                          previousStatus == GameStatus.waitingForBot;
-        final gameEnded = current.status == GameStatus.humanWin ||
-                         current.status == GameStatus.botWin ||
-                         current.status == GameStatus.draw;
-
-        if (wasPlaying && gameEnded && current.gameCompletedNormally && !_hasRecordedCompletion) {
-          _hasRecordedCompletion = true;
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _handleGameComplete(current);
-          });
-        }
-
-        // Update last known status
-        _lastKnownStatus = current.status;
-      }
-    });
+    // Set up listener when game state changes
+    if (gameState != _currentGameState) {
+      _currentGameState?.removeListener(_onGameStateChanged);
+      _currentGameState = gameState;
+      _currentGameState?.addListener(_onGameStateChanged);
+      _lastKnownStatus = gameState?.status;
+    }
     
     return Scaffold(
       appBar: AppBar(
@@ -93,20 +119,57 @@ class _PlayPageState extends ConsumerState<PlayPage> {
   }
   
   Widget _buildGame(GameState gameState) {
-    return GameView(
-      gameState: gameState,
-      getStatusText: _getStatusText,
-      onGameOverPressed: () => _showGameOverOptions(gameState),
+    // Listen to game state changes to rebuild GameView
+    return ListenableBuilder(
+      listenable: gameState,
+      builder: (context, _) {
+        return GameView(
+          gameState: gameState,
+          getStatusText: _getStatusText,
+          onGameOverPressed: () => _showGameOverOptions(gameState),
+          onResign: () => _confirmResign(gameState),
+        );
+      },
+    );
+  }
+
+  void _confirmResign(GameState gameState) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resign Game'),
+        content: const Text('Are you sure you want to resign? This will not count toward your progress.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              gameState.resignGame();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Resign'),
+          ),
+        ],
+      ),
     );
   }
   
   void _handleGameComplete(GameState gameState) async {
+    print('DEBUG _handleGameComplete: Starting for bot ${gameState.botConfig.id}');
+
     // Record the game
     final levelResult = await ref.read(levelRepositoryProvider)
       .getLevelById(widget.levelId);
 
     if (levelResult.isSuccess) {
       final level = levelResult.data!;
+
+      print('DEBUG _handleGameComplete: Recording game. LevelId: ${widget.levelId}, BotId: ${gameState.botConfig.id}, Won: ${gameState.humanWon}, RequiredGames: ${level.requiredGames}');
 
       await recordBotGameCompleted(
         ref,
@@ -116,6 +179,8 @@ class _PlayPageState extends ConsumerState<PlayPage> {
         level.requiredGames,
       );
 
+      print('DEBUG _handleGameComplete: Game recorded, invalidating providers');
+
       // Force refresh
       ref.invalidate(botProgressProvider);
       ref.invalidate(botsProvider);
@@ -123,6 +188,10 @@ class _PlayPageState extends ConsumerState<PlayPage> {
       if (mounted) {
         setState(() {});
       }
+
+      print('DEBUG _handleGameComplete: Complete');
+    } else {
+      print('DEBUG _handleGameComplete: ERROR - Failed to load level');
     }
   }
   
@@ -149,8 +218,8 @@ class _PlayPageState extends ConsumerState<PlayPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('Choose Different Bot'),
+              leading: const Icon(Icons.sports_esports),
+              title: const Text('Choose Different Game'),
               onTap: () {
                 Navigator.pop(context);
                 ref.read(gameStateNotifierProvider(widget.levelId).notifier).endGame();

@@ -9,12 +9,14 @@ class GameView extends StatelessWidget {
   final GameState gameState;
   final String Function(GameState) getStatusText;
   final VoidCallback? onGameOverPressed;
+  final VoidCallback? onResign;
 
   const GameView({
     super.key,
     required this.gameState,
     required this.getStatusText,
     this.onGameOverPressed,
+    this.onResign,
   });
 
   bool get _isGameOver =>
@@ -33,15 +35,61 @@ class GameView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(getStatusText(gameState)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(getStatusText(gameState)),
+                    Text(
+                      'Moves: ${gameState.moveCount}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
               if (_isGameOver && onGameOverPressed != null)
                 ElevatedButton(
                   onPressed: onGameOverPressed,
                   child: const Text('Next'),
+                )
+              else if (!_isGameOver && onResign != null)
+                TextButton.icon(
+                  onPressed: onResign,
+                  icon: const Icon(Icons.flag, size: 16),
+                  label: const Text('Resign'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                 ),
             ],
           ),
         ),
+
+        // Move restriction error message
+        if (gameState.lastMoveRestrictionError != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.warning,
+                  color: Theme.of(context).colorScheme.onErrorContainer,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    gameState.lastMoveRestrictionError!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
         // Chess board
         Expanded(
@@ -59,13 +107,17 @@ class GameView extends StatelessWidget {
                     boardState: gameState.boardState,
                     size: size,
                     onMoveMade: gameState.onHumanMove,
+                    validateMove: gameState.validateMove,
                     onIllegalMove: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Illegal move!'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
+                      // Don't show snackbar for restriction errors - they're shown in the banner
+                      if (gameState.lastMoveRestrictionError == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Illegal move!'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
                     },
                   );
                 },

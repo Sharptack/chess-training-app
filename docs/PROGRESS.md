@@ -781,11 +781,81 @@ Return to level page: green checkmark appears
 
 ---
 
-## Phase 6.7: Play Section Enhancements 🎮 PLANNED
-**Branch**: phase-6.7-play-enhancements **Status**: Planned
+## Phase 6.7: Play Section Enhancements 🎮 IN PROGRESS
+**Branch**: phase-6.7-play-enhancements **Status**: Round 1 Complete & Tested ✅
 **Focus**: Major improvements to Play/Practice section before Phase 7
 
-### Planned Features
+### Round 1: Core Game Mechanics ✅ COMPLETE & TESTED
+
+**Implemented Features:**
+
+**1. Custom Starting Positions** ♟️ ✅
+- Added `startingFen` field to Bot and Boss models
+- GameState initializes from custom FEN when provided in lib/core/game_logic/game_state.dart:78-83
+- Falls back to standard starting position if no FEN specified
+- Example configuration: bot_003_endgame (Rook endgame: King+Rook vs King)
+- Example FEN: "8/5k2/8/8/8/8/4K3/6R1 w - - 0 1"
+
+**2. Move Restriction System** 📋 ✅
+- Added `allowedMoves` field (Map<int, List<String>>) to Bot and Boss models
+- Move validation logic in game_state.dart:114-130
+- Restrictions work per-move-number (e.g., move 1: ["e4"], move 2: ["Bc4", "Nf3"])
+- Invalid moves blocked with error message: "Please find a move that's part of the required sequence."
+- Error displayed in red warning banner below status bar
+- Example configuration: bot_004_opening (Italian Opening practice)
+
+**3. Completion Requirements Update** ✅
+- Added `minMovesForCompletion` field to Bot and Boss models (default: 10)
+- Move counter tracking in game_state.dart:24
+- Progress recorded if: (1) Human wins OR (2) Loss with minimum moves played
+- Resignation does NOT count toward completion
+- Move count displayed in game status bar
+- Completion logic updated in play_page.dart:39-48
+
+**4. UI Terminology: "Bots" → "Games"** 📝 ✅
+- Changed "Choose Your Opponent" → "Select Your Game"
+- Changed "Choose Different Bot" → "Choose Different Game"
+- Changed progress text "games completed" → "completions"
+- Updated icon to sports_esports (game controller)
+- Kept internal model class names as "Bot" to minimize refactoring
+
+**5. Resign Button** 🎛️ ✅
+- Added resign button to GameView widget
+- Shows in status bar when game is active (game_view.dart:55-63)
+- Confirmation dialog before resigning
+- Resigned games do NOT count toward progress
+- Implemented in both PlayPage and BossPage
+
+### Technical Implementation
+
+**Files Modified (8 files)**:
+- `lib/data/models/bot.dart` - Added startingFen, allowedMoves, minMovesForCompletion
+- `lib/data/models/boss.dart` - Added startingFen, allowedMoves, minMovesForCompletion
+- `lib/core/game_logic/game_state.dart` - FEN init, move restrictions, move counting, resign
+- `lib/core/widgets/game_view.dart` - Resign button, move count display, error banner
+- `lib/features/play/pages/play_page.dart` - Completion logic, resign dialog, terminology
+- `lib/features/boss/pages/boss_page.dart` - Boss model updates, resign dialog
+- `lib/features/play/widgets/bot_selector_page.dart` - Terminology updates
+- `assets/data/bots/bots.json` - Added minMovesForCompletion to all bots, added 2 examples
+
+**Example Configurations**:
+```json
+{
+  "bot_003_endgame": {
+    "minMovesForCompletion": 5,
+    "startingFen": "8/5k2/8/8/8/8/4K3/6R1 w - - 0 1"
+  },
+  "bot_004_opening": {
+    "minMovesForCompletion": 15,
+    "allowedMoves": {
+      "1": ["e4"],
+      "2": ["Bc4", "Nf3"]
+    }
+  }
+}
+```
+
+### Round 2: Remaining Features (PLANNED)
 
 **1. Cloud Video Storage Migration** 🎥 (HIGH PRIORITY)
 - Migrate from local video storage to cloud hosting (YouTube/Vimeo)
@@ -794,75 +864,65 @@ Return to level page: green checkmark appears
 - Consider offline caching strategy
 - Update lesson_page.dart to handle external video sources
 
-**2. Custom Starting Positions** ♟️ (HIGH PRIORITY)
-- Add `startingFen` field to Bot/Game configuration
-- Allow custom board positions per game
-- Update GameState to initialize from FEN
-- UI for selecting/displaying starting position
-- Example use cases: endgame practice, opening-specific training
+**2. Undo Move Button** 🎛️ (MEDIUM PRIORITY)
+- Add undo/take-back functionality to game_state.dart
+- Add undo button to GameView widget
+- Proper handling of undo during bot's turn
+- Consider limiting undos per game (educational purpose)
 
-**3. Move Restriction System** 📋 (HIGH PRIORITY)
-- Add `allowedMoves` or `openingRestriction` to game config
-- Restrict legal moves based on desired opening (e.g., Ruy Lopez only)
-- Validate moves against restriction rules
-- Show hints/feedback when player tries restricted move
-- Examples: force specific openings, practice tactical patterns
+**3. Move History Panel** 📜 (LOW PRIORITY)
+- Display move history in algebraic notation
+- Show move pairs (1. e4 e5 2. Nf3 Nc6)
+- Scrollable history panel
+- Integration with GameView
 
-**4. Terminology Change: "Bots" → "Games"** 📝 (HIGH PRIORITY)
-- Rename throughout UI and code
-- `bot_selector_page.dart` → `game_selector_page.dart`
-- "Play against Bot X" → "Play Game X"
-- Update JSON: `bots.json` → `games.json`
-- More accurate terminology for educational games vs AI opponents
+**4. Starting Position Preview** 🔍 (LOW PRIORITY)
+- Show starting position before game begins
+- Visual indicator when custom FEN is used
+- Optional board preview in bot selector
 
-**5. Game Controls Enhancement** 🎛️ (HIGH PRIORITY)
-- Add **Resign** button to play_page and boss_page
-- Add **Undo Move** button (take back last move)
-- Show move history panel
-- Proper button placement in game UI
+### Testing Results ✅ ALL TESTS PASSED
 
-**6. Completion Requirements Update** ✅ (MEDIUM PRIORITY)
-- Change from "must win" to "must play X moves"
-- Add `minMovesRequired` field to game config (default: 10)
-- Track move count, mark complete if game reaches threshold
-- Loss counts as complete if >= 10 moves (or configured value)
-- Win always counts as complete regardless of move count
-- Update progress tracking logic in providers.dart
-- Allows learning from losses, less frustrating for beginners
+**Custom FEN & Starting Positions:**
+- ✅ bot_003_endgame loads King+Rook vs King position correctly
+- ✅ Standard bots use normal starting position
+- ✅ Progress records correctly for custom positions
 
-### Technical Changes Needed
+**Move Restrictions:**
+- ✅ bot_004_opening blocks invalid moves (a3 on move 1)
+- ✅ bot_004_opening allows only e4 on move 1
+- ✅ bot_004_opening allows only Bc4/Nf3 on move 2
+- ✅ Error banner displays with kid-friendly message
+- ✅ Board state doesn't change when move is restricted
+- ✅ Bot responds normally after restricted move attempt
 
-**Data Models**:
-```dart
-// Bot/Game model enhancements
-class Game {  // renamed from Bot
-  final String startingFen;  // NEW
-  final List<String>? allowedMoves;  // NEW
-  final int minMovesForCompletion;  // NEW (default: 10)
-  // ... existing fields
-}
-```
+**Progress Tracking:**
+- ✅ Wins always count toward progress (any move count)
+- ✅ Losses count if minimum moves met (10 for standard bots, 5 for endgame)
+- ✅ Progress updates immediately after game completion
+- ✅ Progress persists across app restarts
+- ✅ Level completion badge shows correctly (green checkmark)
+- ✅ Bot selector shows individual bot progress with checkmarks
 
-**Game State**:
-- Add move counter tracking
-- Add move restriction validation
-- Add undo functionality
-- Add resign handling
+**UI/UX:**
+- ✅ "Next" button appears immediately after game ends
+- ✅ "Select Your Game" terminology in bot selector
+- ✅ "Choose Different Game" in game over menu
+- ✅ Move counter displays in status bar
+- ✅ Resign button shows during active games
+- ✅ Resign confirmation dialog works
+- ✅ Resigned games don't count toward progress
 
-**UI Components**:
-- Game controls widget (resign/undo buttons)
-- Move history display
-- Starting position preview
-- Restriction indicator
+**Backwards Compatibility:**
+- ✅ Existing bots work with default values (bot_001, bot_002)
+- ✅ Boss battles work with new fields
+- ✅ All previous progress preserved
 
-### Files to Create/Modify
-- `lib/data/models/game.dart` (renamed from bot.dart)
-- `lib/features/play/widgets/game_controls.dart` (NEW)
-- `lib/features/play/widgets/game_selector_page.dart` (renamed)
-- `lib/features/play/pages/play_page.dart` (add controls)
-- `lib/core/game_logic/game_state.dart` (undo, resign, restrictions)
-- `lib/state/providers.dart` (update completion logic)
-- `assets/data/games.json` (renamed, enhanced schema)
+### Bugs Fixed During Testing
+1. **Move restrictions validated after move was made** → Fixed: Now validates BEFORE move
+2. **Progress not recording** → Fixed: Changed from ref.listen to direct ChangeNotifier listener
+3. **"Next" button not appearing** → Fixed: Wrapped GameView in ListenableBuilder
+4. **Level completion incorrect** → Fixed: Added new bots to level_0001.json botIds
 
 ---
 

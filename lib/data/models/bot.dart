@@ -8,7 +8,9 @@ class Bot extends Equatable {
   final String style;
   final List<String> weaknesses;
   final Map<String, dynamic>? engineSettings;
-
+  final String? startingFen;
+  final Map<int, List<String>>? allowedMoves; // Move number -> list of allowed SAN moves
+  final int minMovesForCompletion;
 
   const Bot({
     required this.id,
@@ -17,22 +19,48 @@ class Bot extends Equatable {
     required this.style,
     this.weaknesses = const [],
     this.engineSettings,
+    this.startingFen,
+    this.allowedMoves,
+    this.minMovesForCompletion = 10,
   });
 
   factory Bot.fromJson(Map<String, dynamic> json) {
+    // Parse allowedMoves if present
+    Map<int, List<String>>? allowedMoves;
+    if (json['allowedMoves'] != null) {
+      final movesJson = json['allowedMoves'] as Map<String, dynamic>;
+      allowedMoves = {};
+      movesJson.forEach((key, value) {
+        final moveNumber = int.parse(key);
+        allowedMoves![moveNumber] = List<String>.from(value as List);
+      });
+    }
+
     return Bot(
       id: json['id'] as String,
       name: json['name'] as String,
       elo: json['elo'] as int,
       style: json['style'] as String,
-      weaknesses: json['weaknesses'] != null 
+      weaknesses: json['weaknesses'] != null
           ? List<String>.from(json['weaknesses'] as List)
           : [],
-          engineSettings: json['engineSettings'] as Map<String, dynamic>?,
+      engineSettings: json['engineSettings'] as Map<String, dynamic>?,
+      startingFen: json['startingFen'] as String?,
+      allowedMoves: allowedMoves,
+      minMovesForCompletion: json['minMovesForCompletion'] as int? ?? 10,
     );
   }
 
   Map<String, dynamic> toJson() {
+    // Convert allowedMoves back to JSON format
+    Map<String, dynamic>? movesJson;
+    if (allowedMoves != null) {
+      movesJson = {};
+      allowedMoves!.forEach((key, value) {
+        movesJson![key.toString()] = value;
+      });
+    }
+
     return {
       'id': id,
       'name': name,
@@ -40,6 +68,9 @@ class Bot extends Equatable {
       'style': style,
       'weaknesses': weaknesses,
       'engineSettings': engineSettings,
+      'startingFen': startingFen,
+      'allowedMoves': movesJson,
+      'minMovesForCompletion': minMovesForCompletion,
     };
   }
 
@@ -53,5 +84,5 @@ class Bot extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, elo, style, weaknesses, engineSettings];
+  List<Object?> get props => [id, name, elo, style, weaknesses, engineSettings, startingFen, allowedMoves, minMovesForCompletion];
 }

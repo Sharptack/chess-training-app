@@ -15,6 +15,7 @@ class ChessBoardWidget extends StatefulWidget {
   final Color lastMoveColor;
   final Function(String move)? onMoveMade;
   final VoidCallback? onIllegalMove;
+  final bool Function(String move)? validateMove; // NEW: Check if move is allowed before making it
   
   const ChessBoardWidget({
     super.key,
@@ -27,6 +28,7 @@ class ChessBoardWidget extends StatefulWidget {
     this.lastMoveColor = const Color(0xFFCDD26A),
     this.onMoveMade,
     this.onIllegalMove,
+    this.validateMove,
   });
   
   @override
@@ -310,31 +312,40 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _attemptMove(String from, String to, {String? promotion}) {
-  print('DEBUG: _attemptMove called: $from -> $to'); // ADD THIS LINE
-  
-  // Store the move count before attempting the move
-  final moveCountBefore = widget.boardState.moveHistory.length;
-  
-  // Make the move using the chess package
-  final success = widget.boardState.makeMove(from, to, promotion: promotion);
-  
-  if (success) {
-    // Get the last move in SAN notation from move history
-    String moveNotation;
-    if (widget.boardState.moveHistory.length > moveCountBefore) {
-      // The chess package added a move to history, get it in SAN format
-      moveNotation = widget.boardState.moveHistory.last;
-    } else {
-      // Fallback to simple notation
-      moveNotation = '$from$to';
+  // First, try to get the SAN notation WITHOUT making the move
+  // We need to check what the move would be called to validate it
+  final tempSuccess = widget.boardState.makeMove(from, to, promotion: promotion);
+
+  if (!tempSuccess) {
+    widget.onIllegalMove?.call();
+    return;
+  }
+
+  // Get the SAN notation from the move that was just made
+  final moveNotation = widget.boardState.moveHistory.isNotEmpty
+      ? widget.boardState.moveHistory.last
+      : '$from$to';
+
+  // Undo the move so we can validate it first
+  widget.boardState.undoMove();
+
+  // Validate the move if validator is provided
+  if (widget.validateMove != null) {
+    final isAllowed = widget.validateMove!(moveNotation);
+    if (!isAllowed) {
+      // Move is not allowed by game rules (e.g., restriction)
+      widget.onIllegalMove?.call();
+      return;
     }
-    
-    print('DEBUG: Move successful, calling callback: $moveNotation'); // ADD THIS LINE
-    
+  }
+
+  // Now make the move for real
+  final success = widget.boardState.makeMove(from, to, promotion: promotion);
+
+  if (success) {
     // Call the callback with the SAN notation
     widget.onMoveMade?.call(moveNotation);
   } else {
-    print('DEBUG: Move failed'); // ADD THIS LINE
     widget.onIllegalMove?.call();
   }
 }

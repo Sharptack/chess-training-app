@@ -10,7 +10,8 @@
       "limitStrength": false,
       "randomBlunderChance": 0.9
     },
-    "weaknesses": ["plays_randomly", "testing_bot"]
+    "weaknesses": ["plays_randomly", "testing_bot"],
+    "minMovesForCompletion": 10
   },
 
   "bot_001": {
@@ -24,7 +25,8 @@
       "limitStrength": false,
       "randomBlunderChance": 0.7
     },
-    "weaknesses": ["hangs_pieces", "no_planning"]
+    "weaknesses": ["hangs_pieces", "no_planning"],
+    "minMovesForCompletion": 10
   },
   "bot_002": {
     "id": "bot_002",
@@ -38,6 +40,42 @@
       "randomBlunderChance": 0.3,
       "contempt": -30
     },
-    "weaknesses": ["too_passive"]
+    "weaknesses": ["too_passive"],
+    "minMovesForCompletion": 10
+  },
+  "bot_003_endgame": {
+    "id": "bot_003_endgame",
+    "name": "Endgame Practice",
+    "elo": 500,
+    "style": "tactical",
+    "engineSettings": {
+      "skillLevel": -3,
+      "moveTime": 100,
+      "limitStrength": false,
+      "randomBlunderChance": 0.5
+    },
+    "weaknesses": [],
+    "minMovesForCompletion": 5,
+    "startingFen": "8/5k2/8/8/8/8/4K3/6R1 w - - 0 1",
+    "comment": "Example: Rook endgame - King and Rook vs King"
+  },
+  "bot_004_opening": {
+    "id": "bot_004_opening",
+    "name": "Italian Opening Practice",
+    "elo": 500,
+    "style": "tactical",
+    "engineSettings": {
+      "skillLevel": -2,
+      "moveTime": 100,
+      "limitStrength": false,
+      "randomBlunderChance": 0.4
+    },
+    "weaknesses": [],
+    "minMovesForCompletion": 15,
+    "allowedMoves": {
+      "1": ["e4"],
+      "2": ["Bc4", "Nf3"]
+    },
+    "comment": "Example: Forces player to play e4 on move 1, then Bc4 or Nf3 on move 2 (Italian Opening)"
   }
 }

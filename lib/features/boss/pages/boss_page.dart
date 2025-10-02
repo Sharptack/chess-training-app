@@ -16,34 +16,50 @@ class BossPage extends ConsumerStatefulWidget {
 class _BossPageState extends ConsumerState<BossPage> {
   bool _hasRecordedCompletion = false;
   GameStatus? _lastKnownStatus;
+  GameState? _currentGameState;
+
+  @override
+  void dispose() {
+    _currentGameState?.removeListener(_onGameStateChanged);
+    super.dispose();
+  }
+
+  void _onGameStateChanged() {
+    final gameState = _currentGameState;
+    if (gameState == null) return;
+
+    final previousStatus = _lastKnownStatus;
+    final currentStatus = gameState.status;
+
+    final wasPlaying = previousStatus == GameStatus.waitingForHuman ||
+                      previousStatus == GameStatus.waitingForBot;
+    final gameEnded = currentStatus == GameStatus.humanWin ||
+                     currentStatus == GameStatus.botWin ||
+                     currentStatus == GameStatus.draw;
+
+    if (wasPlaying && gameEnded && gameState.gameCompletedNormally && !_hasRecordedCompletion) {
+      _hasRecordedCompletion = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleGameComplete(gameState);
+      });
+    }
+
+    _lastKnownStatus = currentStatus;
+  }
 
   @override
   Widget build(BuildContext context) {
     // Watch the game state and listen for changes
     final gameState = ref.watch(gameStateNotifierProvider('boss_${widget.levelId}'));
 
-    // Listen for game completion
-    ref.listen(gameStateNotifierProvider('boss_${widget.levelId}'), (previous, current) {
-      GameStatus? previousStatus = previous?.status ?? _lastKnownStatus;
-
-      if (current != null) {
-        final wasPlaying = previousStatus == GameStatus.waitingForHuman ||
-                          previousStatus == GameStatus.waitingForBot;
-        final gameEnded = current.status == GameStatus.humanWin ||
-                         current.status == GameStatus.botWin ||
-                         current.status == GameStatus.draw;
-
-        if (wasPlaying && gameEnded && current.gameCompletedNormally && !_hasRecordedCompletion) {
-          _hasRecordedCompletion = true;
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _handleGameComplete(current);
-          });
-        }
-
-        _lastKnownStatus = current.status;
-      }
-    });
+    // Set up listener when game state changes
+    if (gameState != _currentGameState) {
+      _currentGameState?.removeListener(_onGameStateChanged);
+      _currentGameState = gameState;
+      _currentGameState?.addListener(_onGameStateChanged);
+      _lastKnownStatus = gameState?.status;
+    }
 
     // Load level data using FutureProvider
     final levelAsync = ref.watch(levelProvider(widget.levelId));
@@ -153,6 +169,9 @@ class _BossPageState extends ConsumerState<BossPage> {
       style: boss.style,
       engineSettings: boss.engineSettings,
       weaknesses: [],
+      startingFen: boss.startingFen,
+      allowedMoves: boss.allowedMoves,
+      minMovesForCompletion: boss.minMovesForCompletion ?? 10,
     );
 
     ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier)
@@ -160,10 +179,43 @@ class _BossPageState extends ConsumerState<BossPage> {
   }
 
   Widget _buildGame(GameState gameState, boss) {
-    return GameView(
-      gameState: gameState,
-      getStatusText: _getStatusText,
-      onGameOverPressed: () => _showGameOverOptions(gameState),
+    // Listen to game state changes to rebuild GameView
+    return ListenableBuilder(
+      listenable: gameState,
+      builder: (context, _) {
+        return GameView(
+          gameState: gameState,
+          getStatusText: _getStatusText,
+          onGameOverPressed: () => _showGameOverOptions(gameState),
+          onResign: () => _confirmResign(gameState),
+        );
+      },
+    );
+  }
+
+  void _confirmResign(GameState gameState) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resign Game'),
+        content: const Text('Are you sure you want to resign?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              gameState.resignGame();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Resign'),
+          ),
+        ],
+      ),
     );
   }
 
