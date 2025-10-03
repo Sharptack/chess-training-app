@@ -16,8 +16,11 @@ class BotRepository {
 
       final data = result.data!;
       final bots = <Bot>[];
-      
+
       for (final entry in data.entries) {
+        // Skip metadata keys like $schema
+        if (entry.key.startsWith(r'$')) continue;
+
         final botData = entry.value as Map<String, dynamic>;
         bots.add(Bot.fromJson(botData));
       }

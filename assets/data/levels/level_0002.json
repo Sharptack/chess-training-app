@@ -15,7 +15,7 @@
   ],
   "play": {
     "botIds": ["bot_0002"],
-    "gamesRequired": 3
+    "gamesRequired": 1
   },
   "boss": {
     "id": "boss_0002",
