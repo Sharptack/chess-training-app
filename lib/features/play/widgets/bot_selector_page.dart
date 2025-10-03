@@ -222,12 +222,21 @@ class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
   }
   
   Future<int> _calculateTotalGames() async {
+    // Get level config to know requiredGames
+    final levelResult = await ref.read(levelRepositoryProvider).getLevelById(widget.levelId);
+    if (levelResult.isError) return 0;
+    final level = levelResult.data!;
+
     int total = 0;
     for (final bot in widget.bots) {
       final progress = await ref.read(
         botProgressProvider('${widget.levelId}_${bot.id}').future
       );
-      total += progress.gamesPlayed;
+      // Only count up to requiredGames per bot (cap excess games)
+      final cappedGames = progress.gamesPlayed > level.requiredGames
+        ? level.requiredGames
+        : progress.gamesPlayed;
+      total += cappedGames;
     }
     return total;
   }

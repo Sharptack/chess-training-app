@@ -298,23 +298,28 @@ final playProgressProvider = FutureProvider.family<Progress, String>(
     print('DEBUG playProgressProvider: Level has ${level.playBotIds.length} bots, ${level.requiredGames} games required per bot');
 
     // Check progress for each bot
-    int totalGamesPlayed = 0;
+    int botsCompleted = 0; // Number of bots that have met their required games
     bool anyStarted = false;
 
     for (final botId in level.playBotIds) {
       final botProgress = await progressRepo.getBotProgress(levelId, botId);
       print('DEBUG playProgressProvider: Bot $botId has ${botProgress.gamesPlayed} games played');
-      totalGamesPlayed += botProgress.gamesPlayed;
+
+      // Only count this bot as complete if they've met the required games
+      if (botProgress.gamesPlayed >= level.requiredGames) {
+        botsCompleted++;
+      }
+
       if (botProgress.gamesPlayed > 0) {
         anyStarted = true;
       }
     }
 
-    // Calculate total required games (requiredGames per bot * number of bots)
-    final totalRequired = level.requiredGames * level.playBotIds.length;
-    final completed = totalGamesPlayed >= totalRequired;
+    // Calculate total required: each bot must be completed once
+    final totalRequired = level.playBotIds.length;
+    final completed = botsCompleted >= totalRequired;
 
-    print('DEBUG playProgressProvider: Total games played: $totalGamesPlayed, Total required: $totalRequired, Completed: $completed');
+    print('DEBUG playProgressProvider: Bots completed: $botsCompleted, Total required: $totalRequired, Completed: $completed');
 
     return Progress(
       levelId: levelId,
@@ -390,17 +395,19 @@ final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequireme
     final playProgress = await ref.watch(playProgressProvider(levelId).future);
     final playComplete = playProgress.completed;
 
-    // Count total games needed
-    int totalGamesPlayed = 0;
+    // Count how many bots are complete (met required games)
+    int botsCompleted = 0;
     for (final botId in level.playBotIds) {
       final botProgress = await progressRepo.getBotProgress(levelId, botId);
-      totalGamesPlayed += botProgress.gamesPlayed;
+      if (botProgress.gamesPlayed >= level.requiredGames) {
+        botsCompleted++;
+      }
     }
-    final totalRequired = level.requiredGames * level.playBotIds.length;
-    final gamesRemaining = totalRequired - totalGamesPlayed;
+    final totalBots = level.playBotIds.length;
+    final botsRemaining = totalBots - botsCompleted;
     final playStatus = playComplete
         ? 'Complete'
-        : '$gamesRemaining more ${gamesRemaining == 1 ? 'game' : 'games'}';
+        : '$botsRemaining more ${botsRemaining == 1 ? 'bot' : 'bots'}';
 
     return BossUnlockRequirements(
       lessonComplete: lessonComplete,

@@ -99,25 +99,93 @@ class _LevelTile extends ConsumerWidget {
       );
     }
 
-    // Handle puzzle progress
+    // Handle puzzle progress (locked until lesson complete)
     else if (progressType == _ProgressType.puzzle && levelId != null) {
-      final asyncProgress = ref.watch(levelPuzzleProgressProvider(levelId!));
+      // Check if lesson is complete first
+      final lessonAsync = ref.watch(lessonByIdProvider(levelId!));
 
-      badge = asyncProgress.when(
-        loading: () => const SizedBox.shrink(),
-        error: (_, __) => const SizedBox.shrink(),
-        data: (progress) => ProgressBadge(progress: progress),
+      return lessonAsync.when(
+        loading: () => _buildTileContainer(context, null),
+        error: (_, __) => _buildTileContainer(context, null),
+        data: (video) {
+          final lessonProgressAsync = ref.watch(lessonProgressProvider('${levelId!}_${video.id}'));
+
+          return lessonProgressAsync.when(
+            loading: () => _buildTileContainer(context, null),
+            error: (_, __) => _buildTileContainer(context, null),
+            data: (lessonProgress) {
+              if (!lessonProgress.completed) {
+                // Lesson not complete, show lock
+                final lock = LockedBadge(
+                  locked: true,
+                  message: 'Complete the lesson to unlock',
+                  requirements: [
+                    RequirementItem(
+                      label: 'Lesson',
+                      status: 'Not complete',
+                      completed: false,
+                    ),
+                  ],
+                );
+                return _buildLockedTile(context, lock);
+              } else {
+                // Lesson complete, show puzzle progress
+                final asyncProgress = ref.watch(levelPuzzleProgressProvider(levelId!));
+                badge = asyncProgress.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (progress) => ProgressBadge(progress: progress),
+                );
+                return _buildTileContainer(context, badge);
+              }
+            },
+          );
+        },
       );
     }
 
-    // Handle play progress
+    // Handle play progress (locked until lesson complete)
     else if (progressType == _ProgressType.play && levelId != null) {
-      final asyncProgress = ref.watch(playProgressProvider(levelId!));
+      // Check if lesson is complete first
+      final lessonAsync = ref.watch(lessonByIdProvider(levelId!));
 
-      badge = asyncProgress.when(
-        loading: () => const SizedBox.shrink(),
-        error: (_, __) => const SizedBox.shrink(),
-        data: (progress) => ProgressBadge(progress: progress),
+      return lessonAsync.when(
+        loading: () => _buildTileContainer(context, null),
+        error: (_, __) => _buildTileContainer(context, null),
+        data: (video) {
+          final lessonProgressAsync = ref.watch(lessonProgressProvider('${levelId!}_${video.id}'));
+
+          return lessonProgressAsync.when(
+            loading: () => _buildTileContainer(context, null),
+            error: (_, __) => _buildTileContainer(context, null),
+            data: (lessonProgress) {
+              if (!lessonProgress.completed) {
+                // Lesson not complete, show lock
+                final lock = LockedBadge(
+                  locked: true,
+                  message: 'Complete the lesson to unlock',
+                  requirements: [
+                    RequirementItem(
+                      label: 'Lesson',
+                      status: 'Not complete',
+                      completed: false,
+                    ),
+                  ],
+                );
+                return _buildLockedTile(context, lock);
+              } else {
+                // Lesson complete, show play progress
+                final asyncProgress = ref.watch(playProgressProvider(levelId!));
+                badge = asyncProgress.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (progress) => ProgressBadge(progress: progress),
+                );
+                return _buildTileContainer(context, badge);
+              }
+            },
+          );
+        },
       );
     }
 
@@ -208,6 +276,33 @@ class _LevelTile extends ConsumerWidget {
             ),
           ),
           if (badge != null) Positioned(top: 8, right: 8, child: badge),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLockedTile(BuildContext context, Widget lockOverlay) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Complete the lesson to unlock this section!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            ),
+          ),
+          lockOverlay,
         ],
       ),
     );
