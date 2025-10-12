@@ -27,7 +27,8 @@
 ```
 lib/
 ├── features/           # Feature modules
-│   ├── home/
+│   ├── campaign/       # Campaign selection (home)
+│   ├── level/          # Level detail view
 │   ├── lesson/
 │   ├── puzzles/
 │   ├── play/
@@ -158,7 +159,9 @@ UI reflects new state
 #### `data/models/`
 Core domain models (all with `fromJson`/`toJson`):
 
-- `level.dart` - Level configuration (lesson, puzzles, play, boss)
+- `campaign.dart` - Campaign configuration (levels, boss)
+- `level.dart` - Level configuration (lesson, puzzles, games)
+- `game.dart` - Game configuration (type, bot, FEN, restrictions)
 - `video_item.dart` - Video lesson metadata
 - `puzzle.dart` - Puzzle with FEN, solution moves, hints
 - `puzzle_set.dart` - Collection of puzzles per level
@@ -168,16 +171,20 @@ Core domain models (all with `fromJson`/`toJson`):
 - `bot_progress.dart` - Bot-specific progress (games played/won)
 
 **Model Highlights**:
-- `Bot.startingFen` - Custom starting position (e.g., endgame practice)
-- `Bot.allowedMoves` - Move restrictions per turn (opening practice)
+- `Campaign` - Groups 3-6 levels with one boss at end
+- `Campaign.boss` - Boss with unlock requirements (all levels must be complete)
+- `Level.games` - Array of Game objects (replaces old botIds)
+- `Game.type` - full_game, endgame_practice, opening_practice
+- `Game.startingFen` - Custom starting position (endgame practice)
+- `Game.allowedMoves` - Move restrictions (opening practice)
 - `Bot.minMovesForCompletion` - Minimum moves to count toward progress
 - `Bot.engineSettings` - Stockfish skill level, blunder chance, move time
 - `Puzzle.moveSequence` - Multi-move tactical sequences
-- `Level.boss.unlockRequirements` - Lesson/puzzles/play completion needed
 
 #### `data/repositories/`
 Data access layer:
 
+- `campaign_repository.dart` - Load campaign configurations (Phase 7.1)
 - `level_repository.dart` - Load level configurations
 - `puzzle_repository.dart` - Load puzzle sets
 - `bot_repository.dart` - Load bot configurations
@@ -207,12 +214,13 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 
 ### Features (`lib/features/`)
 
-#### `features/home/`
-- `home_page.dart` - Campaign level selection grid
+#### `features/campaign/`
+- `campaign_page.dart` - Campaign selection grid (home screen, Phase 7.1)
+- `campaign_detail_page.dart` - Level selection within campaign (Phase 7.1)
 
 #### `features/lesson/`
 - `lesson_page.dart` - Video player with Chewie
-- `video_player_view.dart` - Custom video controls
+- ~~`video_player_view.dart`~~ - Removed in Phase 7.6 (redundant with LessonPlayer)
 - Progress tracking: 2s = started, 90% = completed
 - 30-second timeout for network videos
 
@@ -224,22 +232,24 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 - Smart resume (starts at first incomplete)
 
 #### `features/play/`
-- `play_page.dart` - Bot game interface
-- `bot_selector_page.dart` - Bot selection with progress bars
+- `play_page.dart` - Game interface (full games, endgame, opening practice)
+- `game_selector_page.dart` - Game selection (was bot_selector_page.dart, Phase 7.1)
 - Resignation, undo, move history
 - Progress: win OR loss with min moves played
+- 3 game types: full_game, endgame_practice, opening_practice
 - Custom FEN and move restrictions support
 
 #### `features/boss/`
 - `boss_page.dart` - Boss battle with intro screen
 - Color selection (play as White/Black)
-- Unlock requirements checklist overlay
+- Unlock requirements checklist overlay (campaign-level, Phase 7.2)
 - One-win completion (marks boss defeated)
+- Accessed from campaign page (not level page)
 
 #### `features/level/`
-- `level_page.dart` - 2x2 grid of features (Lesson, Puzzles, Play, Boss)
+- `level_page.dart` - 3-tile layout (Lesson, Puzzles, Games) - Phase 7.1 update
 - Progress badges on each tile
-- Boss locked until requirements met
+- Boss moved to campaign level
 
 ---
 

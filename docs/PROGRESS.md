@@ -1,203 +1,147 @@
 # Chess Training App Progress
 
 ## Vision
-A comprehensive chess learning app for kids with structured lessons, puzzles, and bot practice. Designed for safe, dedicated tablet use with video game-like progression and spaced repetition for memory reinforcement.
+Chess learning app for kids with structured lessons, puzzles, and bot games. Campaign-based progression with engaging gameplay.
 
 ---
 
 ## Current Status
 
-**Phase**: 6.7 Complete ✅
-**Next**: Phase 7.1 - Performance Tracking
-**Target**: MVP Launch by [Target Date]
+**Phase**: Phase 6.7 Complete ✅
+**Next**: Phase 7 - Chess Club Launch Preparation
+**Target**: Chess Club Testing in 5-6 weeks
 
 ### What's Working ✅
-- ✅ Video lessons with progress tracking
-- ✅ Interactive puzzles with multi-move support
-- ✅ Bot gameplay with Stockfish engine (5 difficulty levels)
-- ✅ Boss battles with unlock requirements
-- ✅ Level progression system
-- ✅ Custom starting positions and move restrictions
-- ✅ Professional chess piece graphics
+- Video lessons with progress tracking
+- Interactive puzzles with multi-move support
+- Bot gameplay with Stockfish engine (5 difficulty levels)
+- Boss battles with unlock requirements
+- Level progression system
+- Custom starting positions and move restrictions
+- Professional chess piece graphics
+- Undo, move history, game variety (full games, endgame practice, opening practice)
 
-### Current Capabilities
-- **Levels**: 2 levels created, system supports unlimited
+### Current Content
+- **Levels**: 2 demo levels created, system supports unlimited
 - **Puzzles**: 11 puzzles total (5 in L1, 6 in L2 with 2 shared)
-- **Bots**: 4 bots configured (200-1200 ELO range)
-- **Features**: Lessons, Puzzles, Play, Boss battles all functional
+- **Bots/Games**: 4 configured (200-1200 ELO range)
+- **Features**: Lessons, Puzzles, Games, Boss battles all functional
 
 ---
 
-## Roadmap to MVP Launch
+## Immediate Next Steps
 
-### Phase 7: Spaced Repetition & Analytics (2 weeks)
+See **[LAUNCH_PLAN.md](./LAUNCH_PLAN.md)** for detailed 5-6 week plan to chess club launch.
 
-#### Phase 7.1: Performance Tracking ⏳ NEXT UP
-**Goal**: Build data foundation for smart puzzle selection
-**Timeline**: 3-4 days
-
-**Tasks**:
-- [ ] Create PuzzleAttempt & PuzzlePerformance models
-- [ ] Add background tracking to puzzle attempts
-- [ ] Extend ProgressRepository with analytics methods
-- [ ] Set up Hive storage for attempt history
-- [ ] OPTIONAL: Create ProgressSummaryWidget for homepage
-
-**Deliverables**:
-- Silent performance tracking (no gameplay changes)
-- Data collection for Phase 7.2 algorithm
-- Optional stats widget showing overall progress
+**Phase 7 Overview** (Launch Preparation):
+1. **Week 1**: Campaign system restructure + unlock logic
+2. **Week 2**: Mobile responsiveness + start content creation
+3. **Week 3**: Complete 55 videos, 550+ puzzles, 100-150 games
+4. **Week 4**: Analytics foundation + polish
+5. **Week 5**: QA testing + TestFlight/Internal Testing deployment
+6. **Week 6**: Chess club launch, begin feedback collection
 
 ---
 
-#### Phase 7.2: Dynamic Puzzle Sets ⏳ UPCOMING
-**Goal**: Smart puzzle review based on performance
-**Timeline**: 5-7 days
+## Post-Launch Roadmap
 
-**Tasks**:
-- [ ] Create PuzzleSelector service with selection algorithm
-- [ ] Update PuzzleSet model for dynamic loading
-- [ ] Modify puzzles_page.dart to use performance-based selection
-- [ ] Update Level JSON schema with reviewPuzzleCount
-- [ ] Test: Level 5 = "10 new + 20 weakest from previous 40"
+After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)** based on user feedback.
 
-**Deliverables**:
-- Levels dynamically include review puzzles
-- Failed/weak puzzles appear in later levels
-- Smart reinforcement without blocking progression
+**High Priority Post-Launch** (Tier 1 features):
+- Spaced repetition system (deferred from Phase 7)
+- Scrollable move history (post-game review)
+- Goal-based games ("Castle by move 10")
+- Timed puzzle rush (speed challenge mode)
+- Custom bot AI (beginner-like behavior)
 
----
+**Medium Priority** (Tier 2 features):
+- User accounts & cloud sync
+- Parental dashboard & analytics
+- Advanced insights
 
-### Phase 8: Content Creation & Polish (4-6 weeks)
-
-**Focus**: Build out 20 levels of quality content
-
-#### Content Development
-- [ ] Create 20 levels (lessons, puzzles, bots, bosses)
-- [ ] Record/source video lessons for each level
-- [ ] Design puzzle sets with progressive difficulty
-- [ ] Configure bot opponents with appropriate ELO ranges
-- [ ] Balance boss difficulty and unlock requirements
-
-#### Visual Polish
-- [ ] UI/UX design improvements
-- [ ] Enhanced animations and transitions
-- [ ] Improved onboarding flow
-- [ ] Settings page (sound, theme options)
-- [ ] Achievement/badge system (optional)
-
-#### Small Feature Additions
-- [ ] Sound effects and music (optional)
-- [ ] Hint system improvements
-- [ ] Better error messages and user guidance
-- [ ] Progress export/sharing (optional)
-
-**Milestone**: Content-complete MVP ready for testing
+**Low Priority** (Tier 3+ features):
+- Multiplayer, themes, monetization, etc.
 
 ---
 
-### Phase 9: MVP Launch & Testing (Ongoing)
+## Development History
 
-**Goal**: Real-world validation with chess club kids and network
+**Phases 0-6.7 Complete** (September-December 2025)
+- Foundation, content loading, error handling
+- Video lessons, Hive progress tracking
+- Chess engine integration (chess package)
+- Interactive puzzles with progress persistence
+- Bot gameplay with Stockfish
+- Boss battles with unlock requirements
+- Code quality improvements
+- Custom positions, move restrictions, undo, move history
 
-#### Pre-Launch Checklist
-- [ ] 20 levels complete and tested
-- [ ] All features working smoothly
-- [ ] Performance optimization (load times, memory)
-- [ ] Basic analytics tracking (usage, completion rates)
-- [ ] App store assets (screenshots, description, icon)
+See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 
-#### Testing Strategy
-1. **Alpha Testing** (Chess Club - Week 1-2):
-   - 5-10 kids from chess club
-   - Supervised sessions, direct observation
-   - Gather qualitative feedback (fun, difficulty, confusion points)
-   - Track completion rates, time spent per level
+---
 
-2. **Beta Testing** (Network - Week 3-4):
-   - 20-30 users from personal network
-   - Unsupervised home use on tablets
-   - Feedback form after each level
-   - Analytics on puzzle accuracy, bot win rates, drop-off points
+## Key Metrics for Chess Club Launch
 
-3. **Iteration** (Ongoing):
-   - Weekly data review and priority fixes
-   - Content adjustments based on difficulty feedback
-   - UI improvements for confusion points
-   - Balance changes (puzzle difficulty, bot strength)
+**Engagement**:
+- 70%+ complete at least Campaign 1 (5 levels)
+- 50%+ return after 3 days
+- Sessions per week per user
+- Average session length (target: 20-40 min)
 
-#### Data Collection
-**Quantitative**:
-- Level completion rates
-- Puzzle accuracy per level
-- Bot game win/loss ratios
-- Time spent per feature type
-- Drop-off points in progression
+**Progress**:
+- Lesson/puzzle/game completion rates
+- Campaign progression funnel
+- Boss battle win rate
+
+**Drop-off**:
+- Where users quit (level/campaign)
+- Skip rate (video/puzzle/game)
+- Feature usage breakdown
 
 **Qualitative**:
-- User interviews (kids + parents)
-- Feedback forms
-- Observation notes from supervised play
-- Feature requests and pain points
+- NPS from parents
+- Feedback forms, interviews
 
-#### Iteration Cycles
-- **Week 1-2**: Major bugs and blocking issues
-- **Week 3-4**: Content balance and difficulty tuning
-- **Month 2**: Feature polish and requested additions
-- **Month 3+**: New content based on engagement data
-
----
-
-## Post-MVP Roadmap
-
-After successful testing and initial launch:
-
-### Phase 10: Advanced Features
-- Full spaced repetition (Phase 7.3 - SM-2/FSRS algorithms)
-- Cloud video storage migration (if needed)
-- User accounts and cloud sync
-- Parental controls and analytics dashboard
-- Leaderboards and social features (optional)
-
-### Phase 11: Scaling & Distribution
-- App Store / Google Play submission
-- Marketing and user acquisition
-- Content expansion (levels 21-50)
-- Multiple language support
-- Accessibility enhancements
-
----
-
-## Key Metrics for Success
-
-### MVP Success Criteria
-- **Engagement**: 50%+ of users complete at least 5 levels
-- **Retention**: 30%+ return after 1 week
-- **Satisfaction**: 4+ star average rating from testers
-- **Learning**: Measurable improvement in puzzle accuracy over time
-
-### Technical Metrics
-- **Performance**: <3 second load time for any page
-- **Stability**: <1% crash rate
-- **Storage**: <200MB total app size
-- **Battery**: Minimal battery drain on tablets
+See LAUNCH_PLAN.md Phase 4 for complete metrics list.
 
 ---
 
 ## Quick Links
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical structure and decisions
-- [CHANGELOG.md](./CHANGELOG.md) - Detailed phase history
-- [BACKLOG.md](./BACKLOG.md) - Future features and ideas
+- **[LAUNCH_PLAN.md](./LAUNCH_PLAN.md)** - Detailed 5-6 week roadmap (active)
+- **[BACKLOG.md](./BACKLOG.md)** - Post-launch features by priority tier
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical structure and decisions
+- **[CHANGELOG.md](./CHANGELOG.md)** - Complete development history (Phases 0-6.7)
 
 ---
 
 ## Development Workflow
 
-1. **Feature branches** for each phase (e.g., `phase-7.1-tracking`)
-2. **Test thoroughly** before merging
-3. **Update docs** when phase complete
-4. **Tag releases** for major milestones
+1. Feature branches for each phase (e.g., `phase-7.1-campaign-system`)
+2. Test thoroughly before merging to main
+3. Update CHANGELOG.md when phase complete
+4. Tag releases for major milestones
 
 **Current Branch**: `main` (stable, Phase 6.7 complete)
-**Next Branch**: `phase-7.1-tracking`
+**Next Branch**: `phase-7.1-campaign-system`
+
+---
+
+## Notes
+
+**Why defer spaced repetition?**
+- Focus on getting to real users faster
+- Content creation is higher priority
+- Spaced repetition requires extensive playtesting to calibrate
+- Can add after validating core experience
+
+**Why campaign restructure?**
+- More flexibility in level grouping (4-8 levels per campaign vs fixed)
+- Reduces boss fatigue (13 bosses vs 55 bosses)
+- Cleaner progression model
+- Better matches chess curriculum structure
+
+**After LAUNCH_PLAN.md complete:**
+- Move Phase 7 summary to CHANGELOG.md
+- Delete LAUNCH_PLAN.md (temporary document)
+- Work from BACKLOG.md going forward
