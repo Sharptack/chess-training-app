@@ -59,6 +59,7 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 - [ ] Refactor level_page.dart to show 3 tiles (Lesson, Puzzles, Games)
   - Remove Boss tile from level page
   - Update layout from 2x2 grid to 3-tile layout
+  - Keep unlock requirements progress display (show lesson/puzzles/games completion status for boss unlock visibility)
 
 **Level Model Updates**:
 - [ ] Remove `boss` field from Level model (boss now in Campaign)

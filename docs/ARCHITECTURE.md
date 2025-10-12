@@ -250,6 +250,7 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 - `level_page.dart` - 3-tile layout (Lesson, Puzzles, Games) - Phase 7.1 update
 - Progress badges on each tile
 - Boss moved to campaign level
+- Unlock requirements progress display remains on level page (shows lesson/puzzles/games completion toward boss unlock)
 
 ---
 
