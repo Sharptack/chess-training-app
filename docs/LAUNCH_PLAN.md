@@ -9,6 +9,24 @@
 
 ---
 
+## Terminology: "Bot" vs "Game"
+
+**User-Facing (UI/Docs)**: "Games" - What players experience
+- "Select Your Game" (not "Select Your Bot")
+- "Game completed"
+- Game types: full_game, endgame_practice, opening_practice
+
+**Code/Internal**: "Bot" - AI opponent configuration
+- `Bot` model (keeps existing code structure)
+- `BotRepository`, `bot_factory.dart`, etc.
+- Bot represents the Stockfish/MockBot opponent
+
+**Why Hybrid**: "Games" is conceptually accurate (full games, endgame practice, opening practice). "Bot" is technically accurate (AI opponent). This avoids large refactoring while keeping UI clear.
+
+**Phase 7.1 Change**: Rename `bot_selector_page.dart` → `game_selector_page.dart` for UI consistency.
+
+---
+
 ## Campaign & Level Structure
 
 See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
@@ -53,10 +71,12 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 - [ ] Add campaign detail route
 - [ ] Update navigation throughout app
 
-**Game Model** (new):
+**Game Model & UI** (new):
 - [ ] Create Game model (id, title, type, botId, startingFen, allowedMoves, completionsRequired)
-- [ ] Support 3 game types: full_game, endgame_practice, opening_practice
-- [ ] Update BotSelectorPage to show games instead of bots
+- [ ] Rename `bot_selector_page.dart` → `game_selector_page.dart`
+- [ ] Update UI text to use "Game" terminology (already mostly done)
+
+**Note**: Keep existing `Bot` model and infrastructure. Game model references Bot via `botId`.
 
 **Deliverable**: Campaign-based navigation working, levels display 3 components
 
