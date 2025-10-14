@@ -46,3 +46,5 @@ app.*.map.json
 
 # Ignore all mp4 videos in assets/videos
 assets/videos/*.mp4
+tools/puzzle_importer/*.csv
+tools/puzzle_importer/*.zst
