@@ -1,26 +1,26 @@
-// lib/features/play/widgets/bot_selector_page.dart
+// lib/features/play/widgets/game_selector_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/bot.dart';
 import '../../../state/providers.dart';
 
-class BotSelectorPage extends ConsumerStatefulWidget {
+class GameSelectorPage extends ConsumerStatefulWidget {
   final String levelId;
   final List<Bot> bots;
   final Function(Bot, bool) onStartGame;
-  
-  const BotSelectorPage({
-    super.key, 
+
+  const GameSelectorPage({
+    super.key,
     required this.levelId,
     required this.bots,
     required this.onStartGame,
   });
 
   @override
-  ConsumerState<BotSelectorPage> createState() => _BotSelectorPageState();
+  ConsumerState<GameSelectorPage> createState() => _GameSelectorPageState();
 }
 
-class _BotSelectorPageState extends ConsumerState<BotSelectorPage> {
+class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
   Bot? _selectedBot;
   bool _humanPlaysWhite = true;
 

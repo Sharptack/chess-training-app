@@ -40,85 +40,101 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 
 ---
 
-## Phase 7.1: Campaign System Implementation (Week 1, 3-4 days)
-**Branch**: `phase-7.1-campaign-system`
+## Phase 7.1: Campaign System Implementation ✅ COMPLETE
+**Branch**: `main` (merged)
 **Goal**: Restructure app for campaign-based progression
+**Duration**: October 13, 2025 (1 day)
 
-### Tasks
+### Tasks - ALL COMPLETE ✅
 
 **Campaign Model & Repository**:
-- [ ] Create Campaign model (id, title, description, levelIds, boss)
-- [ ] Create CampaignRepository for loading campaign JSON
-- [ ] Create 13 campaign JSON files (see CAMPAIGN_STRUCTURE.md)
+- [x] Create Campaign model (id, title, description, levelIds, boss)
+- [x] Create CampaignRepository for loading campaign JSON
+- [x] Create 2 campaign JSON files (campaign_01, campaign_02) + 8 placeholder levels
 
 **UI Updates**:
-- [ ] Build CampaignPage (new home screen)
-  - Grid/list of campaigns
-  - Show campaign progress (X/Y levels completed)
-  - Lock campaigns until previous boss defeated
-- [ ] Refactor level_page.dart to show 3 tiles (Lesson, Puzzles, Games)
-  - Remove Boss tile from level page
-  - Update layout from 2x2 grid to 3-tile layout
-  - Keep unlock requirements progress display (show lesson/puzzles/games completion status for boss unlock visibility)
+- [x] Build CampaignsHomePage (new home screen)
+  - Grid of campaigns with lock states
+  - Shows campaign info and boss details
+- [x] Build CampaignDetailPage (shows levels + campaign boss)
+- [x] Refactor level_page.dart to show 3 tiles (Lesson, Puzzles, Games)
+  - Removed Boss tile from level page
+  - Updated layout from 2x2 grid to 3-tile layout (1 top, 2 bottom)
+  - Added "Level Progress" card showing completion status
 
 **Level Model Updates**:
-- [ ] Remove `boss` field from Level model (boss now in Campaign)
-- [ ] Add `games` array to Level model (replaces `play.botIds`)
-- [ ] Update Level JSON schema for new structure
-- [ ] Migrate existing level_0001.json and level_0002.json to new format
+- [x] Remove `boss` field from Level model (boss now in Campaign)
+- [x] Add `campaignId` field to Level model
+- [x] Update Level JSON schema for new structure
+- [x] Migrate existing level_0001.json and level_0002.json to new format
 
 **Routing**:
-- [ ] Update app_router.dart: home → campaigns → levels
-- [ ] Add campaign detail route
-- [ ] Update navigation throughout app
+- [x] Update app_router.dart: home → campaigns → campaign detail → levels
+- [x] Add campaign detail route
+- [x] Move boss route to campaign level (/campaign/:id/boss)
 
-**Game Model & UI** (new):
-- [ ] Create Game model (id, title, type, botId, startingFen, allowedMoves, completionsRequired)
-- [ ] Rename `bot_selector_page.dart` → `game_selector_page.dart`
-- [ ] Update UI text to use "Game" terminology (already mostly done)
+**Game Model & UI**:
+- [x] Rename `bot_selector_page.dart` → `game_selector_page.dart`
+- [x] Update UI text to use "Game" terminology
+- [x] Fix PlayPage to filter bots by level.playBotIds
+- **Note**: No separate Game model needed - Bot model serves this purpose
 
-**Note**: Keep existing `Bot` model and infrastructure. Game model references Bot via `botId`.
+**Unlock Logic** (moved from Phase 7.2):
+- [x] Implement level unlock logic (sequential unlocking)
+- [x] Add `isLevelUnlockedProvider` to check if level is unlocked
+- [x] First level always unlocked, others unlock after previous complete
 
-**Deliverable**: Campaign-based navigation working, levels display 3 components
+**Bug Fixes**:
+- [x] Fixed puzzle loading "invalid radix 10 number" error
+- [x] Fixed game count mismatch between pages
+- [x] Fixed level completion message (now says "Level complete!")
+- [x] Added campaigns directory to pubspec.yaml assets
+
+**Deliverable**: ✅ Campaign-based navigation working, levels display 3 components, unlock progression functional
 
 ---
 
-## Phase 7.2: Unlocking System (Week 1, 2-3 days)
-**Branch**: `phase-7.2-unlock-system`
-**Goal**: Implement full unlock progression
+## Phase 7.2: Campaign Unlocking & Mobile Responsiveness (Week 2, 2-3 days)
+**Branch**: `phase-7.2-campaign-unlocking`
+**Goal**: Complete unlock system and ensure mobile compatibility
 
-### Unlock Logic
+### Remaining Unlock Tasks
 
-- Level 1 starts unlocked
-- Each level unlocks after previous level completes
-- Level completion = lesson viewed + puzzles passed + all games completed
-- Campaign boss unlocks after all levels in campaign complete
-- Next campaign unlocks after boss defeated
+**Already Complete** (done in Phase 7.1):
+- [x] Level unlock logic (sequential, previous must complete)
+- [x] `isLevelUnlockedProvider` implementation
+- [x] Level completion checking (lesson + puzzles + games)
+- [x] Lock overlays on level tiles
+- [x] Campaign boss unlock requirements display
 
-### Tasks
-
-**ProgressRepository Updates**:
-- [ ] Add `isLevelUnlocked(String levelId)` method
-  - Checks if previous level complete
-  - Level 1 always unlocked
-- [ ] Add `isCampaignBossUnlocked(String campaignId)` method
-  - Checks if all levels in campaign complete
-- [ ] Add `isCampaignUnlocked(String campaignId)` method
+**Still TODO**:
+- [ ] Campaign unlock logic (Campaign 2+ locks until previous boss defeated)
+  - Add `isCampaignUnlockedProvider`
   - Campaign 1 always unlocked
-  - Others unlock after previous boss defeated
+  - Others unlock after previous campaign boss defeated
+- [ ] Campaign boss progress tracking
+  - Track boss completion per campaign
+  - Show boss completion status on campaign cards
+- [ ] Lock overlay on CampaignPage for locked campaigns
+- [ ] Add campaign progress display (X/Y levels completed)
 
-**Provider Updates**:
-- [ ] Update unlock requirements provider for campaign-level bosses
-- [ ] Calculate total game completions (sum across all games in level)
-- [ ] Update level completion logic (lesson + puzzles + all games)
+### Mobile Responsiveness
 
-**UI Updates**:
-- [ ] Add lock overlays to CampaignPage (locked campaigns)
-- [ ] Add lock overlays to campaign detail view (locked levels)
-- [ ] Update BossPage lock overlay for campaign-level bosses
-- [ ] Show unlock requirements in UI
+**Testing Matrix**:
+- [ ] iPhone SE (smallest screen)
+- [ ] iPhone 15 Pro Max
+- [ ] iPad
+- [ ] Android phone (Pixel/Galaxy)
+- [ ] Android tablet
 
-**Deliverable**: Full unlock progression working end-to-end
+**Layout Fixes**:
+- [ ] Chess board scaling on small screens
+- [ ] Campaign/level grid responsive layouts
+- [ ] Button sizes (48x48 minimum touch targets)
+- [ ] Text readability
+- [ ] Safe areas (notch, navigation bars)
+
+**Deliverable**: Campaign unlock working, app responsive on iOS/Android phones and tablets
 
 ---
 

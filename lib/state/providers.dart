@@ -10,12 +10,103 @@ import '../data/models/bot.dart';
 import '../data/repositories/progress_repository.dart';
 import '../data/models/progress.dart';
 import '../data/repositories/level_repository.dart';
+import '../data/repositories/campaign_repository.dart';
+import '../data/models/campaign.dart';
 import '../data/models/video_item.dart';
 import '../data/repositories/puzzle_repository.dart';
 import '../data/models/puzzle.dart';
 import '../data/models/puzzle_set.dart';
 import '../data/models/bot_progress.dart';
 
+// ============================================================================
+// CAMPAIGN PROVIDERS
+// ============================================================================
+
+/// CampaignRepository provider
+final campaignRepositoryProvider = Provider<CampaignRepository>((ref) {
+  return const CampaignRepository();
+});
+
+/// Returns all campaigns from the index
+final allCampaignsProvider = FutureProvider<List<Campaign>>((ref) async {
+  final repo = ref.watch(campaignRepositoryProvider);
+  final result = await repo.getAllCampaigns();
+
+  if (result.isError) {
+    throw Exception(result.failure!.message);
+  }
+
+  return result.data!;
+});
+
+/// Returns a single campaign by ID
+final campaignProvider = FutureProvider.family<Campaign, String>((ref, String campaignId) async {
+  final repo = ref.watch(campaignRepositoryProvider);
+  final result = await repo.getCampaignById(campaignId);
+
+  if (result.isError) {
+    throw Exception(result.failure!.message);
+  }
+
+  return result.data!;
+});
+
+/// Returns boss unlock requirements for a campaign (checks ALL levels in campaign)
+final campaignBossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequirements, String>(
+  (ref, String campaignId) async {
+    final campaignAsync = await ref.watch(campaignProvider(campaignId).future);
+    final campaign = campaignAsync;
+
+    // Check completion of all levels in the campaign
+    final progressRepo = ref.watch(progressRepositoryProvider);
+
+    bool allLessonsComplete = true;
+    bool allPuzzlesComplete = true;
+    int totalGamesCompleted = 0;
+    int totalGamesRequired = 0;
+
+    for (final levelId in campaign.levelIds) {
+      final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
+      if (levelResult.isError) continue;
+
+      final level = levelResult.data!;
+
+      // Check lesson
+      final lessonProgress = await progressRepo.getLessonProgress(levelId, level.lessonVideo.id);
+      if (!lessonProgress.completed) {
+        allLessonsComplete = false;
+      }
+
+      // Check puzzles
+      final puzzleProgress = await progressRepo.getLessonProgress('puzzles', levelId);
+      if (!puzzleProgress.completed) {
+        allPuzzlesComplete = false;
+      }
+
+      // Check games (count total across all bots)
+      for (final botId in level.playBotIds) {
+        final botProgress = await progressRepo.getBotProgress(levelId, botId);
+        totalGamesCompleted += botProgress.gamesPlayed.clamp(0, level.requiredGames);
+      }
+      totalGamesRequired += level.requiredGames * level.playBotIds.length;
+    }
+
+    final allGamesComplete = totalGamesCompleted >= totalGamesRequired;
+
+    return BossUnlockRequirements(
+      lessonComplete: allLessonsComplete,
+      lessonStatus: allLessonsComplete ? 'All complete' : 'Incomplete',
+      puzzlesComplete: allPuzzlesComplete,
+      puzzleStatus: allPuzzlesComplete ? 'All complete' : 'Incomplete',
+      playComplete: allGamesComplete,
+      playStatus: '$totalGamesCompleted / $totalGamesRequired games',
+    );
+  },
+);
+
+// ============================================================================
+// LEVEL & LESSON PROVIDERS
+// ============================================================================
 
 /// Command helper to reset a lesson's progress and refresh its state.
 Future<void> resetLesson(WidgetRef ref, String levelId, String videoId) async {
@@ -352,6 +443,33 @@ class BossUnlockRequirements {
   }) : isUnlocked = lessonComplete && puzzlesComplete && playComplete;
 }
 
+/// Check if a level is unlocked (first level always unlocked, others need previous complete)
+final isLevelUnlockedProvider = FutureProvider.family<bool, String>(
+  (ref, String levelId) async {
+    // Get the level to find its campaign and position
+    final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
+    if (levelResult.isError) return false;
+
+    final level = levelResult.data!;
+
+    // Get the campaign to find level order
+    final campaignResult = await ref.watch(campaignProvider(level.campaignId).future);
+    final campaign = campaignResult;
+
+    // Find this level's position in the campaign
+    final levelIndex = campaign.levelIds.indexOf(levelId);
+
+    // First level is always unlocked
+    if (levelIndex <= 0) return true;
+
+    // Check if previous level is complete
+    final previousLevelId = campaign.levelIds[levelIndex - 1];
+    final previousLevelRequirements = await ref.watch(bossUnlockRequirementsProvider(previousLevelId).future);
+
+    return previousLevelRequirements.isUnlocked;
+  },
+);
+
 /// Check if boss is unlocked for a level
 final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequirements, String>(
   (ref, String levelId) async {
@@ -395,19 +513,17 @@ final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequireme
     final playProgress = await ref.watch(playProgressProvider(levelId).future);
     final playComplete = playProgress.completed;
 
-    // Count how many bots are complete (met required games)
-    int botsCompleted = 0;
+    // Count total games played vs required
+    int totalGamesPlayed = 0;
     for (final botId in level.playBotIds) {
       final botProgress = await progressRepo.getBotProgress(levelId, botId);
-      if (botProgress.gamesPlayed >= level.requiredGames) {
-        botsCompleted++;
-      }
+      // Cap each bot's contribution at requiredGames
+      totalGamesPlayed += botProgress.gamesPlayed.clamp(0, level.requiredGames);
     }
-    final totalBots = level.playBotIds.length;
-    final botsRemaining = totalBots - botsCompleted;
+    final totalGamesRequired = level.playBotIds.length * level.requiredGames;
     final playStatus = playComplete
         ? 'Complete'
-        : '$botsRemaining more ${botsRemaining == 1 ? 'bot' : 'bots'}';
+        : '$totalGamesPlayed / $totalGamesRequired games';
 
     return BossUnlockRequirements(
       lessonComplete: lessonComplete,

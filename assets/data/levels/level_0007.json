@@ -1,0 +1,21 @@
+{
+  "id": "level_0007",
+  "title": "Bishop Practice",
+  "description": "Master bishop movement and tactical patterns.",
+  "campaignId": "campaign_02",
+  "lesson": {
+    "video": {
+      "id": "video_0007",
+      "title": "Bishop Movement and Tactics",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0007"
+  ],
+  "play": {
+    "botIds": ["bot_002"],
+    "gamesRequired": 1
+  }
+}

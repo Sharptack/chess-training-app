@@ -1,0 +1,21 @@
+{
+  "id": "level_0010",
+  "title": "Checkmate in 1 with Rook",
+  "description": "Learn common rook checkmate patterns.",
+  "campaignId": "campaign_02",
+  "lesson": {
+    "video": {
+      "id": "video_0010",
+      "title": "Rook Checkmate Patterns",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0010"
+  ],
+  "play": {
+    "botIds": ["bot_002"],
+    "gamesRequired": 1
+  }
+}

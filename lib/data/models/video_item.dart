@@ -21,4 +21,13 @@ url: json['url'] as String,
 thumbnail: json['thumbnail'] as String?,
 );
 }
+
+Map<String, dynamic> toJson() {
+return {
+'id': id,
+'title': title,
+'url': url,
+if (thumbnail != null) 'thumbnail': thumbnail,
+};
+}
 }

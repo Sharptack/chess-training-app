@@ -1,0 +1,21 @@
+{
+  "id": "level_0003",
+  "title": "Stopping Check 1 – Capture",
+  "description": "Learn to respond to check by capturing the attacking piece.",
+  "campaignId": "campaign_01",
+  "lesson": {
+    "video": {
+      "id": "video_0003",
+      "title": "Capturing to Stop Check",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0003"
+  ],
+  "play": {
+    "botIds": ["bot_001"],
+    "gamesRequired": 1
+  }
+}

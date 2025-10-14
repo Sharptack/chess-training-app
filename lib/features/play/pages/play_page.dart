@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/game_view.dart';
 import '../../../core/game_logic/game_state.dart';
 import '../../../state/providers.dart';
-import '../widgets/bot_selector_page.dart';
+import '../widgets/game_selector_page.dart';
 
 class PlayPage extends ConsumerStatefulWidget {
   final String levelId;
@@ -102,19 +102,33 @@ class _PlayPageState extends ConsumerState<PlayPage> {
   Widget _buildBotSelector() {
     _hasRecordedCompletion = false; // Reset when returning to selector
     _lastKnownStatus = null; // Reset last known status
+
+    // Load level to get the specific bot IDs for this level
+    final levelAsync = ref.watch(levelProvider(widget.levelId));
     final botsAsync = ref.watch(botsProvider);
 
-    return botsAsync.when(
-      data: (bots) => BotSelectorPage(
-        levelId: widget.levelId,
-        bots: bots,
-        onStartGame: (bot, humanPlaysWhite) {
-          ref.read(gameStateNotifierProvider(widget.levelId).notifier)
-            .startGame(bot: bot, humanPlaysWhite: humanPlaysWhite);
-        },
-      ),
+    return levelAsync.when(
+      data: (level) {
+        return botsAsync.when(
+          data: (allBots) {
+            // Filter bots to only include those specified in level.playBotIds
+            final levelBots = allBots.where((bot) => level.playBotIds.contains(bot.id)).toList();
+
+            return GameSelectorPage(
+              levelId: widget.levelId,
+              bots: levelBots,
+              onStartGame: (bot, humanPlaysWhite) {
+                ref.read(gameStateNotifierProvider(widget.levelId).notifier)
+                  .startGame(bot: bot, humanPlaysWhite: humanPlaysWhite);
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text('Error loading bots: $error')),
+        );
+      },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text('Error: $error')),
+      error: (error, _) => Center(child: Text('Error loading level: $error')),
     );
   }
   

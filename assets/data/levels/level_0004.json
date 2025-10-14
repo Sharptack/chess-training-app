@@ -1,0 +1,21 @@
+{
+  "id": "level_0004",
+  "title": "Stopping Check 2 – Block",
+  "description": "Learn to respond to check by blocking the attack with another piece.",
+  "campaignId": "campaign_01",
+  "lesson": {
+    "video": {
+      "id": "video_0004",
+      "title": "Blocking to Stop Check",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0004"
+  ],
+  "play": {
+    "botIds": ["bot_001"],
+    "gamesRequired": 1
+  }
+}

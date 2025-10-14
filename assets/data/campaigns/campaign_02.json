@@ -1,0 +1,29 @@
+{
+  "id": "campaign_02",
+  "title": "Fundamentals 2",
+  "description": "Learn basic checkmate patterns with Queen, Rook, and minor pieces",
+  "levelIds": [
+    "level_0006",
+    "level_0007",
+    "level_0008",
+    "level_0009",
+    "level_0010"
+  ],
+  "boss": {
+    "id": "boss_campaign_02",
+    "name": "Knight Defender",
+    "elo": 500,
+    "style": "tactical",
+    "engineSettings": {
+      "skillLevel": -5,
+      "moveTime": 250,
+      "limitStrength": true,
+      "randomBlunderChance": 0.5
+    },
+    "unlockRequirements": {
+      "allLessonsMustBeComplete": true,
+      "allPuzzlesMustBeComplete": true,
+      "requiredGamesTotal": 15
+    }
+  }
+}

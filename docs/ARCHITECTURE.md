@@ -92,12 +92,16 @@ result.when(
 
 ### 4. Provider-Based State Management
 **Key Providers**:
+- `campaignProvider` - FutureProvider.family for campaign data (Phase 7.1)
+- `allCampaignsProvider` - FutureProvider for all campaigns (Phase 7.1)
 - `levelProvider` - FutureProvider.family for level data
 - `puzzleSetProvider` - FutureProvider.family for puzzle sets
 - `lessonProgressProvider` - StateNotifierProvider for lesson progress
 - `puzzleProgressProvider` - StateNotifierProvider for puzzle completion
 - `playProgressProvider` - Computed provider for bot game progress
+- `isLevelUnlockedProvider` - Computed provider for level unlock status (Phase 7.1)
 - `bossUnlockRequirementsProvider` - Computed provider for boss unlock status
+- `campaignBossUnlockRequirementsProvider` - Computed provider for campaign boss unlock (Phase 7.1)
 
 **State Flow**:
 ```

@@ -1,11 +1,12 @@
 {
   "id": "level_0002",
-  "title": "Mixed Tactics",
-  "description": "Review fundamentals and learn new tactical patterns",
+  "title": "Pawn Promotion",
+  "description": "Learn how pawns can transform into powerful pieces when they reach the opposite end of the board.",
+  "campaignId": "campaign_01",
   "lesson": {
     "video": {
-      "id": "lesson_0002",
-      "title": "Introduction to Pins and Skewers",
+      "id": "video_0002",
+      "title": "The Power of Pawn Promotion",
       "url": "assets/videos/sample.mp4",
       "thumbnail": null
     }
@@ -16,11 +17,5 @@
   "play": {
     "botIds": ["bot_0002"],
     "gamesRequired": 1
-  },
-  "boss": {
-    "id": "boss_0002",
-    "name": "Pin Master Paul",
-    "elo": 700,
-    "style": "positional"
   }
 }

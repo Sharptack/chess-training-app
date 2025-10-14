@@ -50,4 +50,27 @@ class Boss {
       allowUndo: json['allowUndo'] as bool?,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    // Convert allowedMoves back to JSON format
+    Map<String, dynamic>? movesJson;
+    if (allowedMoves != null) {
+      movesJson = {};
+      allowedMoves!.forEach((key, value) {
+        movesJson![key.toString()] = value;
+      });
+    }
+
+    return {
+      'id': id,
+      'name': name,
+      'elo': elo,
+      'style': style,
+      if (engineSettings != null) 'engineSettings': engineSettings,
+      if (startingFen != null) 'startingFen': startingFen,
+      if (movesJson != null) 'allowedMoves': movesJson,
+      if (minMovesForCompletion != null) 'minMovesForCompletion': minMovesForCompletion,
+      if (allowUndo != null) 'allowUndo': allowUndo,
+    };
+  }
 }

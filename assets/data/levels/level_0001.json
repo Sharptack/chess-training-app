@@ -1,11 +1,12 @@
 {
   "id": "level_0001",
-  "title": "God’s Call to Moses",
-  "description": "Learn how God prepared Moses for leadership and the lessons of faith.",
+  "title": "Check vs. Checkmate",
+  "description": "Learn the difference between check and checkmate, the fundamental goal of chess.",
+  "campaignId": "campaign_01",
   "lesson": {
     "video": {
-      "id": "moses_intro",
-      "title": "Moses and the Burning Bush",
+      "id": "video_0001",
+      "title": "Understanding Check and Checkmate",
       "url": "assets/videos/sample.mp4",
       "thumbnail": "assets/ui/thumbs/level_0001.png"
     }
@@ -16,19 +17,7 @@
     "puzzle_0003"
   ],
   "play": {
-    "botIds": ["bot_001", "bot_002", "bot_003_endgame", "bot_004_opening"],
+    "botIds": ["bot_001", "bot_002", "bot_003_endgame"],
     "gamesRequired": 1
-  },
-  "boss": {
-    "id": "pharaoh_boss",
-    "name": "Pharaoh's Challenge",
-    "elo": 900,
-    "style": "defensive",
-    "engineSettings": {
-      "skillLevel": 5,
-      "moveTime": 200,
-      "limitStrength": false,
-      "randomBlunderChance": 0.15
-    }
   }
 }
