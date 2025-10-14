@@ -803,6 +803,35 @@ lib/core/
 
 ---
 
+## Phase 7.2: Campaign Unlocking ✅ COMPLETE
+**Branch**: phase-7.2-campaign-unlocking
+**Merged**: October 14, 2025
+**Focus**: Campaign unlock system and simplified boss requirements
+
+### Implemented
+- Campaign-level boss progress tracking (not level-level)
+- Sequential campaign unlocking (Campaign 1 always unlocked, others require previous boss defeated)
+- Simplified boss unlock requirements (just shows "X/Y levels complete")
+- Campaign progress display on home screen (X/Y levels completed per campaign)
+- Lock overlay with "Complete [Previous Campaign]" message
+
+### Technical Changes
+- **ProgressRepository**: Added `markCampaignBossCompleted()`, `getCampaignBossProgress()`
+- **Providers**: Added `isCampaignUnlockedProvider`, `campaignBossProgressProvider`, `campaignLevelCompletionProvider`
+- **Simplified**: `campaignBossUnlockRequirementsProvider` now just checks if all levels complete
+- **UI**: Updated campaigns_home_page and campaign_detail_page with new unlock logic
+
+### Files Modified
+- lib/data/repositories/progress_repository.dart
+- lib/state/providers.dart
+- lib/features/home/pages/home_page.dart (was campaigns_home_page.dart)
+- lib/features/campaign/pages/campaign_page.dart (was campaign_detail_page.dart)
+- lib/router/app_router.dart (updated imports)
+
+**Note**: Files were refactored to use original naming structure (HomePage/CampaignPage)
+
+---
+
 ## Phase 7.1: Campaign System Implementation ✅ COMPLETE
 **Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
 **Status**: Completed
@@ -824,8 +853,8 @@ Restructured app from flat level-based system to hierarchical campaign-based sys
 - **FIXED**: PuzzleRepository - fixed "invalid radix 10" error with level ID parsing
 
 #### UI Pages
-- **NEW**: CampaignsHomePage - grid of all campaigns with lock states
-- **NEW**: CampaignDetailPage - shows levels within campaign + boss tile
+- **NEW**: HomePage - grid of all campaigns with lock states (in features/home/)
+- **NEW**: CampaignPage - shows levels within campaign + boss tile (in features/campaign/)
 - **MODIFIED**: LevelPage - changed from 2x2 grid (4 tiles) to 3-tile layout (1 top: Lesson, 2 bottom: Puzzles + Games)
 - **MODIFIED**: LevelPage - added "Level Progress" card showing unlock requirements
 - **MODIFIED**: BossPage - now accepts `campaignId` instead of `levelId`
@@ -841,8 +870,8 @@ Restructured app from flat level-based system to hierarchical campaign-based sys
 - **FIXED**: `bossUnlockRequirementsProvider` - now shows "X / Y games" format matching game selector
 
 #### Routing
-- **CHANGED**: Home route (/) now shows CampaignsHomePage instead of level list
-- **NEW**: `/campaign/:id` → CampaignDetailPage
+- **CHANGED**: Home route (/) now shows HomePage with all campaigns grid
+- **NEW**: `/campaign/:id` → CampaignPage (campaign detail view)
 - **CHANGED**: Boss route from `/level/:id/boss` to `/campaign/:id/boss`
 - **KEPT**: `/level/:id` → LevelPage with lesson/puzzles/play subroutes
 
@@ -869,7 +898,7 @@ Restructured app from flat level-based system to hierarchical campaign-based sys
 ### Files Created (13)
 - Models: campaign.dart
 - Repositories: campaign_repository.dart
-- Pages: campaigns_home_page.dart, campaign_detail_page.dart, game_selector_page.dart
+- Pages: home_page.dart, campaign_page.dart, game_selector_page.dart
 - Data: campaign_01.json, campaign_02.json, index.json, level_0003-0010.json (8 files)
  - Scripts: scripts/update-file-structure.sh
  - Docs: docs/file_structure.txt (generated)

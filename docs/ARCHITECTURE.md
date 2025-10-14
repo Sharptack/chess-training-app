@@ -206,7 +206,8 @@ Future<Result<PuzzleSet>> getPuzzleSet(String levelId);
 Future<void> markLessonCompleted(String levelId);
 Future<void> markLevelPuzzlesCompleted(String levelId, String puzzleId);
 Future<void> recordBotGameCompleted(String levelId, String botId, bool humanWon);
-Future<void> markBossCompleted(String levelId);
+Future<void> markCampaignBossCompleted(String campaignId); // Phase 7.2
+Future<Progress?> getCampaignBossProgress(String campaignId); // Phase 7.2
 Future<Progress?> getProgress(String levelId, String itemId);
 Future<BotProgress?> getBotProgress(String levelId, String botId);
 ```
@@ -218,9 +219,11 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 
 ### Features (`lib/features/`)
 
+#### `features/home/`
+- `home_page.dart` - Home screen showing all campaigns grid (Phase 7.1, refactored 7.2)
+
 #### `features/campaign/`
-- `campaign_page.dart` - Campaign selection grid (home screen, Phase 7.1)
-- `campaign_detail_page.dart` - Level selection within campaign (Phase 7.1)
+- `campaign_page.dart` - Campaign detail showing levels + boss (Phase 7.1, refactored 7.2)
 
 #### `features/lesson/`
 - `lesson_page.dart` - Video player with Chewie
@@ -264,6 +267,8 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 All Riverpod providers in one file:
 
 **Data Providers**:
+- `campaignProvider` - FutureProvider.family<Campaign, String>
+- `allCampaignsProvider` - FutureProvider<List<Campaign>>
 - `levelProvider` - FutureProvider.family<Level, String>
 - `puzzleSetProvider` - FutureProvider.family<PuzzleSet, String>
 - `botsProvider` - FutureProvider<List<Bot>>
@@ -272,15 +277,18 @@ All Riverpod providers in one file:
 - `lessonProgressProvider` - Provider.family<Progress?, (String, String)>
 - `puzzleProgressProvider` - Provider.family<Progress?, (String, String)>
 - `playProgressProvider` - Provider.family<Progress?, String> (computed)
-- `bossProgressProvider` - Provider.family<Progress?, String>
+- `campaignBossProgressProvider` - Provider.family<Progress?, String> (Phase 7.2)
 - `bossUnlockRequirementsProvider` - Provider.family<BossUnlockRequirements, String>
+- `campaignBossUnlockRequirementsProvider` - Provider.family<BossUnlockRequirements, String> (Phase 7.2)
+- `isCampaignUnlockedProvider` - Provider.family<bool, String> (Phase 7.2)
+- `campaignLevelCompletionProvider` - Provider.family<(int, int), String> (Phase 7.2)
 
 **Progress Functions** (invalidate providers after saving):
 ```dart
 Future<void> markLessonCompleted(WidgetRef ref, String levelId);
 Future<void> markLevelPuzzlesCompleted(WidgetRef ref, String levelId, String puzzleId);
 Future<void> recordBotGameCompleted(WidgetRef ref, String levelId, String botId, bool humanWon);
-Future<void> markBossCompleted(WidgetRef ref, String levelId);
+Future<void> markBossCompleted(WidgetRef ref, String campaignId); // Updated Phase 7.2
 ```
 
 **Game State Providers**:

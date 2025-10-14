@@ -1,8 +1,8 @@
 // lib/router/app_router.dart
 import 'package:go_router/go_router.dart';
 
-import '../features/campaign/pages/campaigns_home_page.dart';
-import '../features/campaign/pages/campaign_detail_page.dart';
+import '../features/home/pages/home_page.dart';
+import '../features/campaign/pages/campaign_page.dart';
 import '../features/level/pages/level_page.dart';
 import '../features/lesson/pages/lesson_page.dart';
 import '../features/puzzles/pages/puzzles_page.dart';
@@ -26,7 +26,7 @@ class AppRouter {
       GoRoute(
         path: Routes.home,
         name: 'home',
-        builder: (context, state) => const CampaignsHomePage(),
+        builder: (context, state) => const HomePage(),
         routes: [
           // Campaign detail with levels and boss
           GoRoute(
@@ -34,7 +34,7 @@ class AppRouter {
             name: 'campaign',
             builder: (context, state) {
               final campaignId = state.pathParameters['campaignId']!;
-              return CampaignDetailPage(campaignId: campaignId);
+              return CampaignPage(campaignId: campaignId);
             },
             routes: [
               // Boss at campaign level
