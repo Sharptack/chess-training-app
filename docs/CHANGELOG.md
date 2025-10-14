@@ -804,7 +804,7 @@ lib/core/
 ---
 
 ## Phase 7.1: Campaign System Implementation ✅ COMPLETE
-**Branch**: main
+**Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
 **Status**: Completed
 **Date**: October 13, 2025
 
@@ -871,6 +871,8 @@ Restructured app from flat level-based system to hierarchical campaign-based sys
 - Repositories: campaign_repository.dart
 - Pages: campaigns_home_page.dart, campaign_detail_page.dart, game_selector_page.dart
 - Data: campaign_01.json, campaign_02.json, index.json, level_0003-0010.json (8 files)
+ - Scripts: scripts/update-file-structure.sh
+ - Docs: docs/file_structure.txt (generated)
 
 ### Files Modified (11)
 - Models: level.dart, boss.dart, video_item.dart
@@ -892,3 +894,5 @@ Restructured app from flat level-based system to hierarchical campaign-based sys
 
 See [PROGRESS.md](./PROGRESS.md) for current phase planning and roadmap.
 See [BACKLOG.md](./BACKLOG.md) for future features and enhancements.
+
+> Note: Work was developed on branch `phase-7.1-campaign-system` and merged into `main` (commit `b293f59`) on 2025-10-13.
