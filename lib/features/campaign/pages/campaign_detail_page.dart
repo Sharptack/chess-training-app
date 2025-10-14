@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../state/providers.dart';
-import '../../../core/widgets/locked_badge.dart';
-import '../../progress/widgets/progress_badge.dart';
 
 /// Shows all levels within a campaign plus the campaign boss
 class CampaignDetailPage extends ConsumerWidget {
@@ -301,24 +299,14 @@ class _BossTile extends ConsumerWidget {
                           const Divider(),
                           const SizedBox(height: 8),
                           Text(
-                            'Requirements:',
+                            'Unlock Requirement:',
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           const SizedBox(height: 8),
                           _buildRequirement(
                             context,
-                            'Complete all lessons',
+                            requirements.lessonStatus,
                             requirements.lessonComplete,
-                          ),
-                          _buildRequirement(
-                            context,
-                            'Complete all puzzles',
-                            requirements.puzzlesComplete,
-                          ),
-                          _buildRequirement(
-                            context,
-                            requirements.playStatus,
-                            requirements.playComplete,
                           ),
                         ],
                       ],

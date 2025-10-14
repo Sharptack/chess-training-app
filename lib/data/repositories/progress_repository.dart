@@ -76,7 +76,7 @@ class ProgressRepository {
   Future<void> recordBotGame(String levelId, String botId, bool won, int requiredGames) async {
     final key = 'bot_${levelId}_$botId';
     final current = await getBotProgress(levelId, botId);
-    
+
     final updated = BotProgress(
       levelId: levelId,
       botId: botId,
@@ -86,7 +86,50 @@ class ProgressRepository {
       firstPlayedAt: current.firstPlayedAt ?? DateTime.now(),
       lastPlayedAt: DateTime.now(),
     );
-    
+
     await _box.put(key, updated.toJson());
+  }
+
+  /// Mark campaign boss as completed
+  Future<void> markCampaignBossCompleted(String campaignId) async {
+    final key = 'campaign_boss_$campaignId';
+    final progress = Progress(
+      levelId: campaignId,
+      videoId: 'boss',
+      started: true,
+      completed: true,
+      startedAt: DateTime.now(),
+      completedAt: DateTime.now(),
+    );
+    await _box.put(key, progress.toJson());
+  }
+
+  /// Get campaign boss progress
+  Future<Progress> getCampaignBossProgress(String campaignId) async {
+    final key = 'campaign_boss_$campaignId';
+    final stored = _box.get(key);
+
+    if (stored == null) {
+      return Progress(
+        levelId: campaignId,
+        videoId: 'boss',
+        started: false,
+        completed: false,
+      );
+    }
+
+    try {
+      final map = Map<String, dynamic>.from(stored);
+      map['levelId'] = campaignId;
+      map['videoId'] = 'boss';
+      return Progress.fromJson(map);
+    } catch (e) {
+      return Progress(
+        levelId: campaignId,
+        videoId: 'boss',
+        started: false,
+        completed: false,
+      );
+    }
   }
 }

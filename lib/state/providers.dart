@@ -51,55 +51,40 @@ final campaignProvider = FutureProvider.family<Campaign, String>((ref, String ca
   return result.data!;
 });
 
-/// Returns boss unlock requirements for a campaign (checks ALL levels in campaign)
-final campaignBossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequirements, String>(
+/// Get count of completed levels in a campaign
+final campaignLevelCompletionProvider = FutureProvider.family<(int, int), String>(
   (ref, String campaignId) async {
-    final campaignAsync = await ref.watch(campaignProvider(campaignId).future);
-    final campaign = campaignAsync;
+    final campaign = await ref.watch(campaignProvider(campaignId).future);
 
-    // Check completion of all levels in the campaign
-    final progressRepo = ref.watch(progressRepositoryProvider);
-
-    bool allLessonsComplete = true;
-    bool allPuzzlesComplete = true;
-    int totalGamesCompleted = 0;
-    int totalGamesRequired = 0;
+    int completedLevels = 0;
 
     for (final levelId in campaign.levelIds) {
-      final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
-      if (levelResult.isError) continue;
-
-      final level = levelResult.data!;
-
-      // Check lesson
-      final lessonProgress = await progressRepo.getLessonProgress(levelId, level.lessonVideo.id);
-      if (!lessonProgress.completed) {
-        allLessonsComplete = false;
+      final levelRequirements = await ref.watch(bossUnlockRequirementsProvider(levelId).future);
+      if (levelRequirements.isUnlocked) {
+        completedLevels++;
       }
-
-      // Check puzzles
-      final puzzleProgress = await progressRepo.getLessonProgress('puzzles', levelId);
-      if (!puzzleProgress.completed) {
-        allPuzzlesComplete = false;
-      }
-
-      // Check games (count total across all bots)
-      for (final botId in level.playBotIds) {
-        final botProgress = await progressRepo.getBotProgress(levelId, botId);
-        totalGamesCompleted += botProgress.gamesPlayed.clamp(0, level.requiredGames);
-      }
-      totalGamesRequired += level.requiredGames * level.playBotIds.length;
     }
 
-    final allGamesComplete = totalGamesCompleted >= totalGamesRequired;
+    return (completedLevels, campaign.levelIds.length);
+  },
+);
+
+/// Returns boss unlock requirements for a campaign (checks ALL levels in campaign)
+/// Simplified: Just checks if all levels are complete
+final campaignBossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequirements, String>(
+  (ref, String campaignId) async {
+    final completion = await ref.watch(campaignLevelCompletionProvider(campaignId).future);
+    final completedLevels = completion.$1;
+    final totalLevels = completion.$2;
+    final allLevelsComplete = completedLevels >= totalLevels;
 
     return BossUnlockRequirements(
-      lessonComplete: allLessonsComplete,
-      lessonStatus: allLessonsComplete ? 'All complete' : 'Incomplete',
-      puzzlesComplete: allPuzzlesComplete,
-      puzzleStatus: allPuzzlesComplete ? 'All complete' : 'Incomplete',
-      playComplete: allGamesComplete,
-      playStatus: '$totalGamesCompleted / $totalGamesRequired games',
+      lessonComplete: allLevelsComplete,
+      lessonStatus: '$completedLevels / $totalLevels levels complete',
+      puzzlesComplete: allLevelsComplete,
+      puzzleStatus: '',
+      playComplete: allLevelsComplete,
+      playStatus: '',
     );
   },
 );
@@ -537,6 +522,7 @@ final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequireme
 );
 
 /// Get boss progress for a level (simple: completed or not)
+/// DEPRECATED: Use campaignBossProgressProvider instead
 final bossProgressProvider = FutureProvider.family<Progress, String>(
   (ref, String levelId) async {
     final repo = ref.watch(progressRepositoryProvider);
@@ -544,9 +530,42 @@ final bossProgressProvider = FutureProvider.family<Progress, String>(
   },
 );
 
-/// Mark boss as completed
-Future<void> markBossCompleted(WidgetRef ref, String levelId) async {
+/// Get campaign boss progress (new campaign-level tracking)
+final campaignBossProgressProvider = FutureProvider.family<Progress, String>(
+  (ref, String campaignId) async {
+    final repo = ref.watch(progressRepositoryProvider);
+    return repo.getCampaignBossProgress(campaignId);
+  },
+);
+
+/// Mark campaign boss as completed
+Future<void> markBossCompleted(WidgetRef ref, String campaignId) async {
   final repo = ref.read(progressRepositoryProvider);
-  await repo.markLessonCompleted('boss', levelId);
-  ref.invalidate(bossProgressProvider(levelId));
+  await repo.markCampaignBossCompleted(campaignId);
+  ref.invalidate(campaignBossProgressProvider(campaignId));
+  // Invalidate campaign unlock for all campaigns (next campaign may now be unlocked)
+  ref.invalidate(allCampaignsProvider);
 }
+
+/// Check if a campaign is unlocked
+/// Campaign 1 is always unlocked, others require previous campaign boss defeated
+final isCampaignUnlockedProvider = FutureProvider.family<bool, String>(
+  (ref, String campaignId) async {
+    // Get all campaigns to determine order
+    final allCampaigns = await ref.watch(allCampaignsProvider.future);
+
+    // Find this campaign's index
+    final campaignIndex = allCampaigns.indexWhere((c) => c.id == campaignId);
+
+    // If not found or is first campaign, it's unlocked
+    if (campaignIndex <= 0) return true;
+
+    // Check if previous campaign's boss is defeated
+    final previousCampaign = allCampaigns[campaignIndex - 1];
+    final previousBossProgress = await ref.watch(
+      campaignBossProgressProvider(previousCampaign.id).future
+    );
+
+    return previousBossProgress.completed;
+  },
+);

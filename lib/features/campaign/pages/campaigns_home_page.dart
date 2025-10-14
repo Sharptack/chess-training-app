@@ -51,23 +51,12 @@ class CampaignsHomePage extends ConsumerWidget {
             itemCount: campaigns.length,
             itemBuilder: (context, index) {
               final campaign = campaigns[index];
-
-              // Check if campaign is unlocked (campaign 1 always unlocked)
-              final isUnlocked = index == 0; // TODO: implement unlock logic
+              final previousCampaign = index > 0 ? campaigns[index - 1] : null;
 
               return _CampaignCard(
                 campaign: campaign,
-                isUnlocked: isUnlocked,
-                onTap: isUnlocked
-                    ? () => context.push('/campaign/${campaign.id}')
-                    : () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Complete the previous campaign boss to unlock!'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
+                previousCampaign: previousCampaign,
+                onTap: () => context.push('/campaign/${campaign.id}'),
               );
             },
           );
@@ -77,19 +66,64 @@ class CampaignsHomePage extends ConsumerWidget {
   }
 }
 
-class _CampaignCard extends StatelessWidget {
+class _CampaignCard extends ConsumerWidget {
   final dynamic campaign;
-  final bool isUnlocked;
+  final dynamic previousCampaign;
   final VoidCallback onTap;
 
   const _CampaignCard({
     required this.campaign,
-    required this.isUnlocked,
+    required this.previousCampaign,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isUnlockedAsync = ref.watch(isCampaignUnlockedProvider(campaign.id));
+    final completionAsync = ref.watch(campaignLevelCompletionProvider(campaign.id));
+
+    return isUnlockedAsync.when(
+      loading: () => _buildCard(context, true, 0, campaign.levelIds.length, null),
+      error: (_, __) => _buildCard(context, false, 0, campaign.levelIds.length, null),
+      data: (isUnlocked) {
+        return completionAsync.when(
+          loading: () => _buildCard(context, isUnlocked, 0, campaign.levelIds.length, null),
+          error: (_, __) => _buildCard(context, isUnlocked, 0, campaign.levelIds.length, null),
+          data: (completion) {
+            final completedLevels = completion.$1;
+            final totalLevels = completion.$2;
+
+            return _buildCard(
+              context,
+              isUnlocked,
+              completedLevels,
+              totalLevels,
+              isUnlocked ? onTap : () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      previousCampaign != null
+                          ? 'Complete ${previousCampaign.title} boss to unlock!'
+                          : 'This campaign is locked',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCard(
+    BuildContext context,
+    bool isUnlocked,
+    int completedLevels,
+    int totalLevels,
+    VoidCallback? onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -115,27 +149,29 @@ class _CampaignCard extends StatelessWidget {
                     Text(
                       campaign.description,
                       style: Theme.of(context).textTheme.bodyMedium,
-                      maxLines: 3,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
+                    if (completedLevels > 0 || isUnlocked) ...[
+                      Row(
+                        children: [
+                          const Icon(Icons.check_circle, size: 20),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$completedLevels / $totalLevels levels',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                     Row(
                       children: [
                         const Icon(Icons.emoji_events, size: 20),
                         const SizedBox(width: 4),
                         Text(
                           'Boss: ${campaign.boss.name}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.layers, size: 20),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${campaign.levelIds.length} levels',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -148,15 +184,34 @@ class _CampaignCard extends StatelessWidget {
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.lock,
-                      size: 48,
-                      color: Colors.white,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.lock,
+                        size: 48,
+                        color: Colors.white,
+                      ),
+                      if (previousCampaign != null) ...[
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'Complete\n${previousCampaign.title}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
