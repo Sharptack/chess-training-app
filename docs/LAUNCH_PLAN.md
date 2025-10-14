@@ -94,29 +94,38 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 
 ---
 
-## Phase 7.2: Campaign Unlocking & Mobile Responsiveness (Week 2, 2-3 days)
-**Branch**: `phase-7.2-campaign-unlocking`
-**Goal**: Complete unlock system and ensure mobile compatibility
+## Phase 7.2: Campaign Unlocking ✅ COMPLETE
+**Branch**: `phase-7.2-campaign-unlocking` (merged to main)
+**Goal**: Complete campaign unlock system
+**Duration**: October 14, 2025 (1 day)
 
-### Remaining Unlock Tasks
+### Tasks - ALL COMPLETE ✅
 
-**Already Complete** (done in Phase 7.1):
-- [x] Level unlock logic (sequential, previous must complete)
-- [x] `isLevelUnlockedProvider` implementation
-- [x] Level completion checking (lesson + puzzles + games)
-- [x] Lock overlays on level tiles
-- [x] Campaign boss unlock requirements display
+**Campaign Boss Progress Tracking**:
+- [x] Add `markCampaignBossCompleted()` to ProgressRepository
+- [x] Add `getCampaignBossProgress()` to ProgressRepository
+- [x] Add `campaignBossProgressProvider` for campaign-level boss tracking
+- [x] Update `markBossCompleted()` to use campaign-level tracking
 
-**Still TODO**:
-- [ ] Campaign unlock logic (Campaign 2+ locks until previous boss defeated)
-  - Add `isCampaignUnlockedProvider`
-  - Campaign 1 always unlocked
-  - Others unlock after previous campaign boss defeated
-- [ ] Campaign boss progress tracking
-  - Track boss completion per campaign
-  - Show boss completion status on campaign cards
-- [ ] Lock overlay on CampaignPage for locked campaigns
-- [ ] Add campaign progress display (X/Y levels completed)
+**Campaign Unlock Logic**:
+- [x] Add `isCampaignUnlockedProvider` (Campaign 1 always unlocked)
+- [x] Campaign 2+ unlock after previous campaign boss defeated
+- [x] Add `campaignLevelCompletionProvider` to track X/Y levels completed
+- [x] Simplify `campaignBossUnlockRequirementsProvider` to show "X/Y levels complete"
+
+**UI Updates**:
+- [x] Update campaigns_home_page to use real unlock logic
+- [x] Add campaign progress display (X/Y levels) on campaign cards
+- [x] Add lock overlay with "Complete [Previous Campaign]" message
+- [x] Simplify boss unlock overlay to single requirement
+
+**Deliverable**: ✅ Campaign unlock working, boss tracking at campaign level, simplified UI
+
+---
+
+## Phase 7.3: Mobile Responsiveness (Week 2, 2-3 days)
+**Branch**: `phase-7.3-mobile-responsive`
+**Goal**: Ensure app works on phones and tablets (iOS & Android)
 
 ### Mobile Responsiveness
 
@@ -137,10 +146,6 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 **Deliverable**: Campaign unlock working, app responsive on iOS/Android phones and tablets
 
 ---
-
-## Phase 7.3: Mobile Responsiveness (Week 1-2, 2-3 days)
-**Branch**: `phase-7.3-mobile-responsive`
-**Goal**: Ensure app works on phones and tablets (iOS & Android)
 
 ### Testing Matrix
 

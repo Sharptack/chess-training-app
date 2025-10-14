@@ -803,6 +803,32 @@ lib/core/
 
 ---
 
+## Phase 7.2: Campaign Unlocking ✅ COMPLETE
+**Branch**: phase-7.2-campaign-unlocking
+**Merged**: October 14, 2025
+**Focus**: Campaign unlock system and simplified boss requirements
+
+### Implemented
+- Campaign-level boss progress tracking (not level-level)
+- Sequential campaign unlocking (Campaign 1 always unlocked, others require previous boss defeated)
+- Simplified boss unlock requirements (just shows "X/Y levels complete")
+- Campaign progress display on home screen (X/Y levels completed per campaign)
+- Lock overlay with "Complete [Previous Campaign]" message
+
+### Technical Changes
+- **ProgressRepository**: Added `markCampaignBossCompleted()`, `getCampaignBossProgress()`
+- **Providers**: Added `isCampaignUnlockedProvider`, `campaignBossProgressProvider`, `campaignLevelCompletionProvider`
+- **Simplified**: `campaignBossUnlockRequirementsProvider` now just checks if all levels complete
+- **UI**: Updated campaigns_home_page and campaign_detail_page with new unlock logic
+
+### Files Modified
+- lib/data/repositories/progress_repository.dart
+- lib/state/providers.dart
+- lib/features/campaign/pages/campaigns_home_page.dart
+- lib/features/campaign/pages/campaign_detail_page.dart
+
+---
+
 ## Phase 7.1: Campaign System Implementation ✅ COMPLETE
 **Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
 **Status**: Completed
