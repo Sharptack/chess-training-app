@@ -27,10 +27,16 @@ class PuzzleRepository {
 
     try {
       // Try different file naming conventions
+      // Extract numeric part if levelId is like "level_0001"
+      String numericPart = levelId;
+      if (levelId.contains('_')) {
+        numericPart = levelId.split('_').last;
+      }
+
       final possiblePaths = [
         'assets/data/puzzles/puzzle_set_$levelId.json',
-        'assets/data/puzzles/puzzle_set_${levelId.padLeft(4, '0')}.json',
-        'assets/data/puzzles/puzzle_set_${int.parse(levelId).toString().padLeft(3, '0')}.json',
+        'assets/data/puzzles/puzzle_set_$numericPart.json',
+        'assets/data/puzzles/puzzle_set_${numericPart.padLeft(4, '0')}.json',
       ];
 
       Result<Map<String, dynamic>>? successfulResult;

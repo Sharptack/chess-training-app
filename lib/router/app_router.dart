@@ -1,8 +1,8 @@
 // lib/router/app_router.dart
 import 'package:go_router/go_router.dart';
 
-import '../features/home/pages/home_page.dart';
-import '../features/campaign/pages/campaign_page.dart';
+import '../features/campaign/pages/campaigns_home_page.dart';
+import '../features/campaign/pages/campaign_detail_page.dart';
 import '../features/level/pages/level_page.dart';
 import '../features/lesson/pages/lesson_page.dart';
 import '../features/puzzles/pages/puzzles_page.dart';
@@ -11,12 +11,12 @@ import '../features/boss/pages/boss_page.dart';
 
 class Routes {
   static const home = '/';
-  static const campaign = 'campaign'; // /campaign/:id
+  static const campaign = 'campaign'; // /campaign/:id (campaign detail)
   static const level = 'level';       // /level/:id
   static const lesson = 'lesson';     // /level/:id/lesson
   static const puzzles = 'puzzles';   // /level/:id/puzzles
   static const play = 'play';         // /level/:id/play
-  static const boss = 'boss';         // /level/:id/boss
+  static const boss = 'boss';         // /campaign/:id/boss (moved to campaign level)
 }
 
 class AppRouter {
@@ -26,16 +26,29 @@ class AppRouter {
       GoRoute(
         path: Routes.home,
         name: 'home',
-        builder: (context, state) => const HomePage(),
+        builder: (context, state) => const CampaignsHomePage(),
         routes: [
+          // Campaign detail with levels and boss
           GoRoute(
             path: '${Routes.campaign}/:campaignId',
             name: 'campaign',
             builder: (context, state) {
               final campaignId = state.pathParameters['campaignId']!;
-              return CampaignPage(campaignId: campaignId);
+              return CampaignDetailPage(campaignId: campaignId);
             },
+            routes: [
+              // Boss at campaign level
+              GoRoute(
+                path: Routes.boss,
+                name: 'campaign-boss',
+                builder: (context, state) {
+                  final campaignId = state.pathParameters['campaignId']!;
+                  return BossPage(campaignId: campaignId);
+                },
+              ),
+            ],
           ),
+          // Level detail with lesson, puzzles, play
           GoRoute(
             path: '${Routes.level}/:levelId',
             name: 'level',
@@ -66,14 +79,6 @@ class AppRouter {
                 builder: (context, state) {
                   final levelId = state.pathParameters['levelId']!;
                   return PlayPage(levelId: levelId);
-                },
-              ),
-              GoRoute(
-                path: Routes.boss,
-                name: 'boss',
-                builder: (context, state) {
-                  final levelId = state.pathParameters['levelId']!;
-                  return BossPage(levelId: levelId);
                 },
               ),
             ],

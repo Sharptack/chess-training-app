@@ -15,57 +15,70 @@ class LevelPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: Text('Level $levelId')),
-      body: GridView.count(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        children: [
-          // LESSON TILE – now looks up videoId dynamically
-          Consumer(
-            builder: (context, ref, _) {
-              final asyncLesson = ref.watch(lessonByIdProvider(levelId));
+        child: Column(
+          children: [
+            // Top tile - Lesson (wider, circular/diamond shape)
+            SizedBox(
+              height: 200,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  final asyncLesson = ref.watch(lessonByIdProvider(levelId));
 
-              return asyncLesson.when(
-                loading: () => const _LevelTile(title: 'Lesson', route: ''),
-                error: (_, __) => const _LevelTile(title: 'Lesson', route: ''),
-                data: (video) {
-                  return _LevelTile(
-                    title: 'Lesson',
-                    route: '/level/$levelId/lesson',
-                    progressType: _ProgressType.lesson,
-                    levelId: levelId,
-                    videoId: video.id, // 👈 dynamic!
+                  return asyncLesson.when(
+                    loading: () => const _LevelTile(title: 'Lesson', route: ''),
+                    error: (_, __) => const _LevelTile(title: 'Lesson', route: ''),
+                    data: (video) {
+                      return _LevelTile(
+                        title: 'Lesson',
+                        route: '/level/$levelId/lesson',
+                        progressType: _ProgressType.lesson,
+                        levelId: levelId,
+                        videoId: video.id,
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
-          _LevelTile(
-            title: 'Puzzles',
-            route: '/level/$levelId/puzzles',
-            progressType: _ProgressType.puzzle,
-            levelId: levelId,
-          ),
-          _LevelTile(
-            title: 'Play',
-            route: '/level/$levelId/play',
-            progressType: _ProgressType.play,
-            levelId: levelId,
-          ),
-          _LevelTile(
-            title: 'Boss',
-            route: '/level/$levelId/boss',
-            progressType: _ProgressType.boss,
-            levelId: levelId,
-          ),
-        ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Bottom row - Puzzles and Games (side by side)
+            SizedBox(
+              height: 200,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _LevelTile(
+                      title: 'Puzzles',
+                      route: '/level/$levelId/puzzles',
+                      progressType: _ProgressType.puzzle,
+                      levelId: levelId,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _LevelTile(
+                      title: 'Games',
+                      route: '/level/$levelId/play',
+                      progressType: _ProgressType.play,
+                      levelId: levelId,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Boss unlock requirements display
+            _BossUnlockRequirementsDisplay(levelId: levelId),
+          ],
+        ),
       ),
     );
   }
 }
 
-enum _ProgressType { none, lesson, puzzle, play, boss }
+enum _ProgressType { none, lesson, puzzle, play }
 
 class _LevelTile extends ConsumerWidget {
   final String title;
@@ -189,75 +202,6 @@ class _LevelTile extends ConsumerWidget {
       );
     }
 
-    // Handle boss unlock and progress
-    else if (progressType == _ProgressType.boss && levelId != null) {
-      final unlockRequirementsAsync = ref.watch(bossUnlockRequirementsProvider(levelId!));
-      final bossProgressAsync = ref.watch(bossProgressProvider(levelId!));
-
-      return unlockRequirementsAsync.when(
-        loading: () => _buildTileContainer(context, null),
-        error: (_, __) => _buildTileContainer(context, null),
-        data: (requirements) {
-          if (requirements.isUnlocked) {
-            // Boss is unlocked, show progress badge
-            badge = bossProgressAsync.when(
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-              data: (progress) => ProgressBadge(progress: progress),
-            );
-            return _buildTileContainer(context, badge);
-          } else {
-            // Boss is locked, show requirements overlay
-            lockOverlay = LockedBadge(
-              locked: true,
-              message: 'Complete requirements to unlock',
-              requirements: [
-                RequirementItem(
-                  label: 'Lesson',
-                  status: requirements.lessonStatus,
-                  completed: requirements.lessonComplete,
-                ),
-                RequirementItem(
-                  label: 'Puzzles',
-                  status: requirements.puzzleStatus,
-                  completed: requirements.puzzlesComplete,
-                ),
-                RequirementItem(
-                  label: 'Play',
-                  status: requirements.playStatus,
-                  completed: requirements.playComplete,
-                ),
-              ],
-            );
-            return GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Complete all requirements to unlock the boss!'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
-                    ),
-                  ),
-                  lockOverlay!,
-                ],
-              ),
-            );
-          }
-        },
-      );
-    }
-
     return _buildTileContainer(context, badge);
   }
 
@@ -303,6 +247,119 @@ class _LevelTile extends ConsumerWidget {
             ),
           ),
           lockOverlay,
+        ],
+      ),
+    );
+  }
+}
+
+/// Displays boss unlock requirements progress for this level
+/// (Boss is at campaign level, but we show progress here for visibility)
+class _BossUnlockRequirementsDisplay extends ConsumerWidget {
+  final String levelId;
+
+  const _BossUnlockRequirementsDisplay({required this.levelId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unlockRequirementsAsync = ref.watch(bossUnlockRequirementsProvider(levelId));
+
+    return unlockRequirementsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (requirements) {
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.emoji_events,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Level Progress',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildRequirement(
+                  context,
+                  'Lesson',
+                  requirements.lessonStatus,
+                  requirements.lessonComplete,
+                ),
+                _buildRequirement(
+                  context,
+                  'Puzzles',
+                  requirements.puzzleStatus,
+                  requirements.puzzlesComplete,
+                ),
+                _buildRequirement(
+                  context,
+                  'Games',
+                  requirements.playStatus,
+                  requirements.playComplete,
+                ),
+                if (requirements.isUnlocked) ...[
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Level complete! Return to campaign to continue.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRequirement(
+    BuildContext context,
+    String label,
+    String status,
+    bool completed,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            completed ? Icons.check_circle : Icons.radio_button_unchecked,
+            size: 20,
+            color: completed ? Colors.green : Colors.grey,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$label: ',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          Text(
+            status,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
         ],
       ),
     );

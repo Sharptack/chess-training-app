@@ -1,0 +1,21 @@
+{
+  "id": "level_0009",
+  "title": "Knight Practice",
+  "description": "Master the unique L-shaped movement of the knight.",
+  "campaignId": "campaign_02",
+  "lesson": {
+    "video": {
+      "id": "video_0009",
+      "title": "Knight Movement and Tactics",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0009"
+  ],
+  "play": {
+    "botIds": ["bot_002"],
+    "gamesRequired": 1
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "level_0008",
+  "title": "Checkmate in 1 with Queen (Part 2)",
+  "description": "More advanced queen checkmate patterns and scenarios.",
+  "campaignId": "campaign_02",
+  "lesson": {
+    "video": {
+      "id": "video_0008",
+      "title": "Advanced Queen Checkmates",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0008"
+  ],
+  "play": {
+    "botIds": ["bot_002"],
+    "gamesRequired": 1
+  }
+}

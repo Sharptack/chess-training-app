@@ -1,0 +1,21 @@
+{
+  "id": "level_0005",
+  "title": "Stopping Check 3 – Move",
+  "description": "Learn to respond to check by moving your king to safety.",
+  "campaignId": "campaign_01",
+  "lesson": {
+    "video": {
+      "id": "video_0005",
+      "title": "Moving the King to Safety",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0005"
+  ],
+  "play": {
+    "botIds": ["bot_001"],
+    "gamesRequired": 1
+  }
+}

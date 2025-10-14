@@ -35,6 +35,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/data/campaigns/
     - assets/data/levels/
     - assets/data/puzzles/
     - assets/data/bots/

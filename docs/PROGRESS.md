@@ -7,25 +7,27 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 
 ## Current Status
 
-**Phase**: Phase 6.7 Complete ✅
-**Next**: Phase 7 - Chess Club Launch Preparation
-**Target**: Chess Club Testing in 5-6 weeks
+**Phase**: Phase 7.1 Complete ✅
+**Next**: Phase 7.2 - Mobile Responsiveness & Content Creation
+**Target**: Chess Club Testing in 4-5 weeks
 
 ### What's Working ✅
+- **Campaign system** with hierarchical navigation (campaigns → levels)
+- **Level unlock progression** (level 2 unlocks after level 1 complete)
 - Video lessons with progress tracking
 - Interactive puzzles with multi-move support
 - Bot gameplay with Stockfish engine (5 difficulty levels)
-- Boss battles with unlock requirements
-- Level progression system
+- **Campaign-level boss battles** with unlock requirements
 - Custom starting positions and move restrictions
 - Professional chess piece graphics
 - Undo, move history, game variety (full games, endgame practice, opening practice)
 
 ### Current Content
-- **Levels**: 2 demo levels created, system supports unlimited
+- **Campaigns**: 2 campaigns (Fundamentals 1 & 2)
+- **Levels**: 10 level placeholders (2 with full content, 8 ready for content)
 - **Puzzles**: 11 puzzles total (5 in L1, 6 in L2 with 2 shared)
 - **Bots/Games**: 4 configured (200-1200 ELO range)
-- **Features**: Lessons, Puzzles, Games, Boss battles all functional
+- **Features**: Campaigns, Lessons, Puzzles, Games, Boss battles all functional
 
 ---
 
@@ -66,7 +68,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 
 ## Development History
 
-**Phases 0-6.7 Complete** (September-December 2025)
+**Phases 0-7.1 Complete** (September-October 2025)
 - Foundation, content loading, error handling
 - Video lessons, Hive progress tracking
 - Chess engine integration (chess package)
@@ -75,6 +77,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 - Boss battles with unlock requirements
 - Code quality improvements
 - Custom positions, move restrictions, undo, move history
+- **Campaign system restructure** (Phase 7.1)
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 
@@ -122,8 +125,8 @@ See LAUNCH_PLAN.md Phase 4 for complete metrics list.
 3. Update CHANGELOG.md when phase complete
 4. Tag releases for major milestones
 
-**Current Branch**: `main` (stable, Phase 6.7 complete)
-**Next Branch**: `phase-7.1-campaign-system`
+**Current Branch**: `main` (stable, Phase 7.1 complete)
+**Next Branch**: `phase-7.2-mobile-responsive`
 
 ---
 
@@ -145,3 +148,14 @@ See LAUNCH_PLAN.md Phase 4 for complete metrics list.
 - Move Phase 7 summary to CHANGELOG.md
 - Delete LAUNCH_PLAN.md (temporary document)
 - Work from BACKLOG.md going forward
+
+### Developer utilities
+
+- Repository tree generator: `scripts/update-file-structure.sh` — regenerates `docs/file_structure.txt` from the repository root and overwrites the file.
+- Run from the project root:
+
+	```zsh
+	scripts/update-file-structure.sh
+	```
+
+- This script is useful to keep `docs/file_structure.txt` up-to-date. Consider adding a local pre-commit hook, Makefile target, or CI check to automate this if desired.

@@ -1,328 +1,390 @@
+Project: /Users/Sharpnacks/chess-training-app
+Generated: 2025-10-14 02:27:40Z
+
 .
-|-- README.md
-|-- analysis_options.yaml
-|-- android
-|   |-- app
-|   |   |-- build.gradle.kts
-|   |   `-- src
-|   |       |-- debug
-|   |       |   `-- AndroidManifest.xml
-|   |       |-- main
-|   |       |   |-- AndroidManifest.xml
-|   |       |   |-- java
-|   |       |   |   `-- io
-|   |       |   |       `-- flutter
-|   |       |   |           `-- plugins
-|   |       |   |               `-- GeneratedPluginRegistrant.java
-|   |       |   |-- kotlin
-|   |       |   |   `-- com
-|   |       |   |       `-- example
-|   |       |   |           `-- chess_app
-|   |       |   |               `-- MainActivity.kt
-|   |       |   `-- res
-|   |       |       |-- drawable
-|   |       |       |   `-- launch_background.xml
-|   |       |       |-- drawable-v21
-|   |       |       |   `-- launch_background.xml
-|   |       |       |-- mipmap-hdpi
-|   |       |       |   `-- ic_launcher.png
-|   |       |       |-- mipmap-mdpi
-|   |       |       |   `-- ic_launcher.png
-|   |       |       |-- mipmap-xhdpi
-|   |       |       |   `-- ic_launcher.png
-|   |       |       |-- mipmap-xxhdpi
-|   |       |       |   `-- ic_launcher.png
-|   |       |       |-- mipmap-xxxhdpi
-|   |       |       |   `-- ic_launcher.png
-|   |       |       |-- values
-|   |       |       |   `-- styles.xml
-|   |       |       `-- values-night
-|   |       |           `-- styles.xml
-|   |       `-- profile
-|   |           `-- AndroidManifest.xml
-|   |-- build.gradle.kts
-|   |-- chess_app_android.iml
-|   |-- gradle
-|   |   `-- wrapper
-|   |       |-- gradle-wrapper.jar
-|   |       `-- gradle-wrapper.properties
-|   |-- gradle.properties
-|   |-- gradlew
-|   |-- gradlew.bat
-|   |-- local.properties
-|   `-- settings.gradle.kts
-|-- assets
-|   |-- data
-|   |   |-- bots
-|   |   |   `-- bots.json
-|   |   |-- campaigns
-|   |   |   `-- campaigns
-|   |   |       `-- index.json
-|   |   |-- levels
-|   |   |   |-- level_0001.json
-|   |   |   `-- level_0002.json
-|   |   `-- puzzles
-|   |       |-- index.json
-|   |       |-- puzzle_set_0001.json
-|   |       `-- puzzle_set_0002.json
-|   |-- images
-|   |   `-- pieces
-|   |       |-- piece_black_bishop.svg
-|   |       |-- piece_black_king.svg
-|   |       |-- piece_black_knight.svg
-|   |       |-- piece_black_pawn.svg
-|   |       |-- piece_black_queen.svg
-|   |       |-- piece_black_rook.svg
-|   |       |-- piece_white_bishop.svg
-|   |       |-- piece_white_king.svg
-|   |       |-- piece_white_knight.svg
-|   |       |-- piece_white_pawn.svg
-|   |       |-- piece_white_queen.svg
-|   |       `-- piece_white_rook.svg
-|   |-- schemas
-|   |   |-- bot.schema.json
-|   |   |-- bots.schema.json
-|   |   `-- level.schemas.json
-|   `-- videos
-|       `-- sample.mp4
-|-- chess_app.iml
-|-- docs
-|   |-- ARCHITECTURE.md
-|   |-- BACKLOG.md
-|   |-- CHANGELOG.md
-|   |-- PROGRESS.md
-|   |-- README.md
-|   `-- file_structure.txt
-|-- file_structure.txt
-|-- ios
-|   |-- Flutter
-|   |   |-- AppFrameworkInfo.plist
-|   |   |-- Debug.xcconfig
-|   |   |-- Generated.xcconfig
-|   |   |-- Release.xcconfig
-|   |   |-- ephemeral
-|   |   |   |-- flutter_lldb_helper.py
-|   |   |   `-- flutter_lldbinit
-|   |   `-- flutter_export_environment.sh
-|   |-- Runner
-|   |   |-- AppDelegate.swift
-|   |   |-- Assets.xcassets
-|   |   |   |-- AppIcon.appiconset
-|   |   |   |   |-- Contents.json
-|   |   |   |   |-- Icon-App-1024x1024@1x.png
-|   |   |   |   |-- Icon-App-20x20@1x.png
-|   |   |   |   |-- Icon-App-20x20@2x.png
-|   |   |   |   |-- Icon-App-20x20@3x.png
-|   |   |   |   |-- Icon-App-29x29@1x.png
-|   |   |   |   |-- Icon-App-29x29@2x.png
-|   |   |   |   |-- Icon-App-29x29@3x.png
-|   |   |   |   |-- Icon-App-40x40@1x.png
-|   |   |   |   |-- Icon-App-40x40@2x.png
-|   |   |   |   |-- Icon-App-40x40@3x.png
-|   |   |   |   |-- Icon-App-60x60@2x.png
-|   |   |   |   |-- Icon-App-60x60@3x.png
-|   |   |   |   |-- Icon-App-76x76@1x.png
-|   |   |   |   |-- Icon-App-76x76@2x.png
-|   |   |   |   `-- Icon-App-83.5x83.5@2x.png
-|   |   |   `-- LaunchImage.imageset
-|   |   |       |-- Contents.json
-|   |   |       |-- LaunchImage.png
-|   |   |       |-- LaunchImage@2x.png
-|   |   |       |-- LaunchImage@3x.png
-|   |   |       `-- README.md
-|   |   |-- Base.lproj
-|   |   |   |-- LaunchScreen.storyboard
-|   |   |   `-- Main.storyboard
-|   |   |-- GeneratedPluginRegistrant.h
-|   |   |-- GeneratedPluginRegistrant.m
-|   |   |-- Info.plist
-|   |   `-- Runner-Bridging-Header.h
-|   |-- Runner.xcodeproj
-|   |   |-- project.pbxproj
-|   |   |-- project.xcworkspace
-|   |   |   |-- contents.xcworkspacedata
-|   |   |   `-- xcshareddata
-|   |   |       |-- IDEWorkspaceChecks.plist
-|   |   |       `-- WorkspaceSettings.xcsettings
-|   |   `-- xcshareddata
-|   |       `-- xcschemes
-|   |           `-- Runner.xcscheme
-|   |-- Runner.xcworkspace
-|   |   |-- contents.xcworkspacedata
-|   |   `-- xcshareddata
-|   |       |-- IDEWorkspaceChecks.plist
-|   |       `-- WorkspaceSettings.xcsettings
-|   `-- RunnerTests
-|       `-- RunnerTests.swift
-|-- lib
-|   |-- app.dart
-|   |-- core
-|   |   |-- constants.dart
-|   |   |-- errors
-|   |   |   `-- failure.dart
-|   |   |-- game_logic
-|   |   |   |-- bot_factory.dart
-|   |   |   |-- chess_board_state.dart
-|   |   |   |-- chess_notation.dart
-|   |   |   |-- game_state.dart
-|   |   |   |-- mock_bot.dart
-|   |   |   `-- stockfish_bot.dart
-|   |   |-- theme
-|   |   |   `-- app_theme.dart
-|   |   |-- utils
-|   |   |   `-- result.dart
-|   |   `-- widgets
-|   |       |-- app_button.dart
-|   |       |-- async_value_view.dart
-|   |       |-- chess_board_widget.dart
-|   |       |-- game_view.dart
-|   |       |-- locked_badge.dart
-|   |       `-- piece_widget.dart
-|   |-- data
-|   |   |-- models
-|   |   |   |-- boss.dart
-|   |   |   |-- bot.dart
-|   |   |   |-- bot_progress.dart
-|   |   |   |-- level.dart
-|   |   |   |-- progress.dart
-|   |   |   |-- puzzle.dart
-|   |   |   |-- puzzle_set.dart
-|   |   |   `-- video_item.dart
-|   |   |-- repositories
-|   |   |   |-- bot_repository.dart
-|   |   |   |-- level_repository.dart
-|   |   |   |-- progress_repository.dart
-|   |   |   `-- puzzle_repository.dart
-|   |   `-- sources
-|   |       `-- local
-|   |           `-- asset_source.dart
-|   |-- features
-|   |   |-- boss
-|   |   |   `-- pages
-|   |   |       `-- boss_page.dart
-|   |   |-- campaign
-|   |   |   `-- pages
-|   |   |       `-- campaign_page.dart
-|   |   |-- home
-|   |   |   `-- pages
-|   |   |       `-- home_page.dart
-|   |   |-- lesson
-|   |   |   |-- pages
-|   |   |   |   `-- lesson_page.dart
-|   |   |   `-- widgets
-|   |   |       `-- video_player_view.dart
-|   |   |-- level
-|   |   |   `-- pages
-|   |   |       `-- level_page.dart
-|   |   |-- play
-|   |   |   |-- pages
-|   |   |   |   `-- play_page.dart
-|   |   |   `-- widgets
-|   |   |       `-- bot_selector_page.dart
-|   |   |-- progress
-|   |   |   `-- widgets
-|   |   |       `-- progress_badge.dart
-|   |   `-- puzzles
-|   |       `-- pages
-|   |           `-- puzzles_page.dart
-|   |-- main.dart
-|   |-- router
-|   |   `-- app_router.dart
-|   |-- services
-|   `-- state
-|       `-- providers.dart
-|-- linux
-|   |-- CMakeLists.txt
-|   |-- flutter
-|   |   |-- CMakeLists.txt
-|   |   |-- ephemeral
-|   |   |-- generated_plugin_registrant.cc
-|   |   |-- generated_plugin_registrant.h
-|   |   `-- generated_plugins.cmake
-|   `-- runner
-|       |-- CMakeLists.txt
-|       |-- main.cc
-|       |-- my_application.cc
-|       `-- my_application.h
-|-- macos
-|   |-- Flutter
-|   |   |-- Flutter-Debug.xcconfig
-|   |   |-- Flutter-Release.xcconfig
-|   |   |-- GeneratedPluginRegistrant.swift
-|   |   `-- ephemeral
-|   |       |-- Flutter-Generated.xcconfig
-|   |       `-- flutter_export_environment.sh
-|   |-- Runner
-|   |   |-- AppDelegate.swift
-|   |   |-- Assets.xcassets
-|   |   |   `-- AppIcon.appiconset
-|   |   |       |-- Contents.json
-|   |   |       |-- app_icon_1024.png
-|   |   |       |-- app_icon_128.png
-|   |   |       |-- app_icon_16.png
-|   |   |       |-- app_icon_256.png
-|   |   |       |-- app_icon_32.png
-|   |   |       |-- app_icon_512.png
-|   |   |       `-- app_icon_64.png
-|   |   |-- Base.lproj
-|   |   |   `-- MainMenu.xib
-|   |   |-- Configs
-|   |   |   |-- AppInfo.xcconfig
-|   |   |   |-- Debug.xcconfig
-|   |   |   |-- Release.xcconfig
-|   |   |   `-- Warnings.xcconfig
-|   |   |-- DebugProfile.entitlements
-|   |   |-- Info.plist
-|   |   |-- MainFlutterWindow.swift
-|   |   `-- Release.entitlements
-|   |-- Runner.xcodeproj
-|   |   |-- project.pbxproj
-|   |   |-- project.xcworkspace
-|   |   |   `-- xcshareddata
-|   |   |       `-- IDEWorkspaceChecks.plist
-|   |   `-- xcshareddata
-|   |       `-- xcschemes
-|   |           `-- Runner.xcscheme
-|   |-- Runner.xcworkspace
-|   |   |-- contents.xcworkspacedata
-|   |   `-- xcshareddata
-|   |       `-- IDEWorkspaceChecks.plist
-|   `-- RunnerTests
-|       `-- RunnerTests.swift
-|-- pubspec.lock
-|-- pubspec.yaml
-|-- tools
-|   `-- validate_content.dart
-|-- web
-|   |-- favicon.png
-|   |-- icons
-|   |   |-- Icon-192.png
-|   |   |-- Icon-512.png
-|   |   |-- Icon-maskable-192.png
-|   |   `-- Icon-maskable-512.png
-|   |-- index.html
-|   `-- manifest.json
-`-- windows
+.flutter-plugins-dependencies
+.gitignore
+.metadata
+analysis_options.yaml
+android
+    |-- .gitignore
+    |-- .gradle
+        |-- 8.12
+            |-- checksums
+                |-- checksums.lock
+                |-- md5-checksums.bin
+                |-- sha1-checksums.bin
+            |-- executionHistory
+                |-- executionHistory.bin
+                |-- executionHistory.lock
+            |-- expanded
+            |-- fileChanges
+                |-- last-build.bin
+            |-- fileHashes
+                |-- fileHashes.bin
+                |-- fileHashes.lock
+                |-- resourceHashesCache.bin
+            |-- gc.properties
+            |-- vcsMetadata
+        |-- buildOutputCleanup
+            |-- buildOutputCleanup.lock
+            |-- cache.properties
+            |-- outputFiles.bin
+        |-- file-system.probe
+        |-- noVersion
+            |-- buildLogic.lock
+        |-- vcs-1
+            |-- gc.properties
+    |-- .kotlin
+        |-- sessions
+    |-- app
+        |-- build.gradle.kts
+        |-- src
+            |-- debug
+                |-- AndroidManifest.xml
+            |-- main
+                |-- AndroidManifest.xml
+                |-- java
+                    |-- io
+                        |-- flutter
+                            |-- plugins
+                                |-- GeneratedPluginRegistrant.java
+                |-- kotlin
+                    |-- com
+                        |-- example
+                            |-- chess_app
+                                |-- MainActivity.kt
+                |-- res
+                    |-- drawable
+                    |-- drawable-v21
+                        |-- launch_background.xml
+                        |-- launch_background.xml
+                    |-- mipmap-hdpi
+                        |-- ic_launcher.png
+                    |-- mipmap-mdpi
+                        |-- ic_launcher.png
+                    |-- mipmap-xhdpi
+                        |-- ic_launcher.png
+                    |-- mipmap-xxhdpi
+                        |-- ic_launcher.png
+                    |-- mipmap-xxxhdpi
+                        |-- ic_launcher.png
+                    |-- values
+                    |-- values-night
+                        |-- styles.xml
+                        |-- styles.xml
+            |-- profile
+                |-- AndroidManifest.xml
+    |-- build.gradle.kts
+    |-- gradle
+    |-- gradle.properties
+        |-- wrapper
+            |-- gradle-wrapper.jar
+            |-- gradle-wrapper.properties
+    |-- gradlew
+    |-- gradlew.bat
+    |-- local.properties
+    |-- settings.gradle.kts
+assets
+    |-- data
+        |-- bots
+            |-- bots.json
+        |-- campaigns
+            |-- campaign_01.json
+            |-- campaign_02.json
+            |-- index.json
+        |-- levels
+            |-- level_0001.json
+            |-- level_0002.json
+            |-- level_0003.json
+            |-- level_0004.json
+            |-- level_0005.json
+            |-- level_0006.json
+            |-- level_0007.json
+            |-- level_0008.json
+            |-- level_0009.json
+            |-- level_0010.json
+        |-- puzzles
+            |-- index.json
+            |-- puzzle_set_0001.json
+            |-- puzzle_set_0002.json
+    |-- images
+        |-- pieces
+            |-- piece_black_bishop.svg
+            |-- piece_black_king.svg
+            |-- piece_black_knight.svg
+            |-- piece_black_pawn.svg
+            |-- piece_black_queen.svg
+            |-- piece_black_rook.svg
+            |-- piece_white_bishop.svg
+            |-- piece_white_king.svg
+            |-- piece_white_knight.svg
+            |-- piece_white_pawn.svg
+            |-- piece_white_queen.svg
+            |-- piece_white_rook.svg
+    |-- schemas
+        |-- bot.schema.json
+        |-- bots.schema.json
+        |-- level.schemas.json
+    |-- videos
+        |-- Sample.mp4
+docs
+    |-- ARCHITECTURE.md
+    |-- BACKLOG.md
+    |-- CAMPAIGN_STRUCTURE.md
+    |-- CHANGELOG.md
+    |-- DOCUMENTATION_SUMMARY.md
+    |-- file_structure.txt
+    |-- LAUNCH_PLAN.md
+    |-- PROGRESS.md
+file_structure.txt
+ios
+    |-- .gitignore
+    |-- Flutter
+        |-- AppFrameworkInfo.plist
+        |-- Debug.xcconfig
+        |-- ephemeral
+            |-- flutter_lldb_helper.py
+            |-- flutter_lldbinit
+        |-- flutter_export_environment.sh
+        |-- Generated.xcconfig
+        |-- Release.xcconfig
+    |-- Podfile
+    |-- Runner
+    |-- Runner.xcodeproj
+        |-- project.pbxproj
+        |-- project.xcworkspace
+            |-- contents.xcworkspacedata
+            |-- xcshareddata
+                |-- IDEWorkspaceChecks.plist
+                |-- WorkspaceSettings.xcsettings
+        |-- xcshareddata
+            |-- xcschemes
+                |-- Runner.xcscheme
+    |-- Runner.xcworkspace
+        |-- contents.xcworkspacedata
+        |-- xcshareddata
+            |-- IDEWorkspaceChecks.plist
+            |-- WorkspaceSettings.xcsettings
+        |-- AppDelegate.swift
+        |-- Assets.xcassets
+            |-- AppIcon.appiconset
+                |-- Contents.json
+                |-- Icon-App-1024x1024@1x.png
+                |-- Icon-App-20x20@1x.png
+                |-- Icon-App-20x20@2x.png
+                |-- Icon-App-20x20@3x.png
+                |-- Icon-App-29x29@1x.png
+                |-- Icon-App-29x29@2x.png
+                |-- Icon-App-29x29@3x.png
+                |-- Icon-App-40x40@1x.png
+                |-- Icon-App-40x40@2x.png
+                |-- Icon-App-40x40@3x.png
+                |-- Icon-App-60x60@2x.png
+                |-- Icon-App-60x60@3x.png
+                |-- Icon-App-76x76@1x.png
+                |-- Icon-App-76x76@2x.png
+                |-- Icon-App-83.5x83.5@2x.png
+            |-- LaunchImage.imageset
+                |-- Contents.json
+                |-- LaunchImage.png
+                |-- LaunchImage@2x.png
+                |-- LaunchImage@3x.png
+                |-- README.md
+        |-- Base.lproj
+            |-- LaunchScreen.storyboard
+            |-- Main.storyboard
+        |-- GeneratedPluginRegistrant.h
+        |-- GeneratedPluginRegistrant.m
+        |-- Info.plist
+        |-- Runner-Bridging-Header.h
+    |-- RunnerTests
+        |-- RunnerTests.swift
+lib
+    |-- app.dart
+    |-- core
+        |-- constants.dart
+        |-- errors
+            |-- failure.dart
+        |-- game_logic
+            |-- bot_factory.dart
+            |-- chess_board_state.dart
+            |-- chess_notation.dart
+            |-- game_state.dart
+            |-- mock_bot.dart
+            |-- stockfish_bot.dart
+        |-- theme
+            |-- app_theme.dart
+        |-- utils
+            |-- result.dart
+        |-- widgets
+            |-- app_button.dart
+            |-- async_value_view.dart
+            |-- chess_board_widget.dart
+            |-- game_view.dart
+            |-- locked_badge.dart
+            |-- piece_widget.dart
+    |-- data
+        |-- models
+            |-- boss.dart
+            |-- bot_progress.dart
+            |-- bot.dart
+            |-- campaign.dart
+            |-- level.dart
+            |-- progress.dart
+            |-- puzzle_set.dart
+            |-- puzzle.dart
+            |-- video_item.dart
+        |-- repositories
+            |-- bot_repository.dart
+            |-- campaign_repository.dart
+            |-- level_repository.dart
+            |-- progress_repository.dart
+            |-- puzzle_repository.dart
+        |-- sources
+            |-- local
+                |-- asset_source.dart
+    |-- features
+        |-- boss
+            |-- pages
+                |-- boss_page.dart
+        |-- campaign
+            |-- pages
+                |-- campaign_detail_page.dart
+                |-- campaign_page.dart
+                |-- campaigns_home_page.dart
+        |-- home
+            |-- pages
+                |-- home_page.dart
+        |-- lesson
+            |-- pages
+                |-- lesson_page.dart
+            |-- widgets
+                |-- video_player_view.dart
+        |-- level
+            |-- pages
+                |-- level_page.dart
+        |-- play
+            |-- pages
+                |-- play_page.dart
+            |-- widgets
+                |-- game_selector_page.dart
+        |-- progress
+            |-- widgets
+                |-- progress_badge.dart
+        |-- puzzles
+            |-- pages
+                |-- puzzles_page.dart
+    |-- main.dart
+    |-- router
+        |-- app_router.dart
+    |-- state
+        |-- providers.dart
+linux
+    |-- .gitignore
     |-- CMakeLists.txt
     |-- flutter
-    |   |-- CMakeLists.txt
-    |   |-- ephemeral
-    |   |-- generated_plugin_registrant.cc
-    |   |-- generated_plugin_registrant.h
-    |   `-- generated_plugins.cmake
-    `-- runner
         |-- CMakeLists.txt
-        |-- Runner.rc
+        |-- ephemeral
+            |-- .plugin_symlinks
+                |-- package_info_plus
+                |-- path_provider_linux
+                |-- wakelock_plus
+        |-- generated_plugin_registrant.cc
+        |-- generated_plugin_registrant.h
+        |-- generated_plugins.cmake
+    |-- runner
+        |-- CMakeLists.txt
+        |-- main.cc
+        |-- my_application.cc
+        |-- my_application.h
+macos
+    |-- .gitignore
+    |-- Flutter
+        |-- ephemeral
+            |-- flutter_export_environment.sh
+            |-- Flutter-Generated.xcconfig
+        |-- Flutter-Debug.xcconfig
+        |-- Flutter-Release.xcconfig
+        |-- GeneratedPluginRegistrant.swift
+    |-- Podfile
+    |-- Runner
+    |-- Runner.xcodeproj
+        |-- project.pbxproj
+        |-- project.xcworkspace
+            |-- xcshareddata
+                |-- IDEWorkspaceChecks.plist
+        |-- xcshareddata
+            |-- xcschemes
+                |-- Runner.xcscheme
+    |-- Runner.xcworkspace
+        |-- contents.xcworkspacedata
+        |-- xcshareddata
+            |-- IDEWorkspaceChecks.plist
+        |-- AppDelegate.swift
+        |-- Assets.xcassets
+            |-- AppIcon.appiconset
+                |-- app_icon_1024.png
+                |-- app_icon_128.png
+                |-- app_icon_16.png
+                |-- app_icon_256.png
+                |-- app_icon_32.png
+                |-- app_icon_512.png
+                |-- app_icon_64.png
+                |-- Contents.json
+        |-- Base.lproj
+            |-- MainMenu.xib
+        |-- Configs
+            |-- AppInfo.xcconfig
+            |-- Debug.xcconfig
+            |-- Release.xcconfig
+            |-- Warnings.xcconfig
+        |-- DebugProfile.entitlements
+        |-- Info.plist
+        |-- MainFlutterWindow.swift
+        |-- Release.entitlements
+    |-- RunnerTests
+        |-- RunnerTests.swift
+pubspec.lock
+pubspec.yaml
+README.md
+scripts
+    |-- update-file-structure.sh
+tools
+    |-- validate_content.dart
+web
+    |-- favicon.png
+    |-- icons
+        |-- Icon-192.png
+        |-- Icon-512.png
+        |-- Icon-maskable-192.png
+        |-- Icon-maskable-512.png
+    |-- index.html
+    |-- manifest.json
+windows
+    |-- .gitignore
+    |-- CMakeLists.txt
+    |-- flutter
+        |-- CMakeLists.txt
+        |-- ephemeral
+            |-- .plugin_symlinks
+                |-- package_info_plus
+                |-- path_provider_windows
+                |-- wakelock_plus
+        |-- generated_plugin_registrant.cc
+        |-- generated_plugin_registrant.h
+        |-- generated_plugins.cmake
+    |-- runner
+        |-- CMakeLists.txt
         |-- flutter_window.cpp
         |-- flutter_window.h
         |-- main.cpp
         |-- resource.h
         |-- resources
-        |   `-- app_icon.ico
+            |-- app_icon.ico
         |-- runner.exe.manifest
+        |-- Runner.rc
         |-- utils.cpp
         |-- utils.h
         |-- win32_window.cpp
-        `-- win32_window.h
-
-117 directories, 209 files
+        |-- win32_window.h

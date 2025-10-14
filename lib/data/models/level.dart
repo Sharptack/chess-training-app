@@ -1,25 +1,24 @@
 // lib/data/models/level.dart
 import 'package:ChessTrainerApp/data/models/video_item.dart';
-import 'package:ChessTrainerApp/data/models/boss.dart';
 
 class Level {
   final String id;
   final String title;
   final String description;
+  final String campaignId;
   final VideoItem lessonVideo;
   final List<String> puzzleIds;
   final List<String> playBotIds;
-  final Boss boss;
   final int requiredGames;
 
   Level({
     required this.id,
     required this.title,
     required this.description,
+    required this.campaignId,
     required this.lessonVideo,
     required this.puzzleIds,
     required this.playBotIds,
-    required this.boss,
     this.requiredGames = 3,
   });
 
@@ -57,22 +56,32 @@ class Level {
                           json['requiredGames'] as int? ??
                           3;
 
-    // Parse boss
-    final bossJson = json['boss'] as Map<String, dynamic>?;
-    if (bossJson == null) {
-      throw ArgumentError('Missing "boss" object in level JSON');
-    }
-    final boss = Boss.fromJson(bossJson);
-
     return Level(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
+      campaignId: json['campaignId'] as String,
       lessonVideo: lessonVideo,
       puzzleIds: puzzleIds,
       playBotIds: playBotIds,
-      boss: boss,
       requiredGames: requiredGames,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'campaignId': campaignId,
+      'lesson': {
+        'video': lessonVideo.toJson(),
+      },
+      'puzzles': puzzleIds,
+      'play': {
+        'botIds': playBotIds,
+        'gamesRequired': requiredGames,
+      },
+    };
   }
 }

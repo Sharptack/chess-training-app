@@ -6,8 +6,8 @@ import '../../../data/models/bot.dart';
 import '../../../state/providers.dart';
 
 class BossPage extends ConsumerStatefulWidget {
-  final String levelId;
-  const BossPage({super.key, required this.levelId});
+  final String campaignId;
+  const BossPage({super.key, required this.campaignId});
 
   @override
   ConsumerState<BossPage> createState() => _BossPageState();
@@ -51,7 +51,7 @@ class _BossPageState extends ConsumerState<BossPage> {
   @override
   Widget build(BuildContext context) {
     // Watch the game state and listen for changes
-    final gameState = ref.watch(gameStateNotifierProvider('boss_${widget.levelId}'));
+    final gameState = ref.watch(gameStateNotifierProvider('boss_${widget.campaignId}'));
 
     // Set up listener when game state changes
     if (gameState != _currentGameState) {
@@ -61,12 +61,12 @@ class _BossPageState extends ConsumerState<BossPage> {
       _lastKnownStatus = gameState?.status;
     }
 
-    // Load level data using FutureProvider
-    final levelAsync = ref.watch(levelProvider(widget.levelId));
+    // Load campaign data to get boss
+    final campaignAsync = ref.watch(campaignProvider(widget.campaignId));
 
-    return levelAsync.when(
-      data: (level) {
-        final boss = level.boss;
+    return campaignAsync.when(
+      data: (campaign) {
+        final boss = campaign.boss;
 
         return Scaffold(
           appBar: AppBar(
@@ -175,7 +175,7 @@ class _BossPageState extends ConsumerState<BossPage> {
       allowUndo: boss.allowUndo ?? true,
     );
 
-    ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier)
+    ref.read(gameStateNotifierProvider('boss_${widget.campaignId}').notifier)
       .startGame(bot: bossAsBot, humanPlaysWhite: humanPlaysWhite);
   }
 
@@ -274,7 +274,7 @@ class _BossPageState extends ConsumerState<BossPage> {
   void _restartBattle() {
     _hasRecordedCompletion = false;
     _lastKnownStatus = null;
-    ref.read(gameStateNotifierProvider('boss_${widget.levelId}').notifier).endGame();
+    ref.read(gameStateNotifierProvider('boss_${widget.campaignId}').notifier).endGame();
   }
 
   Future<void> _handleGameComplete(GameState gameState) async {
@@ -284,8 +284,8 @@ class _BossPageState extends ConsumerState<BossPage> {
 
     if (won) {
       // Mark boss as complete
-      await markBossCompleted(ref, widget.levelId);
-      print('DEBUG: Boss marked as completed for level ${widget.levelId}');
+      await markBossCompleted(ref, widget.campaignId);
+      print('DEBUG: Boss marked as completed for campaign ${widget.campaignId}');
     }
   }
 }

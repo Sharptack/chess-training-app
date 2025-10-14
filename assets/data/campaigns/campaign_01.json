@@ -1,0 +1,29 @@
+{
+  "id": "campaign_01",
+  "title": "Fundamentals 1",
+  "description": "Master the basics: check, checkmate, and escaping danger",
+  "levelIds": [
+    "level_0001",
+    "level_0002",
+    "level_0003",
+    "level_0004",
+    "level_0005"
+  ],
+  "boss": {
+    "id": "boss_campaign_01",
+    "name": "Rook Guardian",
+    "elo": 400,
+    "style": "defensive",
+    "engineSettings": {
+      "skillLevel": -8,
+      "moveTime": 200,
+      "limitStrength": true,
+      "randomBlunderChance": 0.7
+    },
+    "unlockRequirements": {
+      "allLessonsMustBeComplete": true,
+      "allPuzzlesMustBeComplete": true,
+      "requiredGamesTotal": 15
+    }
+  }
+}

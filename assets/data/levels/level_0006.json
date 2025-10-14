@@ -1,0 +1,21 @@
+{
+  "id": "level_0006",
+  "title": "Checkmate in 1 with Queen",
+  "description": "Practice delivering checkmate in one move using the queen.",
+  "campaignId": "campaign_02",
+  "lesson": {
+    "video": {
+      "id": "video_0006",
+      "title": "Queen Checkmate Patterns",
+      "url": "assets/videos/sample.mp4",
+      "thumbnail": null
+    }
+  },
+  "puzzles": [
+    "puzzle_set_0006"
+  ],
+  "play": {
+    "botIds": ["bot_002"],
+    "gamesRequired": 1
+  }
+}

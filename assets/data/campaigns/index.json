@@ -1,0 +1,12 @@
+{
+  "campaign_01": {
+    "id": "campaign_01",
+    "name": "Fundamentals 1",
+    "description": "Master the basics: check, checkmate, and escaping danger"
+  },
+  "campaign_02": {
+    "id": "campaign_02",
+    "name": "Fundamentals 2",
+    "description": "Learn basic checkmate patterns with Queen, Rook, and minor pieces"
+  }
+}
