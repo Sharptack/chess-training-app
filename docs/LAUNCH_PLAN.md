@@ -53,10 +53,11 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 - [x] Create 2 campaign JSON files (campaign_01, campaign_02) + 8 placeholder levels
 
 **UI Updates**:
-- [x] Build CampaignsHomePage (new home screen)
+- [x] Build HomePage (home screen, features/home/)
   - Grid of campaigns with lock states
   - Shows campaign info and boss details
-- [x] Build CampaignDetailPage (shows levels + campaign boss)
+- [x] Build CampaignPage (campaign detail, features/campaign/)
+  - Shows levels + campaign boss
 - [x] Refactor level_page.dart to show 3 tiles (Lesson, Puzzles, Games)
   - Removed Boss tile from level page
   - Updated layout from 2x2 grid to 3-tile layout (1 top, 2 bottom)
@@ -114,7 +115,7 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 - [x] Simplify `campaignBossUnlockRequirementsProvider` to show "X/Y levels complete"
 
 **UI Updates**:
-- [x] Update campaigns_home_page to use real unlock logic
+- [x] Update home_page to use real unlock logic
 - [x] Add campaign progress display (X/Y levels) on campaign cards
 - [x] Add lock overlay with "Complete [Previous Campaign]" message
 - [x] Simplify boss unlock overlay to single requirement

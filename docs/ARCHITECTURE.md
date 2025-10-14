@@ -219,9 +219,11 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 
 ### Features (`lib/features/`)
 
+#### `features/home/`
+- `home_page.dart` - Home screen showing all campaigns grid (Phase 7.1, refactored 7.2)
+
 #### `features/campaign/`
-- `campaign_page.dart` - Campaign selection grid (home screen, Phase 7.1)
-- `campaign_detail_page.dart` - Level selection within campaign (Phase 7.1)
+- `campaign_page.dart` - Campaign detail showing levels + boss (Phase 7.1, refactored 7.2)
 
 #### `features/lesson/`
 - `lesson_page.dart` - Video player with Chewie
