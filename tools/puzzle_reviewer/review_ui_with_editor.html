@@ -1,0 +1,445 @@
+<!-- tools/puzzle_reviewer/review_ui_with_editor.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puzzle Reviewer + Editor</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .puzzle-card {
+            border: 2px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+        }
+        .puzzle-card.selected {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+        .puzzle-card.editing {
+            border-color: #2196F3;
+            background: #e3f2fd;
+        }
+        .puzzle-left {
+            flex: 0 0 400px;
+        }
+        .puzzle-right {
+            flex: 1;
+        }
+        .puzzle-info { margin: 10px 0; }
+        .buttons { margin: 10px 0; }
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        button.primary { background: #4CAF50; color: white; border: none; }
+        button.secondary { background: #2196F3; color: white; border: none; }
+        button.danger { background: #f44336; color: white; border: none; }
+        .selected-count {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .edit-section {
+            display: none;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .edit-section.active {
+            display: block;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .form-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .move-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .move-chip {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        #board {
+            width: 400px;
+        }
+        .board-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .board-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Puzzle Reviewer + Editor - <span id="levelName"></span></h1>
+        <div class="selected-count">
+            Selected: <span id="selectedCount">0</span> / 15
+        </div>
+    </div>
+
+    <div class="instructions">
+        <strong>✨ New Features:</strong>
+        <ul>
+            <li><strong>Edit Position:</strong> Click "Edit Puzzle" to modify FEN, moves, or hint</li>
+            <li><strong>Visual Board:</strong> See the puzzle position on a chessboard</li>
+            <li><strong>Play Through:</strong> View the solution moves step by step (coming soon!)</li>
+        </ul>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json">
+    <button class="primary" onclick="exportSelected()">Export Selected Puzzles</button>
+    <button class="secondary" onclick="exportAll()">Export All (with edits)</button>
+
+    <div id="puzzles"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <script>
+        let puzzles = [];
+        let selectedPuzzles = new Set();
+        let editedPuzzles = new Map(); // Track edits
+
+        document.getElementById('fileInput').addEventListener('change', loadPuzzles);
+
+        function loadPuzzles(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                puzzles = JSON.parse(e.target.result);
+                displayPuzzles();
+            };
+
+            reader.readAsText(file);
+        }
+
+        function displayPuzzles() {
+            const container = document.getElementById('puzzles');
+            container.innerHTML = '';
+
+            puzzles.forEach((puzzle, index) => {
+                const card = document.createElement('div');
+                card.className = 'puzzle-card';
+                card.id = `puzzle-${index}`;
+
+                // Use edited version if exists
+                const displayPuzzle = editedPuzzles.has(puzzle.id)
+                    ? editedPuzzles.get(puzzle.id)
+                    : puzzle;
+
+                const editedLabel = editedPuzzles.has(puzzle.id) ? ' <span style="color: #2196F3;">✏️ Edited</span>' : '';
+
+                card.innerHTML = `
+                    <div class="puzzle-left">
+                        <div class="board-container">
+                            <div id="board-${index}" style="width: 400px"></div>
+                            <div class="board-loading" id="loading-${index}">Loading board...</div>
+                        </div>
+                        <div class="buttons">
+                            <button class="secondary" onclick="toggleEdit(${index})">Edit Puzzle</button>
+                            <button onclick="viewOnLichess('${puzzle.lichess_url}')">View on Lichess</button>
+                            <button class="primary" onclick="toggleSelect(${index})">Select</button>
+                        </div>
+                    </div>
+                    <div class="puzzle-right">
+                        <div class="puzzle-info">
+                            <strong>Puzzle ${index + 1}</strong> ${editedLabel} |
+                            Rating: ${displayPuzzle.rating} |
+                            Popularity: ${displayPuzzle.popularity}
+                        </div>
+                        <div class="puzzle-info">
+                            <strong>Themes:</strong> ${displayPuzzle.themes.join(', ')}
+                        </div>
+                        <div class="puzzle-info">
+                            <strong>FEN:</strong> <code>${displayPuzzle.fen}</code>
+                        </div>
+                        <div class="puzzle-info">
+                            <strong>Solution:</strong>
+                            <div class="move-list">
+                                ${displayPuzzle.moveSequence.map(m => `<span class="move-chip">${m}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="puzzle-info">
+                            <strong>Hint:</strong> ${displayPuzzle.hint}
+                        </div>
+
+                        <!-- Edit Section -->
+                        <div class="edit-section" id="edit-${index}">
+                            <h3>Edit Puzzle</h3>
+                            <div class="form-group">
+                                <label>FEN Position:</label>
+                                <input type="text" id="fen-${index}" value="${displayPuzzle.fen}">
+                                <small>Modify the starting position (FEN format)</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Solution Moves (space-separated):</label>
+                                <textarea id="moves-${index}">${displayPuzzle.moveSequence.join(' ')}</textarea>
+                                <small>Example: e2e4 e7e5 Nf3</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Hint:</label>
+                                <input type="text" id="hint-${index}" value="${displayPuzzle.hint}">
+                            </div>
+                            <div class="buttons">
+                                <button class="primary" onclick="saveEdit(${index})">Save Changes</button>
+                                <button onclick="cancelEdit(${index})">Cancel</button>
+                                <button class="danger" onclick="resetEdit(${index})">Reset to Original</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Initialize all chessboards after DOM is fully updated
+            setTimeout(() => {
+                puzzles.forEach((puzzle, index) => {
+                    const displayPuzzle = editedPuzzles.has(puzzle.id)
+                        ? editedPuzzles.get(puzzle.id)
+                        : puzzle;
+
+                    try {
+                        const board = Chessboard(`board-${index}`, {
+                            position: displayPuzzle.fen,
+                            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+                        });
+
+                        // Hide loading indicator
+                        const loader = document.getElementById(`loading-${index}`);
+                        if (loader) loader.style.display = 'none';
+                    } catch (e) {
+                        console.error(`Error rendering board ${index}:`, e);
+                        const loader = document.getElementById(`loading-${index}`);
+                        if (loader) {
+                            loader.innerHTML = '⚠️ Invalid FEN';
+                            loader.style.background = 'rgba(255,200,200,0.9)';
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        function toggleEdit(index) {
+            const editSection = document.getElementById(`edit-${index}`);
+            const card = document.getElementById(`puzzle-${index}`);
+
+            if (editSection.classList.contains('active')) {
+                editSection.classList.remove('active');
+                card.classList.remove('editing');
+            } else {
+                // Close other edit sections
+                document.querySelectorAll('.edit-section.active').forEach(el => {
+                    el.classList.remove('active');
+                });
+                document.querySelectorAll('.puzzle-card.editing').forEach(el => {
+                    el.classList.remove('editing');
+                });
+
+                editSection.classList.add('active');
+                card.classList.add('editing');
+            }
+        }
+
+        function saveEdit(index) {
+            const puzzle = puzzles[index];
+            const fen = document.getElementById(`fen-${index}`).value.trim();
+            const movesStr = document.getElementById(`moves-${index}`).value;
+            const hint = document.getElementById(`hint-${index}`).value;
+
+            // Validate FEN before saving
+            try {
+                const testGame = new Chess(fen);
+            } catch (e) {
+                alert('⚠️ Invalid FEN position! Please check the format.\n\nError: ' + e.message);
+                return;
+            }
+
+            // Create edited version
+            const edited = {
+                ...puzzle,
+                fen: fen,
+                moveSequence: movesStr.split(/\s+/).filter(m => m.length > 0),
+                hint: hint
+            };
+
+            editedPuzzles.set(puzzle.id, edited);
+
+            // Store scroll position and which card was being edited
+            const scrollPos = window.scrollY;
+            const cardRect = document.getElementById(`puzzle-${index}`).getBoundingClientRect();
+            const cardOffsetFromTop = cardRect.top + scrollPos;
+
+            // Update display
+            displayPuzzles();
+
+            // Restore scroll position after render
+            setTimeout(() => {
+                window.scrollTo(0, cardOffsetFromTop - 100); // Keep card visible
+            }, 200);
+
+            // Show success message after boards render
+            setTimeout(() => {
+                alert('✅ Puzzle saved!\n\n💡 The chessboard now shows your updated position.\n📝 Changes marked with ✏️ and will be included in export.');
+            }, 300);
+        }
+
+        function cancelEdit(index) {
+            const editSection = document.getElementById(`edit-${index}`);
+            const card = document.getElementById(`puzzle-${index}`);
+            editSection.classList.remove('active');
+            card.classList.remove('editing');
+        }
+
+        function resetEdit(index) {
+            const puzzle = puzzles[index];
+            editedPuzzles.delete(puzzle.id);
+
+            // Store scroll position
+            const scrollPos = window.scrollY;
+
+            displayPuzzles();
+
+            // Restore scroll position
+            setTimeout(() => {
+                window.scrollTo(0, scrollPos);
+            }, 100);
+
+            alert('✅ Puzzle reset to original version');
+        }
+
+        function toggleSelect(index) {
+            const puzzle = puzzles[index];
+            const puzzleId = puzzle.id;
+
+            if (selectedPuzzles.has(puzzleId)) {
+                selectedPuzzles.delete(puzzleId);
+                document.getElementById(`puzzle-${index}`).classList.remove('selected');
+            } else {
+                selectedPuzzles.add(puzzleId);
+                document.getElementById(`puzzle-${index}`).classList.add('selected');
+            }
+
+            document.getElementById('selectedCount').textContent = selectedPuzzles.size;
+        }
+
+        function viewOnLichess(url) {
+            window.open(url, '_blank');
+        }
+
+        function getPuzzleVersion(puzzle) {
+            return editedPuzzles.has(puzzle.id) ? editedPuzzles.get(puzzle.id) : puzzle;
+        }
+
+        function exportSelected() {
+            const selected = puzzles
+                .filter(p => selectedPuzzles.has(p.id))
+                .map(p => getPuzzleVersion(p));
+
+            if (selected.length === 0) {
+                alert('No puzzles selected!');
+                return;
+            }
+
+            // Convert to final format
+            const finalPuzzles = selected.map(p => ({
+                id: p.id,
+                fen: p.fen,
+                moveSequence: p.moveSequence,
+                hint: p.hint
+            }));
+
+            downloadJSON(finalPuzzles, 'selected_puzzles.json');
+        }
+
+        function exportAll() {
+            // Export all puzzles with edits applied
+            const allWithEdits = puzzles.map(p => getPuzzleVersion(p));
+
+            const finalPuzzles = allWithEdits.map(p => ({
+                id: p.id,
+                fen: p.fen,
+                moveSequence: p.moveSequence,
+                hint: p.hint,
+                rating: p.rating,
+                popularity: p.popularity,
+                themes: p.themes,
+                lichess_url: p.lichess_url
+            }));
+
+            downloadJSON(finalPuzzles, 'all_puzzles_edited.json');
+        }
+
+        function downloadJSON(data, filename) {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

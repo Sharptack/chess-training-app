@@ -1,0 +1,593 @@
+<!-- tools/puzzle_reviewer/puzzle_creator.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puzzle Creator & Editor</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .board-section {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        #board {
+            width: 500px;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .control-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .control-group h3 {
+            margin-top: 0;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        button.primary { background: #4CAF50; color: white; }
+        button.secondary { background: #2196F3; color: white; }
+        button.danger { background: #f44336; color: white; }
+        .piece-selector {
+            display: grid;
+            grid-template-columns: repeat(6, 60px);
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .piece-btn {
+            width: 60px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+        .piece-btn:hover {
+            border-color: #4CAF50;
+        }
+        .piece-btn.selected {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .puzzle-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .puzzle-item {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .puzzle-item:hover {
+            background: #f5f5f5;
+        }
+        .puzzle-item.selected {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .info-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .fen-display {
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .turn-selector {
+            display: flex;
+            gap: 10px;
+        }
+        .turn-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e0e0e0;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+        .turn-btn.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Puzzle Creator & Editor</h1>
+
+    <div class="info-box">
+        <strong>Three Workflows:</strong>
+        <ul>
+            <li><strong>Create from Scratch:</strong> Use drag-and-drop to build a position, add moves and hint</li>
+            <li><strong>Edit Imported:</strong> Load puzzles from file, click to edit on the board</li>
+            <li><strong>Use As-Is:</strong> Import from Lichess candidates and just select the good ones</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <!-- Left: Board Editor -->
+        <div class="board-section">
+            <div id="board"></div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <h3>Board Setup</h3>
+                    <button class="secondary" onclick="startPosition()">Starting Position</button>
+                    <button class="secondary" onclick="clearBoard()">Clear Board</button>
+                    <button class="secondary" onclick="flipBoard()">Flip Board</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Turn to Move</h3>
+                    <div class="turn-selector">
+                        <button class="turn-btn active" id="whiteBtn" onclick="setTurn('w')">White</button>
+                        <button class="turn-btn" id="blackBtn" onclick="setTurn('b')">Black</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Add/Remove Pieces</h3>
+                    <p><small>Click a piece below, then click a square on the board</small></p>
+                    <div class="piece-selector">
+                        <button class="piece-btn" data-piece="wP" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wP.png')"></button>
+                        <button class="piece-btn" data-piece="wN" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wN.png')"></button>
+                        <button class="piece-btn" data-piece="wB" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wB.png')"></button>
+                        <button class="piece-btn" data-piece="wR" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wR.png')"></button>
+                        <button class="piece-btn" data-piece="wQ" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wQ.png')"></button>
+                        <button class="piece-btn" data-piece="wK" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/wK.png')"></button>
+                        <button class="piece-btn" data-piece="bP" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bP.png')"></button>
+                        <button class="piece-btn" data-piece="bN" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bN.png')"></button>
+                        <button class="piece-btn" data-piece="bB" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bB.png')"></button>
+                        <button class="piece-btn" data-piece="bR" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bR.png')"></button>
+                        <button class="piece-btn" data-piece="bQ" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bQ.png')"></button>
+                        <button class="piece-btn" data-piece="bK" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bK.png')"></button>
+                    </div>
+                    <button class="danger" onclick="selectTrash()">🗑️ Remove Piece</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Current FEN</h3>
+                    <div class="fen-display" id="fenDisplay"></div>
+                    <button class="secondary" onclick="copyFEN()">Copy FEN</button>
+                    <button class="secondary" onclick="loadFromFEN()">Load from FEN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Puzzle Details & Library -->
+        <div class="details-section">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('editor')">Puzzle Editor</div>
+                <div class="tab" onclick="switchTab('library')">My Puzzles</div>
+                <div class="tab" onclick="switchTab('import')">Import</div>
+            </div>
+
+            <!-- Tab 1: Editor -->
+            <div class="tab-content active" id="editor-tab">
+                <div class="control-group">
+                    <h3>Puzzle Details</h3>
+
+                    <div class="form-group">
+                        <label>Puzzle ID:</label>
+                        <input type="text" id="puzzleId" placeholder="puzzle_custom_001">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Solution Moves (space-separated):</label>
+                        <textarea id="moves" placeholder="e2e4 e7e5 Nf3 Nc6"></textarea>
+                        <small>Format: e2e4 or Nf3 (standard algebraic or UCI notation)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hint:</label>
+                        <input type="text" id="hint" placeholder="Look for a fork!">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rating (optional):</label>
+                        <input type="number" id="rating" placeholder="800" min="600" max="3000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Themes (space-separated, optional):</label>
+                        <input type="text" id="themes" placeholder="fork mateIn2 middlegame">
+                    </div>
+
+                    <button class="primary" onclick="savePuzzle()">💾 Save Puzzle</button>
+                    <button class="secondary" onclick="clearForm()">🆕 New Puzzle</button>
+                </div>
+            </div>
+
+            <!-- Tab 2: Library -->
+            <div class="tab-content" id="library-tab">
+                <h3>Saved Puzzles (<span id="puzzleCount">0</span>)</h3>
+                <button class="primary" onclick="exportAllPuzzles()">📥 Export All</button>
+                <button class="danger" onclick="clearLibrary()">🗑️ Clear Library</button>
+                <div class="puzzle-list" id="puzzleList"></div>
+            </div>
+
+            <!-- Tab 3: Import -->
+            <div class="tab-content" id="import-tab">
+                <h3>Import Existing Puzzles</h3>
+                <input type="file" id="fileInput" accept=".json">
+                <button class="secondary" onclick="loadFile()">Load File</button>
+                <p><small>Load candidates from puzzle_importer or previously exported puzzles</small></p>
+                <div id="importedPuzzles"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <script>
+        let board;
+        let selectedPiece = null;
+        let currentTurn = 'w';
+        let puzzleLibrary = [];
+        let currentEditingId = null;
+
+        // Initialize
+        $(document).ready(function() {
+            board = Chessboard('board', {
+                draggable: true,
+                dropOffBoard: 'trash',
+                sparePieces: false,
+                position: 'start',
+                onDrop: onDrop,
+                onSnapEnd: onSnapEnd,
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            });
+
+            updateFEN();
+            loadLibraryFromStorage();
+
+            // Piece selector click handlers
+            $('.piece-btn').click(function() {
+                $('.piece-btn').removeClass('selected');
+                $(this).addClass('selected');
+                selectedPiece = $(this).data('piece');
+            });
+
+            // Board click handler for adding pieces
+            $('#board').on('click', '.square-55d63', function() {
+                if (!selectedPiece) return;
+
+                const square = $(this).data('square');
+                if (selectedPiece === 'trash') {
+                    board.position()[square] = null;
+                } else {
+                    const position = board.position();
+                    position[square] = selectedPiece;
+                    board.position(position);
+                }
+                updateFEN();
+            });
+        });
+
+        function onDrop(source, target, piece) {
+            // Allow drag and drop
+            return;
+        }
+
+        function onSnapEnd() {
+            updateFEN();
+        }
+
+        function updateFEN() {
+            const position = board.position();
+            const fen = buildFEN(position, currentTurn);
+            document.getElementById('fenDisplay').textContent = fen;
+        }
+
+        function buildFEN(position, turn) {
+            // Convert position object to FEN string
+            const rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
+            const fenRows = [];
+
+            rows.forEach(row => {
+                let fenRow = '';
+                let emptyCount = 0;
+
+                for (let col of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+                    const square = col + row;
+                    const piece = position[square];
+
+                    if (piece) {
+                        if (emptyCount > 0) {
+                            fenRow += emptyCount;
+                            emptyCount = 0;
+                        }
+                        fenRow += piece;
+                    } else {
+                        emptyCount++;
+                    }
+                }
+
+                if (emptyCount > 0) {
+                    fenRow += emptyCount;
+                }
+
+                fenRows.push(fenRow);
+            });
+
+            return fenRows.join('/') + ' ' + turn + ' KQkq - 0 1';
+        }
+
+        function startPosition() {
+            board.start();
+            updateFEN();
+        }
+
+        function clearBoard() {
+            board.clear();
+            updateFEN();
+        }
+
+        function flipBoard() {
+            board.flip();
+        }
+
+        function setTurn(turn) {
+            currentTurn = turn;
+            document.getElementById('whiteBtn').classList.toggle('active', turn === 'w');
+            document.getElementById('blackBtn').classList.toggle('active', turn === 'b');
+            updateFEN();
+        }
+
+        function selectTrash() {
+            $('.piece-btn').removeClass('selected');
+            selectedPiece = 'trash';
+            alert('Click any piece on the board to remove it');
+        }
+
+        function copyFEN() {
+            const fen = document.getElementById('fenDisplay').textContent;
+            navigator.clipboard.writeText(fen);
+            alert('✅ FEN copied to clipboard!');
+        }
+
+        function loadFromFEN() {
+            const fen = prompt('Enter FEN position:');
+            if (fen) {
+                try {
+                    const game = new Chess(fen);
+                    board.position(fen);
+                    currentTurn = fen.split(' ')[1];
+                    setTurn(currentTurn);
+                    updateFEN();
+                } catch (e) {
+                    alert('⚠️ Invalid FEN: ' + e.message);
+                }
+            }
+        }
+
+        function savePuzzle() {
+            const fen = document.getElementById('fenDisplay').textContent;
+            const id = document.getElementById('puzzleId').value || `puzzle_custom_${Date.now()}`;
+            const movesStr = document.getElementById('moves').value.trim();
+            const hint = document.getElementById('hint').value.trim();
+            const rating = parseInt(document.getElementById('rating').value) || 800;
+            const themesStr = document.getElementById('themes').value.trim();
+
+            if (!movesStr) {
+                alert('⚠️ Please enter solution moves!');
+                return;
+            }
+
+            const puzzle = {
+                id: id,
+                fen: fen,
+                moveSequence: movesStr.split(/\s+/),
+                hint: hint || 'Find the best move',
+                rating: rating,
+                themes: themesStr ? themesStr.split(/\s+/) : ['custom'],
+                custom: true
+            };
+
+            // Update or add
+            const existingIndex = puzzleLibrary.findIndex(p => p.id === id);
+            if (existingIndex >= 0) {
+                puzzleLibrary[existingIndex] = puzzle;
+            } else {
+                puzzleLibrary.push(puzzle);
+            }
+
+            saveLibraryToStorage();
+            refreshLibraryDisplay();
+            switchTab('library');
+
+            alert('✅ Puzzle saved to library!');
+        }
+
+        function clearForm() {
+            document.getElementById('puzzleId').value = '';
+            document.getElementById('moves').value = '';
+            document.getElementById('hint').value = '';
+            document.getElementById('rating').value = '';
+            document.getElementById('themes').value = '';
+            currentEditingId = null;
+            clearBoard();
+        }
+
+        function loadPuzzleToEditor(puzzle) {
+            board.position(puzzle.fen);
+            document.getElementById('puzzleId').value = puzzle.id;
+            document.getElementById('moves').value = puzzle.moveSequence.join(' ');
+            document.getElementById('hint').value = puzzle.hint;
+            document.getElementById('rating').value = puzzle.rating || '';
+            document.getElementById('themes').value = (puzzle.themes || []).join(' ');
+            currentEditingId = puzzle.id;
+            updateFEN();
+            switchTab('editor');
+        }
+
+        function refreshLibraryDisplay() {
+            const list = document.getElementById('puzzleList');
+            list.innerHTML = '';
+
+            document.getElementById('puzzleCount').textContent = puzzleLibrary.length;
+
+            puzzleLibrary.forEach((puzzle, index) => {
+                const item = document.createElement('div');
+                item.className = 'puzzle-item';
+                item.innerHTML = `
+                    <strong>${puzzle.id}</strong><br>
+                    <small>Moves: ${puzzle.moveSequence.join(' → ')}</small><br>
+                    <small>Hint: ${puzzle.hint}</small><br>
+                    <button onclick="loadPuzzleToEditor(puzzleLibrary[${index}])">Edit</button>
+                    <button class="danger" onclick="deletePuzzle(${index})">Delete</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function deletePuzzle(index) {
+            if (confirm('Delete this puzzle?')) {
+                puzzleLibrary.splice(index, 1);
+                saveLibraryToStorage();
+                refreshLibraryDisplay();
+            }
+        }
+
+        function exportAllPuzzles() {
+            if (puzzleLibrary.length === 0) {
+                alert('No puzzles to export!');
+                return;
+            }
+
+            const json = JSON.stringify(puzzleLibrary, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my_custom_puzzles.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearLibrary() {
+            if (confirm('Delete ALL puzzles from library?')) {
+                puzzleLibrary = [];
+                saveLibraryToStorage();
+                refreshLibraryDisplay();
+            }
+        }
+
+        function saveLibraryToStorage() {
+            localStorage.setItem('puzzleLibrary', JSON.stringify(puzzleLibrary));
+        }
+
+        function loadLibraryFromStorage() {
+            const stored = localStorage.getItem('puzzleLibrary');
+            if (stored) {
+                puzzleLibrary = JSON.parse(stored);
+                refreshLibraryDisplay();
+            }
+        }
+
+        function loadFile() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    // Add to library
+                    imported.forEach(p => {
+                        if (!puzzleLibrary.find(existing => existing.id === p.id)) {
+                            puzzleLibrary.push(p);
+                        }
+                    });
+                    saveLibraryToStorage();
+                    refreshLibraryDisplay();
+                    alert(`✅ Imported ${imported.length} puzzles!`);
+                } catch (err) {
+                    alert('⚠️ Error loading file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function switchTab(tabName) {
+            // Update tabs
+            $('.tab').removeClass('active');
+            $('.tab-content').removeClass('active');
+
+            $('[onclick*="' + tabName + '"]').addClass('active');
+            $('#' + tabName + '-tab').addClass('active');
+        }
+    </script>
+</body>
+</html>
