@@ -48,3 +48,4 @@ app.*.map.json
 assets/videos/*.mp4
 tools/puzzle_importer/*.csv
 tools/puzzle_importer/*.zst
+tools/puzzle_importer/output/
