@@ -111,12 +111,13 @@ class _PlayPageState extends ConsumerState<PlayPage> {
       data: (level) {
         return botsAsync.when(
           data: (allBots) {
-            // Filter bots to only include those specified in level.playBotIds
+            // Filter bots to only include those specified in level.playBotIds or level.games
             final levelBots = allBots.where((bot) => level.playBotIds.contains(bot.id)).toList();
 
             return GameSelectorPage(
               levelId: widget.levelId,
               bots: levelBots,
+              games: level.games, // Pass the games array
               onStartGame: (bot, humanPlaysWhite) {
                 ref.read(gameStateNotifierProvider(widget.levelId).notifier)
                   .startGame(bot: bot, humanPlaysWhite: humanPlaysWhite);

@@ -39,6 +39,7 @@ flutter:
     - assets/data/levels/
     - assets/data/puzzles/
     - assets/data/bots/
+    - assets/data/games/
     - assets/schemas/
     - assets/videos/sample.mp4
     - assets/images/pieces/

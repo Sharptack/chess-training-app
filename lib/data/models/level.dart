@@ -1,5 +1,6 @@
 // lib/data/models/level.dart
 import 'package:ChessTrainerApp/data/models/video_item.dart';
+import 'package:ChessTrainerApp/data/models/game.dart';
 
 class Level {
   final String id;
@@ -8,8 +9,9 @@ class Level {
   final String campaignId;
   final VideoItem lessonVideo;
   final List<String> puzzleIds;
-  final List<String> playBotIds;
-  final int requiredGames;
+  final List<String> playBotIds; // Deprecated: use games instead
+  final int requiredGames; // Deprecated: use games instead
+  final List<Game> games; // New games array
 
   Level({
     required this.id,
@@ -18,8 +20,9 @@ class Level {
     required this.campaignId,
     required this.lessonVideo,
     required this.puzzleIds,
-    required this.playBotIds,
+    this.playBotIds = const [],
     this.requiredGames = 3,
+    this.games = const [],
   });
 
   factory Level.fromJson(Map<String, dynamic> json) {
@@ -44,17 +47,33 @@ class Level {
             .toList() ??
         [];
 
-    // Parse playBot IDs from the "play" object
+    // Parse playBot IDs from the "play" object (legacy support)
     final play = json['play'] as Map<String, dynamic>?;
     final playBotIds = (play?['botIds'] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
 
-    // Parse required games from play object, fallback to root level
+    // Parse required games from play object, fallback to root level (legacy support)
     final requiredGames = play?['gamesRequired'] as int? ??
                           json['requiredGames'] as int? ??
                           3;
+
+    // Parse games array (new approach)
+    List<Game> games = [];
+    if (play?['games'] != null) {
+      games = (play!['games'] as List<dynamic>)
+          .map((e) => Game.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (playBotIds.isNotEmpty) {
+      // Fallback: convert old botIds format to new games format
+      games = playBotIds.map((botId) => Game(
+        id: 'game_$botId',
+        type: GameType.bot,
+        botId: botId,
+        completionsRequired: requiredGames,
+      )).toList();
+    }
 
     return Level(
       id: json['id'] as String,
@@ -65,6 +84,7 @@ class Level {
       puzzleIds: puzzleIds,
       playBotIds: playBotIds,
       requiredGames: requiredGames,
+      games: games,
     );
   }
 
@@ -81,6 +101,7 @@ class Level {
       'play': {
         'botIds': playBotIds,
         'gamesRequired': requiredGames,
+        'games': games.map((g) => g.toJson()).toList(),
       },
     };
   }

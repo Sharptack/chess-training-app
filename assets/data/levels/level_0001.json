@@ -18,6 +18,32 @@
   ],
   "play": {
     "botIds": ["bot_001", "bot_002", "bot_003_endgame"],
-    "gamesRequired": 1
+    "gamesRequired": 1,
+    "games": [
+      {
+        "id": "game_check_checkmate_level_0001",
+        "type": "check_checkmate",
+        "positionIds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+        "completionsRequired": 1
+      },
+      {
+        "id": "game_bot_001",
+        "type": "bot",
+        "botId": "bot_001",
+        "completionsRequired": 1
+      },
+      {
+        "id": "game_bot_002",
+        "type": "bot",
+        "botId": "bot_002",
+        "completionsRequired": 1
+      },
+      {
+        "id": "game_bot_003_endgame",
+        "type": "bot",
+        "botId": "bot_003_endgame",
+        "completionsRequired": 1
+      }
+    ]
   }
 }

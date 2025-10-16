@@ -2,17 +2,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/bot.dart';
+import '../../../data/models/game.dart';
 import '../../../state/providers.dart';
+import '../../games/check_checkmate/pages/check_checkmate_page.dart';
 
 class GameSelectorPage extends ConsumerStatefulWidget {
   final String levelId;
   final List<Bot> bots;
+  final List<Game> games;
   final Function(Bot, bool) onStartGame;
 
   const GameSelectorPage({
     super.key,
     required this.levelId,
     required this.bots,
+    this.games = const [],
     required this.onStartGame,
   });
 
@@ -22,6 +26,7 @@ class GameSelectorPage extends ConsumerStatefulWidget {
 
 class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
   Bot? _selectedBot;
+  Game? _selectedGame;
   bool _humanPlaysWhite = true;
 
   @override
@@ -31,37 +36,46 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Progress overview for ALL bots
+          // Progress overview for ALL games
           _buildOverallProgress(),
           const SizedBox(height: 24),
-          
+
           Text(
             'Select Your Game',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
-          
-          // Bot list with individual progress
+
+          // Game list with individual progress
           Expanded(
             child: ListView.builder(
-              itemCount: widget.bots.length,
+              itemCount: widget.games.isNotEmpty ? widget.games.length : widget.bots.length,
               itemBuilder: (context, index) {
-                final bot = widget.bots[index];
-                return _buildBotCard(bot);
+                // Use new games array if available, otherwise fallback to bots
+                if (widget.games.isNotEmpty) {
+                  final game = widget.games[index];
+                  return _buildGameCard(game);
+                } else {
+                  // Legacy: just show bots
+                  final bot = widget.bots[index];
+                  return _buildBotCard(bot);
+                }
               },
             ),
           ),
-          
-          // Color selection
-          const SizedBox(height: 16),
-          _buildColorSelection(),
-          
+
+          // Color selection (only for bot games)
+          if (_selectedBot != null || (_selectedGame?.type == GameType.bot)) ...[
+            const SizedBox(height: 16),
+            _buildColorSelection(),
+          ],
+
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _selectedBot != null 
-                ? () => widget.onStartGame(_selectedBot!, _humanPlaysWhite)
+              onPressed: (_selectedBot != null || _selectedGame != null)
+                ? _handleStartGame
                 : null,
               child: const Text('Start Game'),
             ),
@@ -69,6 +83,41 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
         ],
       ),
     );
+  }
+
+  void _handleStartGame() {
+    if (_selectedGame != null) {
+      _launchGame(_selectedGame!);
+    } else if (_selectedBot != null) {
+      widget.onStartGame(_selectedBot!, _humanPlaysWhite);
+    }
+  }
+
+  void _launchGame(Game game) {
+    switch (game.type) {
+      case GameType.bot:
+        // Find the bot and launch
+        final bot = widget.bots.firstWhere(
+          (b) => b.id == game.botId,
+          orElse: () => throw Exception('Bot not found: ${game.botId}'),
+        );
+        widget.onStartGame(bot, _humanPlaysWhite);
+        break;
+      case GameType.checkCheckmate:
+        // Navigate to CheckCheckmatePage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CheckCheckmatePage(
+              gameId: game.id,
+              levelId: widget.levelId,
+              positionIds: game.positionIds ?? [],
+              completionsRequired: game.completionsRequired,
+            ),
+          ),
+        );
+        break;
+    }
   }
   
   Widget _buildOverallProgress() {
@@ -194,7 +243,102 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
     },
   );
 }
-  
+
+  Widget _buildGameCard(Game game) {
+    switch (game.type) {
+      case GameType.bot:
+        return _buildBotGameCard(game);
+      case GameType.checkCheckmate:
+        return _buildCheckCheckmateGameCard(game);
+    }
+  }
+
+  Widget _buildBotGameCard(Game game) {
+    // Find the bot
+    final bot = widget.bots.firstWhere(
+      (b) => b.id == game.botId,
+      orElse: () => throw Exception('Bot not found: ${game.botId}'),
+    );
+
+    return Consumer(
+      builder: (context, ref, child) {
+        // Use bot progress provider for bot games
+        return ref.watch(botProgressProvider('${widget.levelId}_${game.botId}')).when(
+          data: (progress) {
+            return Card(
+              child: ListTile(
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: _getDifficultyColor(bot.difficultyLevel),
+                      child: Text(
+                        bot.difficultyLevel.toString(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                title: Text(bot.name),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Type: ${game.gameTypeLabel}'),
+                    Text('ELO: ${bot.elo} • Style: ${bot.style}'),
+                    if (progress.gamesPlayed > 0)
+                      Text(
+                        'Completed: ${progress.gamesPlayed}/${game.completionsRequired} (${progress.gamesWon} wins)',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+                trailing: _selectedGame?.id == game.id
+                  ? const Icon(Icons.check_circle, color: Colors.green)
+                  : progress.isComplete
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () => setState(() {
+                  _selectedGame = game;
+                  _selectedBot = null;
+                }),
+              ),
+            );
+          },
+          loading: () => const Card(child: ListTile(title: Text('Loading...'))),
+          error: (_, __) => Card(child: ListTile(title: Text(game.displayName))),
+        );
+      },
+    );
+  }
+
+  Widget _buildCheckCheckmateGameCard(Game game) {
+    // For now, show a simple card without progress tracking
+    // TODO: Implement game progress tracking for non-bot games
+    return Card(
+      child: ListTile(
+        leading: const CircleAvatar(
+          backgroundColor: Colors.purple,
+          child: Icon(Icons.psychology, color: Colors.white),
+        ),
+        title: Text(game.displayName),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Type: ${game.gameTypeLabel}'),
+            Text('${game.positionIds?.length ?? 0} positions'),
+          ],
+        ),
+        trailing: _selectedGame?.id == game.id
+          ? const Icon(Icons.check_circle, color: Colors.green)
+          : null,
+        onTap: () => setState(() {
+          _selectedGame = game;
+          _selectedBot = null;
+        }),
+      ),
+    );
+  }
+
   Widget _buildColorSelection() {
     return Row(
       children: [
