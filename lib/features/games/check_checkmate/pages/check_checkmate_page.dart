@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/chess_board_widget.dart';
 import '../../../../core/game_logic/chess_board_state.dart';
+import '../../../../state/providers.dart';
 import '../models/check_checkmate_position.dart';
 
 class CheckCheckmatePage extends ConsumerStatefulWidget {
@@ -137,9 +138,14 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
 
     // Update progress
     try {
-      // Record game completion in the repository
-      // Note: This will need to be implemented in the progress repository
-      // For now, we'll just show the completion dialog
+      final progressRepo = ref.read(progressRepositoryProvider);
+      await progressRepo.recordGameCompletion(
+        widget.gameId,
+        widget.completionsRequired,
+      );
+
+      // Invalidate the game progress provider to refresh the UI
+      ref.invalidate(gameProgressProvider(widget.gameId));
     } catch (e) {
       print('Error updating progress: $e');
     }

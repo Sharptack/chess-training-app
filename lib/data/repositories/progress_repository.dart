@@ -2,6 +2,7 @@
 import 'package:hive/hive.dart';
 import '../models/progress.dart';
 import '../models/bot_progress.dart';
+import '../models/game_progress.dart';
 
 class ProgressRepository {
   final Box _box;
@@ -131,5 +132,36 @@ class ProgressRepository {
         completed: false,
       );
     }
+  }
+
+  /// Get game progress (for non-bot games like check_checkmate)
+  Future<GameProgress> getGameProgress(String gameId, int completionsRequired) async {
+    final key = 'game_$gameId';
+    final data = _box.get(key);
+
+    if (data == null) {
+      return GameProgress(
+        gameId: gameId,
+        completionsRequired: completionsRequired,
+      );
+    }
+
+    return GameProgress.fromJson(Map<String, dynamic>.from(data));
+  }
+
+  /// Record a game completion (for non-bot games)
+  Future<void> recordGameCompletion(String gameId, int completionsRequired) async {
+    final key = 'game_$gameId';
+    final current = await getGameProgress(gameId, completionsRequired);
+
+    final updated = GameProgress(
+      gameId: gameId,
+      completions: current.completions + 1,
+      completionsRequired: completionsRequired,
+      firstPlayedAt: current.firstPlayedAt ?? DateTime.now(),
+      lastPlayedAt: DateTime.now(),
+    );
+
+    await _box.put(key, updated.toJson());
   }
 }

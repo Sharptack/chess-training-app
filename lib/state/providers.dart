@@ -17,6 +17,8 @@ import '../data/repositories/puzzle_repository.dart';
 import '../data/models/puzzle.dart';
 import '../data/models/puzzle_set.dart';
 import '../data/models/bot_progress.dart';
+import '../data/models/game_progress.dart';
+import '../data/models/game.dart';
 
 // ============================================================================
 // CAMPAIGN PROVIDERS
@@ -340,6 +342,16 @@ final botProgressProvider = FutureProvider.family<BotProgress, String>(
   },
 );
 
+/// Get game progress (for non-bot games like check_checkmate)
+final gameProgressProvider = FutureProvider.family<GameProgress, String>(
+  (ref, String gameId) async {
+    final repo = ref.watch(progressRepositoryProvider);
+    // We need to get the game to know completionsRequired
+    // For now, use a default of 1 - this should be improved
+    return repo.getGameProgress(gameId, 1);
+  },
+);
+
 /// Record a completed bot game
 Future<void> recordBotGameCompleted(
   WidgetRef ref,
@@ -355,12 +367,12 @@ Future<void> recordBotGameCompleted(
   ref.invalidate(bossUnlockRequirementsProvider(levelId));
 }
 
-/// Get overall play progress for a level (checks if all bots have completed required games)
+/// Get overall play progress for a level (checks all games' completion requirements)
 final playProgressProvider = FutureProvider.family<Progress, String>(
   (ref, String levelId) async {
     print('DEBUG playProgressProvider: Checking progress for level $levelId');
 
-    // Get level to know which bots and how many games required
+    // Get level to know which games are required
     final levelResult = await ref.watch(levelRepositoryProvider).getLevelById(levelId);
 
     if (levelResult.isError) {
@@ -371,40 +383,86 @@ final playProgressProvider = FutureProvider.family<Progress, String>(
     final level = levelResult.data!;
     final progressRepo = ref.watch(progressRepositoryProvider);
 
-    print('DEBUG playProgressProvider: Level has ${level.playBotIds.length} bots, ${level.requiredGames} games required per bot');
+    // If level has games array, use that; otherwise fall back to bot IDs
+    if (level.games.isNotEmpty) {
+      print('DEBUG playProgressProvider: Level has ${level.games.length} games');
 
-    // Check progress for each bot
-    int botsCompleted = 0; // Number of bots that have met their required games
-    bool anyStarted = false;
+      int gamesCompleted = 0;
+      bool anyStarted = false;
 
-    for (final botId in level.playBotIds) {
-      final botProgress = await progressRepo.getBotProgress(levelId, botId);
-      print('DEBUG playProgressProvider: Bot $botId has ${botProgress.gamesPlayed} games played');
+      for (final game in level.games) {
+        if (game.type == GameType.bot) {
+          // For bot games, check bot progress
+          final botProgress = await progressRepo.getBotProgress(levelId, game.botId!);
+          print('DEBUG playProgressProvider: Bot game ${game.id} has ${botProgress.gamesPlayed}/${game.completionsRequired}');
 
-      // Only count this bot as complete if they've met the required games
-      if (botProgress.gamesPlayed >= level.requiredGames) {
-        botsCompleted++;
+          if (botProgress.gamesPlayed >= game.completionsRequired) {
+            gamesCompleted++;
+          }
+          if (botProgress.gamesPlayed > 0) {
+            anyStarted = true;
+          }
+        } else {
+          // For non-bot games (like check_checkmate), check game progress
+          final gameProgress = await progressRepo.getGameProgress(game.id, game.completionsRequired);
+          print('DEBUG playProgressProvider: Game ${game.id} has ${gameProgress.completions}/${game.completionsRequired}');
+
+          if (gameProgress.completions >= game.completionsRequired) {
+            gamesCompleted++;
+          }
+          if (gameProgress.completions > 0) {
+            anyStarted = true;
+          }
+        }
       }
 
-      if (botProgress.gamesPlayed > 0) {
-        anyStarted = true;
+      final totalRequired = level.games.length;
+      final completed = gamesCompleted >= totalRequired;
+
+      print('DEBUG playProgressProvider: Games completed: $gamesCompleted/$totalRequired, Completed: $completed');
+
+      return Progress(
+        levelId: levelId,
+        videoId: 'play',
+        started: anyStarted,
+        completed: completed,
+        startedAt: anyStarted ? DateTime.now() : null,
+        completedAt: completed ? DateTime.now() : null,
+      );
+    } else {
+      // Legacy: use playBotIds
+      print('DEBUG playProgressProvider: Level has ${level.playBotIds.length} bots (legacy), ${level.requiredGames} games required per bot');
+
+      int botsCompleted = 0;
+      bool anyStarted = false;
+
+      for (final botId in level.playBotIds) {
+        final botProgress = await progressRepo.getBotProgress(levelId, botId);
+        print('DEBUG playProgressProvider: Bot $botId has ${botProgress.gamesPlayed} games played');
+
+        if (botProgress.gamesPlayed >= level.requiredGames) {
+          botsCompleted++;
+        }
+
+        if (botProgress.gamesPlayed > 0) {
+          anyStarted = true;
+        }
       }
+
+      final totalRequired = level.playBotIds.length;
+      final completed = botsCompleted >= totalRequired;
+
+      print('DEBUG playProgressProvider: Bots completed: $botsCompleted, Total required: $totalRequired, Completed: $completed');
+
+      return Progress(
+        levelId: levelId,
+        videoId: 'play',
+        started: anyStarted,
+        completed: completed,
+        startedAt: anyStarted ? DateTime.now() : null,
+        completedAt: completed ? DateTime.now() : null,
+      );
     }
-
-    // Calculate total required: each bot must be completed once
-    final totalRequired = level.playBotIds.length;
-    final completed = botsCompleted >= totalRequired;
-
-    print('DEBUG playProgressProvider: Bots completed: $botsCompleted, Total required: $totalRequired, Completed: $completed');
-
-    return Progress(
-      levelId: levelId,
-      videoId: 'play',
-      started: anyStarted,
-      completed: completed,
-      startedAt: anyStarted ? DateTime.now() : null,
-      completedAt: completed ? DateTime.now() : null,
-    );
   },
 );
 

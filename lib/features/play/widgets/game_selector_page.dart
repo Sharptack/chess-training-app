@@ -324,30 +324,45 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
   }
 
   Widget _buildCheckCheckmateGameCard(Game game) {
-    // For now, show a simple card without progress tracking
-    // TODO: Implement game progress tracking for non-bot games
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.purple,
-          child: Icon(Icons.psychology, color: Colors.white),
-        ),
-        title: Text(game.displayName),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Type: ${game.gameTypeLabel}'),
-            Text('${game.positionIds?.length ?? 0} positions'),
-          ],
-        ),
-        trailing: _selectedGame?.id == game.id
-          ? const Icon(Icons.check_circle, color: Colors.green)
-          : null,
-        onTap: () => setState(() {
-          _selectedGame = game;
-          _selectedBot = null;
-        }),
-      ),
+    return Consumer(
+      builder: (context, ref, child) {
+        return ref.watch(gameProgressProvider(game.id)).when(
+          data: (progress) {
+            return Card(
+              child: ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.purple,
+                  child: Icon(Icons.psychology, color: Colors.white),
+                ),
+                title: Text(game.displayName),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Type: ${game.gameTypeLabel}'),
+                    Text('${game.positionIds?.length ?? 0} positions'),
+                    if (progress.completions > 0)
+                      Text(
+                        'Completed: ${progress.completions}/${game.completionsRequired}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+                trailing: _selectedGame?.id == game.id
+                  ? const Icon(Icons.check_circle, color: Colors.green)
+                  : progress.isComplete
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () => setState(() {
+                  _selectedGame = game;
+                  _selectedBot = null;
+                }),
+              ),
+            );
+          },
+          loading: () => const Card(child: ListTile(title: Text('Loading...'))),
+          error: (_, __) => Card(child: ListTile(title: Text(game.displayName))),
+        );
+      },
     );
   }
 
