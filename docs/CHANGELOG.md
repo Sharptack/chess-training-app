@@ -803,6 +803,101 @@ lib/core/
 
 ---
 
+
+## Phase 7.1: Campaign System Implementation ✅ COMPLETE
+**Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
+**Status**: Completed
+**Date**: October 13, 2025
+
+### Overview
+Restructured app from flat level-based system to hierarchical campaign-based system. Bosses moved from individual levels to campaign-level challenges.
+
+### Major Changes
+
+#### Data Models
+- **NEW**: Campaign model (id, title, description, levelIds, boss)
+- **MODIFIED**: Level model - removed `boss` field, added `campaignId` field
+- **MODIFIED**: Boss model - added `toJson()` method
+- **MODIFIED**: VideoItem model - added `toJson()` method
+
+#### Repositories
+- **NEW**: CampaignRepository (getCampaignById, getAllCampaigns)
+- **FIXED**: PuzzleRepository - fixed "invalid radix 10" error with level ID parsing
+
+#### UI Pages
+- **NEW**: HomePage - grid of all campaigns with lock states (in features/home/)
+- **NEW**: CampaignPage - shows levels within campaign + boss tile (in features/campaign/)
+- **MODIFIED**: LevelPage - changed from 2x2 grid (4 tiles) to 3-tile layout (1 top: Lesson, 2 bottom: Puzzles + Games)
+- **MODIFIED**: LevelPage - added "Level Progress" card showing unlock requirements
+- **MODIFIED**: BossPage - now accepts `campaignId` instead of `levelId`
+- **FIXED**: PlayPage - now filters bots to show only those in level.playBotIds
+- **RENAMED**: bot_selector_page.dart → game_selector_page.dart
+
+#### State Management
+- **NEW**: `campaignRepositoryProvider`
+- **NEW**: `allCampaignsProvider` - loads all campaigns
+- **NEW**: `campaignProvider` - loads single campaign by ID
+- **NEW**: `campaignBossUnlockRequirementsProvider` - checks completion across ALL levels in campaign
+- **NEW**: `isLevelUnlockedProvider` - checks if level is unlocked (previous level must be complete)
+- **FIXED**: `bossUnlockRequirementsProvider` - now shows "X / Y games" format matching game selector
+
+#### Routing
+- **CHANGED**: Home route (/) now shows HomePage with all campaigns grid
+- **NEW**: `/campaign/:id` → CampaignPage (campaign detail view)
+- **CHANGED**: Boss route from `/level/:id/boss` to `/campaign/:id/boss`
+- **KEPT**: `/level/:id` → LevelPage with lesson/puzzles/play subroutes
+
+#### Data Files
+- **NEW**: assets/data/campaigns/index.json
+- **NEW**: assets/data/campaigns/campaign_01.json (Fundamentals 1, 5 levels)
+- **NEW**: assets/data/campaigns/campaign_02.json (Fundamentals 2, 5 levels)
+- **NEW**: assets/data/levels/level_0003.json through level_0010.json (placeholders)
+- **MODIFIED**: level_0001.json, level_0002.json - removed boss, added campaignId
+- **MODIFIED**: pubspec.yaml - added campaigns directory to assets
+
+### Navigation Flow Changes
+**Before**: Home → Level Selection → Level Detail (Lesson/Puzzles/Play/Boss)
+**After**: Home (Campaigns) → Campaign Detail (Levels + Boss) → Level Detail (Lesson/Puzzles/Games)
+
+### Bug Fixes
+1. **Puzzle loading error** - Fixed "invalid radix 10 number" when parsing level IDs
+2. **Game count mismatch** - Fixed calculation to match game selector exactly
+3. **All bots showing** - PlayPage now filters bots by level.playBotIds
+4. **Assets not loading** - Added campaigns directory to pubspec.yaml
+5. **Level unlock logic** - Implemented proper unlock checking (level 2 unlocks after level 1 complete)
+6. **Completion message** - Changed from "Boss unlocked!" to "Level complete! Return to campaign."
+
+### Files Created (13)
+- Models: campaign.dart
+- Repositories: campaign_repository.dart
+- Pages: home_page.dart, campaign_page.dart, game_selector_page.dart
+- Data: campaign_01.json, campaign_02.json, index.json, level_0003-0010.json (8 files)
+ - Scripts: scripts/update-file-structure.sh
+ - Docs: docs/file_structure.txt (generated)
+
+### Files Modified (11)
+- Models: level.dart, boss.dart, video_item.dart
+- Repositories: puzzle_repository.dart
+- Pages: level_page.dart, boss_page.dart, play_page.dart
+- State: providers.dart
+- Routing: app_router.dart
+- Config: pubspec.yaml
+- Data: level_0001.json, level_0002.json
+
+### Breaking Changes
+⚠️ Level JSON schema changed - must add `campaignId` field, remove `boss` field
+⚠️ Boss route changed from `/level/:id/boss` to `/campaign/:id/boss`
+⚠️ `BotSelectorPage` renamed to `GameSelectorPage`
+
+---
+
+## Next Steps
+
+See [PROGRESS.md](./PROGRESS.md) for current phase planning and roadmap.
+See [BACKLOG.md](./BACKLOG.md) for future features and enhancements.
+
+> Note: Work was developed on branch `phase-7.1-campaign-system` and merged into `main` (commit `b293f59`) on 2025-10-13.
+
 ## Phase 7.2: Campaign Unlocking ✅ COMPLETE
 **Branch**: phase-7.2-campaign-unlocking
 **Merged**: October 14, 2025
@@ -830,7 +925,6 @@ lib/core/
 
 **Note**: Files were refactored to use original naming structure (HomePage/CampaignPage)
 
----
 
 ## Phase 8: Game Types System ✅ COMPLETE
 **Branch**: phase-8-game-types
@@ -954,97 +1048,3 @@ lib/core/
 - Fixed provider invalidation to refresh level page UI after game completion
 
 ---
-
-## Phase 7.1: Campaign System Implementation ✅ COMPLETE
-**Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
-**Status**: Completed
-**Date**: October 13, 2025
-
-### Overview
-Restructured app from flat level-based system to hierarchical campaign-based system. Bosses moved from individual levels to campaign-level challenges.
-
-### Major Changes
-
-#### Data Models
-- **NEW**: Campaign model (id, title, description, levelIds, boss)
-- **MODIFIED**: Level model - removed `boss` field, added `campaignId` field
-- **MODIFIED**: Boss model - added `toJson()` method
-- **MODIFIED**: VideoItem model - added `toJson()` method
-
-#### Repositories
-- **NEW**: CampaignRepository (getCampaignById, getAllCampaigns)
-- **FIXED**: PuzzleRepository - fixed "invalid radix 10" error with level ID parsing
-
-#### UI Pages
-- **NEW**: HomePage - grid of all campaigns with lock states (in features/home/)
-- **NEW**: CampaignPage - shows levels within campaign + boss tile (in features/campaign/)
-- **MODIFIED**: LevelPage - changed from 2x2 grid (4 tiles) to 3-tile layout (1 top: Lesson, 2 bottom: Puzzles + Games)
-- **MODIFIED**: LevelPage - added "Level Progress" card showing unlock requirements
-- **MODIFIED**: BossPage - now accepts `campaignId` instead of `levelId`
-- **FIXED**: PlayPage - now filters bots to show only those in level.playBotIds
-- **RENAMED**: bot_selector_page.dart → game_selector_page.dart
-
-#### State Management
-- **NEW**: `campaignRepositoryProvider`
-- **NEW**: `allCampaignsProvider` - loads all campaigns
-- **NEW**: `campaignProvider` - loads single campaign by ID
-- **NEW**: `campaignBossUnlockRequirementsProvider` - checks completion across ALL levels in campaign
-- **NEW**: `isLevelUnlockedProvider` - checks if level is unlocked (previous level must be complete)
-- **FIXED**: `bossUnlockRequirementsProvider` - now shows "X / Y games" format matching game selector
-
-#### Routing
-- **CHANGED**: Home route (/) now shows HomePage with all campaigns grid
-- **NEW**: `/campaign/:id` → CampaignPage (campaign detail view)
-- **CHANGED**: Boss route from `/level/:id/boss` to `/campaign/:id/boss`
-- **KEPT**: `/level/:id` → LevelPage with lesson/puzzles/play subroutes
-
-#### Data Files
-- **NEW**: assets/data/campaigns/index.json
-- **NEW**: assets/data/campaigns/campaign_01.json (Fundamentals 1, 5 levels)
-- **NEW**: assets/data/campaigns/campaign_02.json (Fundamentals 2, 5 levels)
-- **NEW**: assets/data/levels/level_0003.json through level_0010.json (placeholders)
-- **MODIFIED**: level_0001.json, level_0002.json - removed boss, added campaignId
-- **MODIFIED**: pubspec.yaml - added campaigns directory to assets
-
-### Navigation Flow Changes
-**Before**: Home → Level Selection → Level Detail (Lesson/Puzzles/Play/Boss)
-**After**: Home (Campaigns) → Campaign Detail (Levels + Boss) → Level Detail (Lesson/Puzzles/Games)
-
-### Bug Fixes
-1. **Puzzle loading error** - Fixed "invalid radix 10 number" when parsing level IDs
-2. **Game count mismatch** - Fixed calculation to match game selector exactly
-3. **All bots showing** - PlayPage now filters bots by level.playBotIds
-4. **Assets not loading** - Added campaigns directory to pubspec.yaml
-5. **Level unlock logic** - Implemented proper unlock checking (level 2 unlocks after level 1 complete)
-6. **Completion message** - Changed from "Boss unlocked!" to "Level complete! Return to campaign."
-
-### Files Created (13)
-- Models: campaign.dart
-- Repositories: campaign_repository.dart
-- Pages: home_page.dart, campaign_page.dart, game_selector_page.dart
-- Data: campaign_01.json, campaign_02.json, index.json, level_0003-0010.json (8 files)
- - Scripts: scripts/update-file-structure.sh
- - Docs: docs/file_structure.txt (generated)
-
-### Files Modified (11)
-- Models: level.dart, boss.dart, video_item.dart
-- Repositories: puzzle_repository.dart
-- Pages: level_page.dart, boss_page.dart, play_page.dart
-- State: providers.dart
-- Routing: app_router.dart
-- Config: pubspec.yaml
-- Data: level_0001.json, level_0002.json
-
-### Breaking Changes
-⚠️ Level JSON schema changed - must add `campaignId` field, remove `boss` field
-⚠️ Boss route changed from `/level/:id/boss` to `/campaign/:id/boss`
-⚠️ `BotSelectorPage` renamed to `GameSelectorPage`
-
----
-
-## Next Steps
-
-See [PROGRESS.md](./PROGRESS.md) for current phase planning and roadmap.
-See [BACKLOG.md](./BACKLOG.md) for future features and enhancements.
-
-> Note: Work was developed on branch `phase-7.1-campaign-system` and merged into `main` (commit `b293f59`) on 2025-10-13.
