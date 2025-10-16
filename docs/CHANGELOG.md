@@ -945,6 +945,13 @@ lib/core/
 2. fix: disable piece movement in view-only chess board mode
 3. fix: resolve app crash due to missing bot references
 4. feat: implement progress tracking for check vs checkmate game
+5. docs: update for Phase 8 game types system
+6. fix: update level page progress tracking after game completion
+
+### Bug Fixes
+- Level page now updates immediately after completing any game type
+- Games count in level progress card now correctly includes all game types (not just bots)
+- Fixed provider invalidation to refresh level page UI after game completion
 
 ---
 
