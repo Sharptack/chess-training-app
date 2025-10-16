@@ -31,7 +31,9 @@ lib/
 │   ├── level/          # Level detail view
 │   ├── lesson/
 │   ├── puzzles/
-│   ├── play/
+│   ├── play/           # Game selector UI
+│   ├── games/          # Game implementations (Phase 8)
+│   │   └── check_checkmate/  # Check vs Checkmate game
 │   └── boss/
 ├── core/              # Shared utilities
 │   ├── widgets/       # Reusable UI components
@@ -165,7 +167,7 @@ Core domain models (all with `fromJson`/`toJson`):
 
 - `campaign.dart` - Campaign configuration (levels, boss)
 - `level.dart` - Level configuration (lesson, puzzles, games)
-- `game.dart` - Game configuration (type, bot, FEN, restrictions)
+- `game.dart` - Game configuration (type, bot/positionIds, completions) (Phase 8)
 - `video_item.dart` - Video lesson metadata
 - `puzzle.dart` - Puzzle with FEN, solution moves, hints
 - `puzzle_set.dart` - Collection of puzzles per level
@@ -173,12 +175,16 @@ Core domain models (all with `fromJson`/`toJson`):
 - `boss.dart` - Boss configuration (same as Bot + unlock requirements)
 - `progress.dart` - Generic progress (started/completed timestamps)
 - `bot_progress.dart` - Bot-specific progress (games played/won)
+- `game_progress.dart` - Non-bot game progress (completions/required) (Phase 8)
 
 **Model Highlights**:
 - `Campaign` - Groups 3-6 levels with one boss at end
 - `Campaign.boss` - Boss with unlock requirements (all levels must be complete)
-- `Level.games` - Array of Game objects (replaces old botIds)
-- `Game.type` - full_game, endgame_practice, opening_practice
+- `Level.games` - Array of Game objects (supports multiple game types, Phase 8)
+- `Game.type` - Enum: bot, checkCheckmate (extensible for future types)
+- `Game.botId` - References bot for bot games
+- `Game.positionIds` - Array of position IDs for puzzle-style games
+- `Game.completionsRequired` - How many times game must be completed
 - `Game.startingFen` - Custom starting position (endgame practice)
 - `Game.allowedMoves` - Move restrictions (opening practice)
 - `Bot.minMovesForCompletion` - Minimum moves to count toward progress
@@ -206,10 +212,12 @@ Future<Result<PuzzleSet>> getPuzzleSet(String levelId);
 Future<void> markLessonCompleted(String levelId);
 Future<void> markLevelPuzzlesCompleted(String levelId, String puzzleId);
 Future<void> recordBotGameCompleted(String levelId, String botId, bool humanWon);
+Future<void> recordGameCompletion(String gameId, int completionsRequired); // Phase 8
 Future<void> markCampaignBossCompleted(String campaignId); // Phase 7.2
 Future<Progress?> getCampaignBossProgress(String campaignId); // Phase 7.2
 Future<Progress?> getProgress(String levelId, String itemId);
 Future<BotProgress?> getBotProgress(String levelId, String botId);
+Future<GameProgress?> getGameProgress(String gameId, int completionsRequired); // Phase 8
 ```
 
 #### `data/sources/local/`
@@ -253,6 +261,22 @@ Future<BotProgress?> getBotProgress(String levelId, String botId);
 - One-win completion (marks boss defeated)
 - Accessed from campaign page (not level page)
 
+#### `features/games/` (Phase 8)
+Game implementations for different game types. Separated from `play/` which handles game selection UI.
+
+**Current Games**:
+- `check_checkmate/` - Quiz-style game: view position, choose check or checkmate
+  - 20 positions per level (configurable)
+  - Instant feedback with correct/incorrect
+  - Progress tracking with completion count
+  - Read-only chess board display
+
+**Architecture**:
+- Each game type has its own folder under `features/games/`
+- Contains: pages, widgets, models specific to that game
+- Game data stored in `assets/data/games/`
+- Levels reference games via Game model with type-specific fields
+
 #### `features/level/`
 - `level_page.dart` - 3-tile layout (Lesson, Puzzles, Games) - Phase 7.1 update
 - Progress badges on each tile
@@ -276,7 +300,9 @@ All Riverpod providers in one file:
 **Progress Providers**:
 - `lessonProgressProvider` - Provider.family<Progress?, (String, String)>
 - `puzzleProgressProvider` - Provider.family<Progress?, (String, String)>
-- `playProgressProvider` - Provider.family<Progress?, String> (computed)
+- `botProgressProvider` - FutureProvider.family<BotProgress, String>
+- `gameProgressProvider` - FutureProvider.family<GameProgress, String> (Phase 8)
+- `playProgressProvider` - FutureProvider.family<Progress, String> (checks all game types, Phase 8)
 - `campaignBossProgressProvider` - Provider.family<Progress?, String> (Phase 7.2)
 - `bossUnlockRequirementsProvider` - Provider.family<BossUnlockRequirements, String>
 - `campaignBossUnlockRequirementsProvider` - Provider.family<BossUnlockRequirements, String> (Phase 7.2)

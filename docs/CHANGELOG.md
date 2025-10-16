@@ -832,6 +832,122 @@ lib/core/
 
 ---
 
+## Phase 8: Game Types System ✅ COMPLETE
+**Branch**: phase-8-game-types
+**Date**: October 16, 2025
+**Focus**: Support multiple game types beyond bot games (e.g., puzzle-style games)
+
+### Implemented
+- **Game Types Architecture**: Extensible system for different game types within levels
+- **Check vs Checkmate Game**: Quiz-style game where students identify check or checkmate positions
+- **Progress Tracking**: Complete progress system for non-bot games
+- **Unified Game Selector**: Shows all game types together (bots + puzzle games)
+
+### New Game: Check vs Checkmate
+- Display chess position (read-only board)
+- Two buttons: "✓ Check" and "# Checkmate"
+- 20 positions with instant feedback
+- Progress bar showing position X/20
+- Completion tracking with score display
+- Data file: assets/data/games/check_checkmate_positions.json (20 FEN positions)
+
+### Technical Changes
+
+#### New Models
+- **game.dart**: Game model with GameType enum (bot, checkCheckmate)
+  - Fields: id, type, completionsRequired, botId (for bot games), positionIds (for position-based games)
+  - Extensible for future game types
+- **game_progress.dart**: Progress tracking for non-bot games (completions, completionsRequired, timestamps)
+- **check_checkmate_position.dart**: Position model (id, fen, answer, description)
+
+#### Updated Models
+- **level.dart**:
+  - Added `games` array field (List<Game>)
+  - Maintains backward compatibility with `playBotIds` array
+  - Automatically converts old botIds format to new games format
+
+#### New Features
+- **features/games/check_checkmate/**: Complete game implementation
+  - pages/check_checkmate_page.dart
+  - models/check_checkmate_position.dart
+  - Read-only chess board with view-only mode
+
+#### Repository Updates
+- **progress_repository.dart**:
+  - `getGameProgress(gameId, completionsRequired)` - Fetch game progress
+  - `recordGameCompletion(gameId, completionsRequired)` - Save completion
+
+#### Provider Updates
+- **providers.dart**:
+  - `gameProgressProvider` - FutureProvider.family for non-bot game progress
+  - Updated `playProgressProvider` to check BOTH bot games AND other game types
+  - Now properly calculates level completion based on all game types
+
+#### UI Updates
+- **game_selector_page.dart**:
+  - Supports multiple game types in one list
+  - Shows game type label ("Bot" vs "Puzzle")
+  - Different card styles per game type
+  - Progress display for all game types
+- **play_page.dart**: Loads bots from both playBotIds and games array
+- **chess_board_widget.dart**: Added view-only mode (disable piece movement when onMoveMade is null)
+
+### Level Configuration Format
+```json
+{
+  "play": {
+    "botIds": ["bot_001", "bot_002"],  // Legacy, still supported
+    "gamesRequired": 1,                // Legacy
+    "games": [                         // New format
+      {
+        "id": "game_check_checkmate_level_0001",
+        "type": "check_checkmate",
+        "positionIds": [1, 2, 3, ..., 20],
+        "completionsRequired": 1
+      },
+      {
+        "id": "game_bot_001",
+        "type": "bot",
+        "botId": "bot_001",
+        "completionsRequired": 1
+      }
+    ]
+  }
+}
+```
+
+### Files Created (7)
+- lib/data/models/game.dart
+- lib/data/models/game_progress.dart
+- lib/features/games/check_checkmate/models/check_checkmate_position.dart
+- lib/features/games/check_checkmate/pages/check_checkmate_page.dart
+- assets/data/games/check_checkmate_positions.json
+
+### Files Modified (5)
+- lib/data/models/level.dart (added games array)
+- lib/data/repositories/progress_repository.dart (game progress methods)
+- lib/state/providers.dart (game progress providers)
+- lib/features/play/pages/play_page.dart (load games)
+- lib/features/play/widgets/game_selector_page.dart (display game types)
+- lib/core/widgets/chess_board_widget.dart (view-only mode)
+- assets/data/levels/level_0001.json (added check_checkmate game)
+- pubspec.yaml (added games data directory)
+
+### Architecture Benefits
+- Clean separation: `features/play/` (selector UI) vs `features/games/` (game implementations)
+- Each game type in its own folder with pages/widgets/models
+- Levels can mix any combination of game types
+- Easy to add new game types (just add new GameType enum value)
+- Progress tracking works uniformly across all game types
+
+### Commits
+1. feat: add check vs checkmate game type
+2. fix: disable piece movement in view-only chess board mode
+3. fix: resolve app crash due to missing bot references
+4. feat: implement progress tracking for check vs checkmate game
+
+---
+
 ## Phase 7.1: Campaign System Implementation ✅ COMPLETE
 **Branch**: phase-7.1-campaign-system (merged to main on 2025-10-13)
 **Status**: Completed

@@ -7,7 +7,7 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 
 ## Current Status
 
-**Phase**: Phase 7.2 Complete ✅
+**Phase**: Phase 8 Complete ✅ (Game Types System)
 **Next**: Phase 7.3 - Mobile Responsiveness
 **Target**: Chess Club Testing in 4-5 weeks
 
@@ -21,13 +21,15 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 - Custom starting positions and move restrictions
 - Professional chess piece graphics
 - Undo, move history, game variety (full games, endgame practice, opening practice)
+- **Multiple game types** (bot games + puzzle-style games like check vs checkmate)
 
 ### Current Content
 - **Campaigns**: 2 campaigns (Fundamentals 1 & 2)
 - **Levels**: 10 level placeholders (2 with full content, 8 ready for content)
 - **Puzzles**: 11 puzzles total (5 in L1, 6 in L2 with 2 shared)
-- **Bots/Games**: 4 configured (200-1200 ELO range)
-- **Features**: Campaigns, Lessons, Puzzles, Games, Boss battles all functional
+- **Bots/Games**: 4 bot games configured (200-1200 ELO range)
+- **Game Types**: Check vs Checkmate game (20 positions)
+- **Features**: Campaigns, Lessons, Puzzles, Games (multiple types), Boss battles all functional
 
 ---
 
@@ -68,7 +70,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 
 ## Development History
 
-**Phases 0-7.1 Complete** (September-October 2025)
+**Phases 0-8 Complete** (September-October 2025)
 - Foundation, content loading, error handling
 - Video lessons, Hive progress tracking
 - Chess engine integration (chess package)
@@ -78,6 +80,8 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 - Code quality improvements
 - Custom positions, move restrictions, undo, move history
 - **Campaign system restructure** (Phase 7.1)
+- **Campaign-level boss unlocking** (Phase 7.2)
+- **Game types system** (Phase 8) - Multiple game types beyond bot games
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 
