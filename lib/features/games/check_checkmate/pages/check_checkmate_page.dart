@@ -144,8 +144,9 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
         widget.completionsRequired,
       );
 
-      // Invalidate the game progress provider to refresh the UI
+      // Invalidate providers to refresh the UI
       ref.invalidate(gameProgressProvider(widget.gameId));
+      ref.invalidate(playProgressProvider(widget.levelId)); // For level page
     } catch (e) {
       print('Error updating progress: $e');
     }

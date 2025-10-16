@@ -556,17 +556,40 @@ final bossUnlockRequirementsProvider = FutureProvider.family<BossUnlockRequireme
     final playProgress = await ref.watch(playProgressProvider(levelId).future);
     final playComplete = playProgress.completed;
 
-    // Count total games played vs required
-    int totalGamesPlayed = 0;
-    for (final botId in level.playBotIds) {
-      final botProgress = await progressRepo.getBotProgress(levelId, botId);
-      // Cap each bot's contribution at requiredGames
-      totalGamesPlayed += botProgress.gamesPlayed.clamp(0, level.requiredGames);
+    // Count games completed vs total required
+    int gamesCompleted = 0;
+    int totalGamesRequired = 0;
+
+    if (level.games.isNotEmpty) {
+      // Use new games array
+      totalGamesRequired = level.games.length;
+      for (final game in level.games) {
+        if (game.type == GameType.bot) {
+          final botProgress = await progressRepo.getBotProgress(levelId, game.botId!);
+          if (botProgress.gamesPlayed >= game.completionsRequired) {
+            gamesCompleted++;
+          }
+        } else {
+          final gameProgress = await progressRepo.getGameProgress(game.id, game.completionsRequired);
+          if (gameProgress.completions >= game.completionsRequired) {
+            gamesCompleted++;
+          }
+        }
+      }
+    } else {
+      // Legacy: use playBotIds
+      totalGamesRequired = level.playBotIds.length;
+      for (final botId in level.playBotIds) {
+        final botProgress = await progressRepo.getBotProgress(levelId, botId);
+        if (botProgress.gamesPlayed >= level.requiredGames) {
+          gamesCompleted++;
+        }
+      }
     }
-    final totalGamesRequired = level.playBotIds.length * level.requiredGames;
+
     final playStatus = playComplete
         ? 'Complete'
-        : '$totalGamesPlayed / $totalGamesRequired games';
+        : '$gamesCompleted / $totalGamesRequired games';
 
     return BossUnlockRequirements(
       lessonComplete: lessonComplete,
