@@ -213,9 +213,11 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   Widget _buildPiece(ChessPiece piece, String square, double size) {
-    final canDrag = piece.isWhite == widget.boardState.isWhiteTurn &&
+    // Only allow dragging if onMoveMade callback is provided
+    final canDrag = widget.onMoveMade != null &&
+                   piece.isWhite == widget.boardState.isWhiteTurn &&
                    !widget.boardState.isGameOver;
-    
+
     if (canDrag) {
       return DraggablePieceWidget(
         piece: piece,
@@ -273,9 +275,12 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _onSquareTapped(String square) {
+  // Don't allow interaction if onMoveMade is not provided (view-only mode)
+  if (widget.onMoveMade == null) return;
+
   final currentSelected = widget.boardState.selectedSquare;
   final highlightedSquares = widget.boardState.highlightedSquares;
-  
+
   // If we have a piece selected and click on a highlighted square, make the move
   if (currentSelected != null && highlightedSquares.contains(square)) {
     // Make the move through our widget method to trigger callback
@@ -295,15 +300,18 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _onPieceDropped(String fromSquare, String toSquare) {
+    // Don't allow interaction if onMoveMade is not provided (view-only mode)
+    if (widget.onMoveMade == null) return;
+
     if (fromSquare == toSquare) return;
-    
+
     final piece = widget.boardState.getPieceAt(fromSquare);
-    
+
     // Check for pawn promotion
     final isPromotion = piece?.type == 'p' &&
                        ((piece?.isWhite == true && toSquare[1] == '8') ||
                         (piece?.isWhite == false && toSquare[1] == '1'));
-    
+
     if (isPromotion) {
       _showPromotionDialog(fromSquare, toSquare);
     } else {
