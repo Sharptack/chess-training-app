@@ -255,10 +255,22 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
 
   Widget _buildBotGameCard(Game game) {
     // Find the bot
-    final bot = widget.bots.firstWhere(
-      (b) => b.id == game.botId,
-      orElse: () => throw Exception('Bot not found: ${game.botId}'),
-    );
+    Bot? bot;
+    try {
+      bot = widget.bots.firstWhere((b) => b.id == game.botId);
+    } catch (e) {
+      // Bot not found - show error card
+      return Card(
+        child: ListTile(
+          leading: const CircleAvatar(
+            backgroundColor: Colors.red,
+            child: Icon(Icons.error, color: Colors.white),
+          ),
+          title: Text('Error: Bot ${game.botId} not found'),
+          subtitle: const Text('This game cannot be played'),
+        ),
+      );
+    }
 
     return Consumer(
       builder: (context, ref, child) {
@@ -271,7 +283,7 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      backgroundColor: _getDifficultyColor(bot.difficultyLevel),
+                      backgroundColor: _getDifficultyColor(bot!.difficultyLevel),
                       child: Text(
                         bot.difficultyLevel.toString(),
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

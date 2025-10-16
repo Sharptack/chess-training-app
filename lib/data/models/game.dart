@@ -52,9 +52,20 @@ class Game {
   }
 
   Map<String, dynamic> toJson() {
+    // Convert enum to string format matching JSON
+    String typeStr;
+    switch (type) {
+      case GameType.bot:
+        typeStr = 'bot';
+        break;
+      case GameType.checkCheckmate:
+        typeStr = 'check_checkmate';
+        break;
+    }
+
     final map = {
       'id': id,
-      'type': type.name,
+      'type': typeStr,
       'completionsRequired': completionsRequired,
     };
 
