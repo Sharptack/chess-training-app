@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/chess_board_widget.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/game_logic/chess_board_state.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../core/constants.dart';
 import '../../../data/models/puzzle.dart';
 import '../../../data/models/puzzle_set.dart';
@@ -370,11 +371,13 @@ void _markPuzzleCompleted() {
 
   Widget _buildProgressBar() {
     if (_puzzleSet == null) return const SizedBox.shrink();
-    
+
     final progress = (_currentPuzzleIndex + 1) / _puzzleSet!.puzzleCount;
-    
+    final padding = ResponsiveUtils.getHorizontalPadding(context);
+    final spacing = ResponsiveUtils.getSpacing(context, mobile: 6, tablet: 8, desktop: 10);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Column(
         children: [
           Row(
@@ -390,7 +393,7 @@ void _markPuzzleCompleted() {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing),
           LinearProgressIndicator(
             value: progress,
             backgroundColor: Colors.grey[300],
@@ -406,8 +409,12 @@ void _markPuzzleCompleted() {
   Widget _buildPuzzleHeader() {
     if (_currentPuzzle == null) return const SizedBox.shrink();
 
+    final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
+    final verticalPadding = ResponsiveUtils.getVerticalPadding(context) * 0.5;
+    final spacing = ResponsiveUtils.getSpacing(context, mobile: 4, tablet: 6, desktop: 8);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
       child: Column(
         children: [
           Text(
@@ -417,22 +424,22 @@ void _markPuzzleCompleted() {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: spacing),
           Text(
             _currentPuzzle!.subtitle,
             style: Theme.of(context).textTheme.bodyLarge,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing * 1.5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 _currentPuzzle!.isWhiteToMove ? Icons.radio_button_unchecked : Icons.circle,
                 color: _currentPuzzle!.isWhiteToMove ? Colors.white : Colors.black,
-                size: 16,
+                size: ResponsiveUtils.getIconSize(context, mobile: 14, tablet: 16, desktop: 18),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: spacing),
               Text(
                 _currentPuzzle!.turnDisplay,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -476,26 +483,29 @@ void _markPuzzleCompleted() {
   }
 
   Widget _buildActionButtons() {
+    final padding = ResponsiveUtils.getHorizontalPadding(context);
+    final iconSize = ResponsiveUtils.getIconSize(context, mobile: 18, tablet: 20, desktop: 22);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ElevatedButton.icon(
             onPressed: _resetPuzzle,
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, size: iconSize),
             label: const Text('Reset'),
           ),
           if (_currentPuzzle?.hints.isNotEmpty == true)
             ElevatedButton.icon(
               onPressed: _showHint,
-              icon: const Icon(Icons.lightbulb_outline),
+              icon: Icon(Icons.lightbulb_outline, size: iconSize),
               label: const Text('Hint'),
             ),
           if (_puzzleSolved)
             ElevatedButton.icon(
               onPressed: _advanceToNextPuzzle,
-              icon: const Icon(Icons.arrow_forward),
+              icon: Icon(Icons.arrow_forward, size: iconSize),
               label: const Text('Next'),
             ),
         ],
@@ -530,21 +540,39 @@ void _markPuzzleCompleted() {
               // Calculate sizes
               final screenHeight = constraints.maxHeight;
               final screenWidth = constraints.maxWidth;
-              
-              // Estimate space needed for other widgets
-              const progressBarHeight = 80.0; // Approximate
-              const headerHeight = 100.0; // Approximate  
-              const buttonHeight = 80.0; // Approximate
-              const padding = 32.0;
-              
+
+              // Use responsive values for estimates
+              final progressBarHeight = ResponsiveUtils.getValue(
+                context,
+                mobile: 70.0,
+                tablet: 75.0,
+                desktop: 80.0,
+              );
+
+              final headerHeight = ResponsiveUtils.getValue(
+                context,
+                mobile: 90.0,
+                tablet: 95.0,
+                desktop: 100.0,
+              );
+
+              final buttonHeight = ResponsiveUtils.getValue(
+                context,
+                mobile: 70.0,
+                tablet: 75.0,
+                desktop: 80.0,
+              );
+
+              final padding = ResponsiveUtils.getHorizontalPadding(context) * 2;
+
               // Calculate available space for board
-              final availableHeight = screenHeight - 
+              final availableHeight = screenHeight -
                 progressBarHeight - headerHeight - buttonHeight - padding;
               final availableWidth = screenWidth - padding;
-              
+
               // Board should be square and fit in available space
-              final boardSize = availableHeight < availableWidth 
-                ? availableHeight 
+              final boardSize = availableHeight < availableWidth
+                ? availableHeight
                 : availableWidth;
               
               print('DEBUG: Screen dimensions: ${screenWidth}x${screenHeight}');
@@ -563,8 +591,8 @@ void _markPuzzleCompleted() {
                       _buildPuzzleHeader(),
                       // Fixed height container for the board
                       Container(
-                        height: boardSize + 32, // Add padding
-                        padding: const EdgeInsets.all(16),
+                        height: boardSize + ResponsiveUtils.getHorizontalPadding(context) * 2,
+                        padding: EdgeInsets.all(ResponsiveUtils.getHorizontalPadding(context)),
                         child: Stack(
                           alignment: Alignment.center,
                           children: [

@@ -7,8 +7,8 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 
 ## Current Status
 
-**Phase**: Phase 8 Complete ✅ (Game Types System)
-**Next**: Phase 7.3 - Mobile Responsiveness
+**Phase**: Phase 7.3 Complete ✅ (Mobile Responsiveness)
+**Next**: Phase 7.4 - Build & Deployment Setup
 **Target**: Chess Club Testing in 4-5 weeks
 
 ### What's Working ✅
@@ -22,6 +22,8 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 - Professional chess piece graphics
 - Undo, move history, game variety (full games, endgame practice, opening practice)
 - **Multiple game types** (bot games + puzzle-style games like check vs checkmate)
+- **Mobile-responsive UI** with adaptive layouts for phone/tablet screens
+- **Portrait-only orientation** lock for consistent mobile experience
 
 ### Current Content
 - **Campaigns**: 2 campaigns (Fundamentals 1 & 2)
@@ -82,6 +84,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 - **Campaign system restructure** (Phase 7.1)
 - **Campaign-level boss unlocking** (Phase 7.2)
 - **Game types system** (Phase 8) - Multiple game types beyond bot games
+- **Mobile responsiveness** (Phase 7.3) - Adaptive layouts and portrait-only mode
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 

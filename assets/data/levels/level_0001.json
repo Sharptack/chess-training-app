@@ -7,8 +7,7 @@
     "video": {
       "id": "video_0001",
       "title": "Understanding Check and Checkmate",
-      "url": "assets/videos/sample.mp4",
-      "thumbnail": "assets/ui/thumbs/level_0001.png"
+      "url": "assets/videos/Sample.mp4"
     }
   },
   "puzzles": [

@@ -1,6 +1,7 @@
 // lib/core/widgets/game_view.dart
 import 'package:flutter/material.dart';
 import '../game_logic/game_state.dart';
+import '../utils/responsive_utils.dart';
 import 'chess_board_widget.dart';
 
 /// Shared widget for displaying a chess game in progress
@@ -26,11 +27,14 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = ResponsiveUtils.getHorizontalPadding(context);
+    final spacing = ResponsiveUtils.getSpacing(context, mobile: 6, tablet: 8, desktop: 10);
+
     return Column(
       children: [
         // Status bar with game controls
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(padding),
           color: Theme.of(context).colorScheme.surfaceVariant,
           child: Column(
             children: [
@@ -59,16 +63,18 @@ class GameView extends StatelessWidget {
                     if (gameState.botConfig.allowUndo)
                       IconButton(
                         onPressed: gameState.canUndo ? () => gameState.undoMove() : null,
-                        icon: const Icon(Icons.undo),
+                        icon: Icon(Icons.undo,
+                          size: ResponsiveUtils.getIconSize(context, mobile: 20, tablet: 24, desktop: 28)),
                         tooltip: 'Undo move',
                       ),
                     if (gameState.botConfig.allowUndo)
-                      const SizedBox(width: 8),
+                      SizedBox(width: spacing),
                     // Resign button
                     if (onResign != null)
                       TextButton.icon(
                         onPressed: onResign,
-                        icon: const Icon(Icons.flag, size: 16),
+                        icon: Icon(Icons.flag,
+                          size: ResponsiveUtils.getIconSize(context, mobile: 14, tablet: 16, desktop: 18)),
                         label: const Text('Resign'),
                         style: TextButton.styleFrom(
                           foregroundColor: Theme.of(context).colorScheme.error,
@@ -91,16 +97,16 @@ class GameView extends StatelessWidget {
         if (gameState.lastMoveRestrictionError != null)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: padding, vertical: spacing),
             color: Theme.of(context).colorScheme.errorContainer,
             child: Row(
               children: [
                 Icon(
                   Icons.warning,
                   color: Theme.of(context).colorScheme.onErrorContainer,
-                  size: 20,
+                  size: ResponsiveUtils.getIconSize(context, mobile: 18, tablet: 20, desktop: 22),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: spacing),
                 Expanded(
                   child: Text(
                     gameState.lastMoveRestrictionError!,
@@ -116,14 +122,22 @@ class GameView extends StatelessWidget {
         // Chess board
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(padding),
             child: Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
+                  // Calculate board size with responsive padding
+                  final boardPadding = ResponsiveUtils.getValue(
+                    context,
+                    mobile: 16.0,
+                    tablet: 24.0,
+                    desktop: 32.0,
+                  );
+
                   final size = (constraints.maxWidth < constraints.maxHeight
                           ? constraints.maxWidth
                           : constraints.maxHeight) -
-                      32;
+                      boardPadding;
 
                   return ChessBoardWidget(
                     boardState: gameState.boardState,
@@ -152,9 +166,23 @@ class GameView extends StatelessWidget {
   }
 
   Widget _buildMoveHistory(BuildContext context) {
+    final historyHeight = ResponsiveUtils.getValue(
+      context,
+      mobile: 50.0,
+      tablet: 55.0,
+      desktop: 60.0,
+    );
+
+    final historyPadding = ResponsiveUtils.getSpacing(
+      context,
+      mobile: 6.0,
+      tablet: 8.0,
+      desktop: 10.0,
+    );
+
     return Container(
-      height: 60,
-      padding: const EdgeInsets.all(8),
+      height: historyHeight,
+      padding: EdgeInsets.all(historyPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../state/providers.dart';
 
 /// Home screen showing all available campaigns
@@ -40,23 +41,44 @@ class HomePage extends ConsumerWidget {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.8,
-            ),
-            itemCount: campaigns.length,
-            itemBuilder: (context, index) {
-              final campaign = campaigns[index];
-              final previousCampaign = index > 0 ? campaigns[index - 1] : null;
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Responsive column count based on screen width
+              final columnCount = ResponsiveUtils.getGridColumnCount(
+                context,
+                mobileColumns: 1,
+                tabletColumns: 2,
+                desktopColumns: 3,
+              );
 
-              return _CampaignCard(
-                campaign: campaign,
-                previousCampaign: previousCampaign,
-                onTap: () => context.push('/campaign/${campaign.id}'),
+              final spacing = ResponsiveUtils.getSpacing(
+                context,
+                mobile: 12.0,
+                tablet: 16.0,
+                desktop: 20.0,
+              );
+
+              final padding = ResponsiveUtils.getHorizontalPadding(context);
+
+              return GridView.builder(
+                padding: EdgeInsets.all(padding),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columnCount,
+                  mainAxisSpacing: spacing,
+                  crossAxisSpacing: spacing,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: campaigns.length,
+                itemBuilder: (context, index) {
+                  final campaign = campaigns[index];
+                  final previousCampaign = index > 0 ? campaigns[index - 1] : null;
+
+                  return _CampaignCard(
+                    campaign: campaign,
+                    previousCampaign: previousCampaign,
+                    onTap: () => context.push('/campaign/${campaign.id}'),
+                  );
+                },
               );
             },
           );
@@ -133,7 +155,7 @@ class _CampaignCard extends ConsumerWidget {
             Opacity(
               opacity: isUnlocked ? 1.0 : 0.5,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(context.horizontalPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -156,7 +178,8 @@ class _CampaignCard extends ConsumerWidget {
                     if (completedLevels > 0 || isUnlocked) ...[
                       Row(
                         children: [
-                          const Icon(Icons.check_circle, size: 20),
+                          Icon(Icons.check_circle,
+                            size: ResponsiveUtils.getIconSize(context, mobile: 18, tablet: 20, desktop: 22)),
                           const SizedBox(width: 4),
                           Text(
                             '$completedLevels / $totalLevels levels',
@@ -168,7 +191,8 @@ class _CampaignCard extends ConsumerWidget {
                     ],
                     Row(
                       children: [
-                        const Icon(Icons.emoji_events, size: 20),
+                        Icon(Icons.emoji_events,
+                          size: ResponsiveUtils.getIconSize(context, mobile: 18, tablet: 20, desktop: 22)),
                         const SizedBox(width: 4),
                         Text(
                           'Boss: ${campaign.boss.name}',
@@ -190,9 +214,9 @@ class _CampaignCard extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.lock,
-                        size: 48,
+                        size: ResponsiveUtils.getIconSize(context, mobile: 40, tablet: 48, desktop: 56),
                         color: Colors.white,
                       ),
                       if (previousCampaign != null) ...[

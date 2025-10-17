@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puzzle Loader Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .log { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        pre { background: #fff; padding: 10px; overflow: auto; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Puzzle File Loader Diagnostic Tool</h1>
+
+    <p><strong>Instructions:</strong> Select a JSON file from the output folder to test loading.</p>
+
+    <input type="file" id="fileInput" accept=".json">
+
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerHTML = message;
+            output.appendChild(div);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            output.innerHTML = ''; // Clear previous output
+
+            log('📂 File selected!', 'success');
+
+            const file = event.target.files[0];
+
+            if (!file) {
+                log('❌ No file selected', 'error');
+                return;
+            }
+
+            log(`✓ File name: ${file.name}`, 'success');
+            log(`✓ File size: ${file.size} bytes`, 'success');
+            log(`✓ File type: ${file.type}`, 'success');
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                log('✓ File loaded successfully!', 'success');
+
+                try {
+                    const content = e.target.result;
+                    log(`✓ File content length: ${content.length} characters`, 'success');
+
+                    // Try to parse JSON
+                    const puzzles = JSON.parse(content);
+                    log(`✅ JSON parsed successfully!`, 'success');
+                    log(`✅ Number of puzzles: ${puzzles.length}`, 'success');
+
+                    // Show first puzzle
+                    if (puzzles.length > 0) {
+                        log(`<strong>First puzzle preview:</strong><pre>${JSON.stringify(puzzles[0], null, 2)}</pre>`, 'success');
+                    }
+
+                    // Validate puzzle structure
+                    const firstPuzzle = puzzles[0];
+                    const requiredFields = ['id', 'fen', 'moveSequence', 'hint'];
+                    const missingFields = requiredFields.filter(field => !firstPuzzle.hasOwnProperty(field));
+
+                    if (missingFields.length === 0) {
+                        log(`✅ All required fields present!`, 'success');
+                    } else {
+                        log(`⚠️ Missing fields: ${missingFields.join(', ')}`, 'error');
+                    }
+
+                } catch (error) {
+                    log(`❌ JSON Parse Error: ${error.message}`, 'error');
+                    log(`<pre>${error.stack}</pre>`, 'error');
+                }
+            };
+
+            reader.onerror = function(e) {
+                log(`❌ File read error: ${e.message}`, 'error');
+            };
+
+            log('⏳ Reading file...', 'log');
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../state/providers.dart';
 
 /// Shows all levels within a campaign plus the campaign boss
@@ -36,64 +37,82 @@ class CampaignPage extends ConsumerWidget {
           ),
         ),
         data: (campaign) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Campaign header
-                Text(
-                  campaign.title,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final padding = ResponsiveUtils.getHorizontalPadding(context);
+              final columnCount = ResponsiveUtils.getGridColumnCount(
+                context,
+                mobileColumns: 2,
+                tabletColumns: 3,
+                desktopColumns: 4,
+              );
+              final spacing = ResponsiveUtils.getSpacing(
+                context,
+                mobile: 10.0,
+                tablet: 12.0,
+                desktop: 16.0,
+              );
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Campaign header
+                    Text(
+                      campaign.title,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
+                    Text(
+                      campaign.description,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
+
+                    // Levels grid
+                    Text(
+                      'Levels',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    SizedBox(height: spacing),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columnCount,
+                        mainAxisSpacing: spacing,
+                        crossAxisSpacing: spacing,
+                        childAspectRatio: 1,
                       ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  campaign.description,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 24),
+                      itemCount: campaign.levelIds.length,
+                      itemBuilder: (context, index) {
+                        final levelId = campaign.levelIds[index];
+                        return _LevelTile(
+                          levelId: levelId,
+                          levelNumber: index + 1,
+                        );
+                      },
+                    ),
 
-                // Levels grid
-                Text(
-                  'Levels',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 12),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: campaign.levelIds.length,
-                  itemBuilder: (context, index) {
-                    final levelId = campaign.levelIds[index];
-                    return _LevelTile(
-                      levelId: levelId,
-                      levelNumber: index + 1,
-                    );
-                  },
-                ),
+                    SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 24, tablet: 32, desktop: 40)),
 
-                const SizedBox(height: 32),
-
-                // Boss section
-                Text(
-                  'Campaign Boss',
-                  style: Theme.of(context).textTheme.titleLarge,
+                    // Boss section
+                    Text(
+                      'Campaign Boss',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    SizedBox(height: spacing),
+                    _BossTile(
+                      campaignId: campaignId,
+                      boss: campaign.boss,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                _BossTile(
-                  campaignId: campaignId,
-                  boss: campaign.boss,
-                ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -200,8 +219,12 @@ class _LevelTile extends ConsumerWidget {
                   color: Colors.black.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Center(
-                  child: Icon(Icons.lock, color: Colors.white, size: 32),
+                child: Center(
+                  child: Icon(
+                    Icons.lock,
+                    color: Colors.white,
+                    size: ResponsiveUtils.getIconSize(context, mobile: 24, tablet: 28, desktop: 32),
+                  ),
                 ),
               ),
             ),
@@ -268,10 +291,10 @@ class _BossTile extends ConsumerWidget {
                           children: [
                             Icon(
                               Icons.emoji_events,
-                              size: 32,
+                              size: ResponsiveUtils.getIconSize(context, mobile: 28, tablet: 32, desktop: 36),
                               color: Theme.of(context).colorScheme.primary,
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: ResponsiveUtils.getSpacing(context, mobile: 10, tablet: 12, desktop: 14)),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +368,7 @@ class _BossTile extends ConsumerWidget {
         children: [
           Icon(
             completed ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: 20,
+            size: ResponsiveUtils.getIconSize(context, mobile: 18, tablet: 20, desktop: 22),
             color: completed ? Colors.green : Colors.grey,
           ),
           const SizedBox(width: 8),

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/utils/responsive_utils.dart';
 import '../../../data/models/video_item.dart';
 import '../../../data/models/progress.dart';
 import '../../../state/providers.dart';
@@ -70,9 +71,14 @@ class LessonScreen extends StatelessWidget {
             ),
           ),
           // Reactive progress widget
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: ProgressSection(levelId: levelId, videoId: video.id),
+          Builder(
+            builder: (context) => Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: ResponsiveUtils.getHorizontalPadding(context),
+                vertical: ResponsiveUtils.getVerticalPadding(context) * 0.5,
+              ),
+              child: ProgressSection(levelId: levelId, videoId: video.id),
+            ),
           ),
         ],
       ),
@@ -191,7 +197,11 @@ class _LessonPlayerState extends State<LessonPlayer> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('❌ Video failed to load:\n$_initError\n\nURL: ${widget.video.url}'),
+          child: Text(
+            '❌ Video failed to load:\n$_initError\n\nURL: ${widget.video.url}',
+            textAlign: TextAlign.center,
+            softWrap: true,
+          ),
         ),
       );
     }
@@ -222,62 +232,71 @@ class ProgressSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progressKey = '${levelId}_$videoId';
-    print('ProgressSection building with progressKey=$progressKey'); // Debug
-    
+
     final async = ref.watch(lessonProgressProvider(progressKey));
 
     return async.when(
       loading: () {
-        print('ProgressSection loading...'); // Debug
         return const SizedBox(
           height: 72,
           child: Center(child: CircularProgressIndicator()),
         );
       },
       error: (e, st) {
-        print('ProgressSection error: $e'); // Debug
-        return Column(
-          children: [
-            Text('Error loading progress: $e', style: TextStyle(color: Colors.red)),
-            Text('Key: $progressKey', style: TextStyle(fontSize: 12)),
-          ],
+        return SizedBox(
+          height: 72,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Error loading progress: $e',
+                style: TextStyle(color: Colors.red),
+                softWrap: true,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Key: $progressKey',
+                style: TextStyle(fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         );
       },
       data: (Progress p) {
-        print('ProgressSection loaded progress: started=${p.started}, completed=${p.completed}'); // Debug
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  p.completed ? '✅ Completed' : (p.started ? '⏳ In Progress' : '▶️ Not Started'),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                if (kDebugMode) // dev-only buttons
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => markLessonStarted(ref, levelId, videoId),
-                        child: const Text('Start'),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => markLessonCompleted(ref, levelId, videoId),
-                        child: const Text('Complete'),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => resetLesson(ref, levelId, videoId),
-                        child: const Text('Reset'),
-                      ),
-                    ],
-                  ),
-              ],
+            Text(
+              p.completed ? '✅ Completed' : (p.started ? '⏳ In Progress' : '▶️ Not Started'),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
-            // Debug info
-            if (kDebugMode)
-              Text('Debug: Key=$progressKey', style: TextStyle(fontSize: 10, color: Colors.grey)),
+            // Debug controls
+            if (kDebugMode) ...[
+              const SizedBox(height: 8),
+              // Wrap buttons to prevent overflow
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => markLessonStarted(ref, levelId, videoId),
+                    child: const Text('Start'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => markLessonCompleted(ref, levelId, videoId),
+                    child: const Text('Complete'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => resetLesson(ref, levelId, videoId),
+                    child: const Text('Reset'),
+                  ),
+                ],
+              ),
+            ],
           ],
         );
       },
