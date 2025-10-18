@@ -8,11 +8,8 @@ import 'app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Lock orientation to portrait mode only
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  // Allow all orientations (portrait and landscape)
+  // No orientation lock - let device rotate freely
 
   // Initialize Hive
   await Hive.initFlutter();
