@@ -154,6 +154,7 @@ UI reflects new state
 
 #### `core/utils/`
 - `result.dart` - Result<T> type (Success | Failure)
+- `responsive_utils.dart` - Responsive design utilities (Phase 7.3)
 
 #### `core/theme/`
 - `app_theme.dart` - Material 3 light/dark themes
@@ -487,6 +488,159 @@ class AssetPaths {
   static const String botsConfig = 'assets/data/bots/bots.json';
 }
 ```
+
+---
+
+## Responsive Design System (Phase 7.3)
+
+### ResponsiveUtils Class
+
+Centralized responsive design utilities for handling different screen sizes across mobile, tablet, and desktop devices.
+
+**Location**: `lib/core/utils/responsive_utils.dart`
+
+### Breakpoints
+```dart
+static const double mobileBreakpoint = 600;   // < 600px = mobile
+static const double tabletBreakpoint = 900;   // 600-900px = tablet
+static const double desktopBreakpoint = 1200; // >= 1200px = desktop
+```
+
+### Device Type Detection
+```dart
+ResponsiveUtils.isMobile(context)    // Returns true if width < 600
+ResponsiveUtils.isTablet(context)    // Returns true if 600 <= width < 900
+ResponsiveUtils.isDesktop(context)   // Returns true if width >= 1200
+ResponsiveUtils.getDeviceType(context) // Returns DeviceType enum
+```
+
+### Responsive Value Helpers
+```dart
+// Get different values based on device type
+final padding = ResponsiveUtils.getValue(
+  context,
+  mobile: 16.0,
+  tablet: 24.0,
+  desktop: 32.0,
+);
+
+// Horizontal padding: 16px (mobile), 24px (tablet), 32px (desktop)
+final hPadding = ResponsiveUtils.getHorizontalPadding(context);
+
+// Vertical padding: 12px (height < 700), 16px (700-900), 24px (900+)
+final vPadding = ResponsiveUtils.getVerticalPadding(context);
+
+// Dynamic spacing with custom values
+final spacing = ResponsiveUtils.getSpacing(
+  context,
+  mobile: 8.0,
+  tablet: 12.0,
+  desktop: 16.0,
+);
+
+// Grid column counts
+final columns = ResponsiveUtils.getGridColumnCount(
+  context,
+  mobileColumns: 1,
+  tabletColumns: 2,
+  desktopColumns: 3,
+);
+
+// Icon sizing
+final iconSize = ResponsiveUtils.getIconSize(
+  context,
+  mobile: 24.0,
+  tablet: 28.0,
+  desktop: 32.0,
+);
+```
+
+### BuildContext Extensions
+Convenient extension methods for quick access:
+```dart
+// Instead of ResponsiveUtils.isMobile(context)
+if (context.isMobile) { ... }
+
+// Instead of ResponsiveUtils.getHorizontalPadding(context)
+padding: EdgeInsets.all(context.horizontalPadding)
+
+// Available extensions:
+context.isMobile
+context.isTablet
+context.isDesktop
+context.deviceType
+context.screenWidth
+context.screenHeight
+context.horizontalPadding
+context.verticalPadding
+```
+
+### Usage Examples
+
+**Responsive Grid Layout** (HomePage):
+```dart
+final columnCount = ResponsiveUtils.getGridColumnCount(
+  context,
+  mobileColumns: 1,
+  tabletColumns: 2,
+  desktopColumns: 3,
+);
+
+GridView.builder(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: columnCount,
+    mainAxisSpacing: ResponsiveUtils.getSpacing(context),
+    crossAxisSpacing: ResponsiveUtils.getSpacing(context),
+  ),
+  // ...
+)
+```
+
+**Responsive Icon Sizing** (GameView):
+```dart
+Icon(
+  Icons.undo,
+  size: ResponsiveUtils.getIconSize(
+    context,
+    mobile: 20,
+    tablet: 24,
+    desktop: 28,
+  ),
+)
+```
+
+**Responsive Chess Board Sizing** (GameView):
+```dart
+final boardPadding = ResponsiveUtils.getValue(
+  context,
+  mobile: 16.0,
+  tablet: 24.0,
+  desktop: 32.0,
+);
+
+final size = (constraints.maxWidth < constraints.maxHeight
+    ? constraints.maxWidth
+    : constraints.maxHeight) - boardPadding;
+```
+
+### Implementation Details
+
+- **MediaQuery-based**: Uses MediaQuery to get screen dimensions
+- **LayoutBuilder integration**: Works with LayoutBuilder for constraint-based calculations
+- **No hardcoded values**: All dimensions parameterized for easy tuning
+- **Type-safe**: Generic getValue<T> method supports any type
+- **Null-safe**: Proper fallback handling for tablet/desktop values
+
+### Files Using Responsive System
+
+All major UI pages updated in Phase 7.3:
+- `features/home/pages/home_page.dart` - Grid layout
+- `features/campaign/pages/campaign_page.dart` - Grid layout
+- `features/level/pages/level_page.dart` - Tile sizing
+- `features/lesson/pages/lesson_page.dart` - Padding, text wrapping
+- `features/puzzles/pages/puzzles_page.dart` - Height calculations
+- `features/games/check_checkmate/pages/check_checkmate_page.dart` - Board/button sizing
+- `core/widgets/game_view.dart` - All game UI elements
 
 ---
 

@@ -8,7 +8,7 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 ## Current Status
 
 **Phase**: Phase 7.3 Complete ✅ (Mobile Responsiveness)
-**Next**: Phase 7.4 - Build & Deployment Setup
+**Next**: Phase 7.4 - Content Creation
 **Target**: Chess Club Testing in 4-5 weeks
 
 ### What's Working ✅
@@ -23,7 +23,7 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 - Undo, move history, game variety (full games, endgame practice, opening practice)
 - **Multiple game types** (bot games + puzzle-style games like check vs checkmate)
 - **Mobile-responsive UI** with adaptive layouts for phone/tablet screens
-- **Portrait-only orientation** lock for consistent mobile experience
+- **All orientations supported** (portrait and landscape)
 
 ### Current Content
 - **Campaigns**: 2 campaigns (Fundamentals 1 & 2)
@@ -84,7 +84,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 - **Campaign system restructure** (Phase 7.1)
 - **Campaign-level boss unlocking** (Phase 7.2)
 - **Game types system** (Phase 8) - Multiple game types beyond bot games
-- **Mobile responsiveness** (Phase 7.3) - Adaptive layouts and portrait-only mode
+- **Mobile responsiveness** (Phase 7.3) - Adaptive layouts supporting all orientations
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 
@@ -132,8 +132,8 @@ See LAUNCH_PLAN.md Phase 4 for complete metrics list.
 3. Update CHANGELOG.md when phase complete
 4. Tag releases for major milestones
 
-**Current Branch**: `main` (stable, Phase 7.1 complete)
-**Next Branch**: `phase-7.2-mobile-responsive`
+**Current Branch**: `main` (stable, Phase 7.3 complete)
+**Next Branch**: `phase-7.4-content-creation`
 
 ---
 
