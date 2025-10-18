@@ -2,123 +2,63 @@
   "positions": [
     {
       "id": 1,
-      "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
-      "answer": "check",
-      "description": "White rook can give check"
+      "fen": "r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 1",
+      "answer": "checkmate",
+      "description": "Scholar's Mate - Queen and Bishop deliver checkmate"
     },
     {
       "id": 2,
-      "fen": "6k1/5ppp/8/8/8/8/5PPP/5RK1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "White rook delivers checkmate on the back rank"
+      "fen": "4k3/8/8/8/8/8/4q3/4K3 b - - 0 1",
+      "answer": "check",
+      "description": "Queen gives check from e2"
     },
     {
       "id": 3,
-      "fen": "r5k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
-      "answer": "check",
-      "description": "Rook can check but black can block"
+      "fen": "6rk/5Npp/8/8/8/8/8/6K1 b - - 0 1",
+      "answer": "checkmate",
+      "description": "Smothered mate - Knight on f7 checkmates"
     },
     {
       "id": 4,
-      "fen": "6k1/4Rppp/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Rook on 7th rank delivers checkmate"
+      "fen": "rnb1kbnr/pppp1ppp/8/8/8/8/5q2/4K3 w - - 0 1",
+      "answer": "check",
+      "description": "Black queen checks white king"
     },
     {
       "id": 5,
-      "fen": "6k1/5ppp/5Q2/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "check",
-      "description": "Queen can give check from f6"
+      "fen": "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1",
+      "answer": "checkmate",
+      "description": "Queen and King deliver checkmate"
     },
     {
       "id": 6,
-      "fen": "6k1/5pQp/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Queen on g7 is checkmate"
+      "fen": "2k5/8/1N6/8/8/8/8/4K3 b - - 0 1",
+      "answer": "check",
+      "description": "Knight gives check from b6"
     },
     {
       "id": 7,
-      "fen": "r4rk1/5ppp/8/8/8/8/5PPP/R3R1K1 w - - 0 1",
-      "answer": "check",
-      "description": "Rook can check along the file"
+      "fen": "5Q1k/6pp/8/8/8/8/8/6K1 b - - 0 1",
+      "answer": "checkmate",
+      "description": "Queen on f8 delivers checkmate"
     },
     {
       "id": 8,
-      "fen": "5rk1/4Qppp/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Queen on e7 with rook on f8 is checkmate"
+      "fen": "4k3/4R3/8/8/8/8/8/4K3 b - - 0 1",
+      "answer": "check",
+      "description": "Rook checks from e7"
     },
     {
       "id": 9,
-      "fen": "6k1/5ppp/4B3/8/8/8/5PPP/6K1 w - - 0 1",
+      "fen": "6k1/5Qpp/8/8/8/8/8/6K1 b - - 0 1",
       "answer": "check",
-      "description": "Bishop gives check on the diagonal"
+      "description": "Queen on f7 gives check"
     },
     {
       "id": 10,
-      "fen": "5bk1/5pBp/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Bishop on g7 is checkmate with bishop on f8"
-    },
-    {
-      "id": 11,
-      "fen": "6k1/5ppp/5N2/8/8/8/5PPP/6K1 w - - 0 1",
+      "fen": "4k3/3B4/8/8/8/8/8/4K3 b - - 0 1",
       "answer": "check",
-      "description": "Knight can give check"
-    },
-    {
-      "id": 12,
-      "fen": "5Nk1/4Qppp/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Queen and knight deliver checkmate"
-    },
-    {
-      "id": 13,
-      "fen": "6k1/5ppp/8/6Q1/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "check",
-      "description": "Queen checks from g5"
-    },
-    {
-      "id": 14,
-      "fen": "5Q1k/5p1p/8/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Queen on f8 is checkmate"
-    },
-    {
-      "id": 15,
-      "fen": "r5k1/5ppp/8/8/1B6/8/5PPP/6K1 w - - 0 1",
-      "answer": "check",
-      "description": "Bishop checks king from b4"
-    },
-    {
-      "id": 16,
-      "fen": "6k1/4Rppp/5B2/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Rook and bishop deliver checkmate"
-    },
-    {
-      "id": 17,
-      "fen": "6k1/5ppp/8/8/8/4R3/5PPP/6K1 w - - 0 1",
-      "answer": "check",
-      "description": "Rook checks from e3"
-    },
-    {
-      "id": 18,
-      "fen": "6k1/5Rpp/6P1/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Rook on f7 with pawn on g6 is checkmate"
-    },
-    {
-      "id": 19,
-      "fen": "3r2k1/5ppp/8/8/8/8/4RPPP/6K1 w - - 0 1",
-      "answer": "check",
-      "description": "Rook can check from e2"
-    },
-    {
-      "id": 20,
-      "fen": "5rk1/5Rpp/6P1/8/8/8/5PPP/6K1 w - - 0 1",
-      "answer": "checkmate",
-      "description": "Back rank mate with rook on f7"
+      "description": "Bishop checks from d7"
     }
   ]
 }

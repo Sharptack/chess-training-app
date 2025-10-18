@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/chess_board_widget.dart';
 import '../../../../core/game_logic/chess_board_state.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../state/providers.dart';
 import '../models/check_checkmate_position.dart';
 
@@ -245,39 +246,63 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
                 Theme.of(context).colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
 
             // Position counter
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: ResponsiveUtils.getHorizontalPadding(context)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Position ${_currentPositionIndex + 1} of ${_positions.length}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 18),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     'Score: $_correctAnswers/${_currentPositionIndex + (_showingFeedback ? 1 : 0)}',
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
             // Chess board
             Expanded(
               child: Center(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
+                    final padding = ResponsiveUtils.getHorizontalPadding(context);
+
+                    // Use responsive multipliers
+                    final widthMultiplier = ResponsiveUtils.getValue(
+                      context,
+                      mobile: 0.92,
+                      tablet: 0.90,
+                      desktop: 0.85,
+                    );
+
+                    final heightMultiplier = ResponsiveUtils.getValue(
+                      context,
+                      mobile: 0.75,
+                      tablet: 0.70,
+                      desktop: 0.70,
+                    );
+
                     final maxSize = constraints.maxWidth < constraints.maxHeight
-                        ? constraints.maxWidth * 0.9
-                        : constraints.maxHeight * 0.7;
+                        ? (constraints.maxWidth - padding * 2) * widthMultiplier
+                        : constraints.maxHeight * heightMultiplier;
+
                     return ChessBoardWidget(
                       boardState: _boardState,
                       size: maxSize,
                       showCoordinates: true,
+                      showGameStatus: false, // Don't show check/checkmate - player needs to identify it
                       // Disable moves - this is view-only
                       onMoveMade: null,
                     );
@@ -289,7 +314,7 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
             // Feedback message
             if (_showingFeedback)
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(ResponsiveUtils.getHorizontalPadding(context)),
                 color: _isCorrect ? Colors.green[100] : Colors.red[100],
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -297,13 +322,13 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
                     Icon(
                       _isCorrect ? Icons.check_circle : Icons.cancel,
                       color: _isCorrect ? Colors.green : Colors.red,
-                      size: 32,
+                      size: ResponsiveUtils.getIconSize(context, mobile: 28, tablet: 32, desktop: 36),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: ResponsiveUtils.getSpacing(context, mobile: 10, tablet: 12, desktop: 14)),
                     Text(
                       _isCorrect ? 'Correct!' : 'Incorrect',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
                         fontWeight: FontWeight.bold,
                         color: _isCorrect ? Colors.green[900] : Colors.red[900],
                       ),
@@ -315,41 +340,59 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
             // Answer buttons
             if (!_showingFeedback)
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(ResponsiveUtils.getValue(
+                  context,
+                  mobile: 16.0,
+                  tablet: 20.0,
+                  desktop: 24.0,
+                )),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _handleAnswer('check'),
-                        icon: const Icon(Icons.check, size: 28),
-                        label: const Text(
+                        icon: Icon(Icons.check,
+                          size: ResponsiveUtils.getIconSize(context, mobile: 24, tablet: 26, desktop: 28)),
+                        label: Text(
                           'Check',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(
+                            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: EdgeInsets.symmetric(
+                            vertical: ResponsiveUtils.getValue(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _handleAnswer('checkmate'),
-                        icon: const Text('#', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                        label: const Text(
+                        icon: Text('#',
+                          style: TextStyle(
+                            fontSize: ResponsiveUtils.getIconSize(context, mobile: 24, tablet: 26, desktop: 28),
+                            fontWeight: FontWeight.bold,
+                          )),
+                        label: Text(
                           'Checkmate',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(
+                            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: EdgeInsets.symmetric(
+                            vertical: ResponsiveUtils.getValue(context, mobile: 14.0, tablet: 16.0, desktop: 18.0),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -360,7 +403,7 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
                 ),
               ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: ResponsiveUtils.getSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
           ],
         ),
       ),

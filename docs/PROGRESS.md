@@ -7,8 +7,8 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 
 ## Current Status
 
-**Phase**: Phase 8 Complete ✅ (Game Types System)
-**Next**: Phase 7.3 - Mobile Responsiveness
+**Phase**: Phase 7.3 Complete ✅ (Mobile Responsiveness)
+**Next**: Phase 7.4 - Content Creation
 **Target**: Chess Club Testing in 4-5 weeks
 
 ### What's Working ✅
@@ -22,14 +22,17 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 - Professional chess piece graphics
 - Undo, move history, game variety (full games, endgame practice, opening practice)
 - **Multiple game types** (bot games + puzzle-style games like check vs checkmate)
+- **Mobile-responsive UI** with adaptive layouts for phone/tablet screens
+- **All orientations supported** (portrait and landscape)
 
 ### Current Content
 - **Campaigns**: 2 campaigns (Fundamentals 1 & 2)
 - **Levels**: 10 level placeholders (2 with full content, 8 ready for content)
 - **Puzzles**: 11 puzzles total (5 in L1, 6 in L2 with 2 shared)
 - **Bots/Games**: 4 bot games configured (200-1200 ELO range)
-- **Game Types**: Check vs Checkmate game (20 positions)
+- **Game Types**: Check vs Checkmate game (10 valid positions: 5 check, 5 checkmate)
 - **Features**: Campaigns, Lessons, Puzzles, Games (multiple types), Boss battles all functional
+- **Tools**: puzzle_creator.html for creating custom chess positions with correct FEN notation
 
 ---
 
@@ -82,6 +85,7 @@ After chess club testing, prioritize features from **[BACKLOG.md](./BACKLOG.md)*
 - **Campaign system restructure** (Phase 7.1)
 - **Campaign-level boss unlocking** (Phase 7.2)
 - **Game types system** (Phase 8) - Multiple game types beyond bot games
+- **Mobile responsiveness** (Phase 7.3) - Adaptive layouts supporting all orientations
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for detailed phase-by-phase history.
 
@@ -129,8 +133,8 @@ See LAUNCH_PLAN.md Phase 4 for complete metrics list.
 3. Update CHANGELOG.md when phase complete
 4. Tag releases for major milestones
 
-**Current Branch**: `main` (stable, Phase 7.1 complete)
-**Next Branch**: `phase-7.2-mobile-responsive`
+**Current Branch**: `main` (stable, Phase 7.3 complete)
+**Next Branch**: `phase-7.4-content-creation`
 
 ---
 
