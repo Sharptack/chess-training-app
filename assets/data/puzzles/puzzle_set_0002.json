@@ -11,7 +11,7 @@
       "toMove": "white",
       "themes": ["checkmate", "back-rank"],
       "difficulty": 1,
-      "solutionMoves": ["Re8#"],
+      "solutionMoves": ["e1e8"],
       "hints": ["Look for a move that attacks the enemy king on the back rank"],
       "successMessage": "Good review! Back-rank mates are fundamental!",
       "failureMessage": "Remember: Look for moves that attack the king directly."
@@ -24,7 +24,7 @@
       "toMove": "white",
       "themes": ["pin", "tactics"],
       "difficulty": 2,
-      "solutionMoves": ["Bb5"],
+      "solutionMoves": ["c4b5"],
       "hints": ["Look for a piece that can't move without exposing something valuable"],
       "successMessage": "Excellent! The knight is pinned to the king!",
       "failureMessage": "Look for a way to attack a piece that can't move."
@@ -37,7 +37,7 @@
       "toMove": "white",
       "themes": ["discovered-attack", "tactics"],
       "difficulty": 3,
-      "solutionMoves": ["e5"],
+      "solutionMoves": ["e4e5"],
       "hints": ["Moving one piece can reveal an attack from another"],
       "successMessage": "Great! The knight must move and the bishop attacks the queen!",
       "failureMessage": "Think about what happens when the knight has to move."
@@ -50,7 +50,7 @@
       "toMove": "white",
       "themes": ["fork", "knight", "tactics"],
       "difficulty": 2,
-      "solutionMoves": ["Ng5"],
+      "solutionMoves": ["f3g5"],
       "hints": ["Knights are great at attacking multiple pieces", "Look at f7"],
       "successMessage": "Good review! Knight forks are powerful tactics!",
       "failureMessage": "Look for a knight move that creates multiple threats."
@@ -63,7 +63,7 @@
       "toMove": "white",
       "themes": ["skewer", "endgame"],
       "difficulty": 2,
-      "solutionMoves": ["Ra8+"],
+      "solutionMoves": ["a1a8"],
       "hints": ["A skewer forces a valuable piece to move and exposes a piece behind it"],
       "successMessage": "Perfect! After the king moves, you win the rook!",
       "failureMessage": "Look for a check that forces the king to abandon the rook."
@@ -76,20 +76,20 @@
       "toMove": "white",
       "themes": ["checkmate", "queen-sacrifice"],
       "difficulty": 4,
-      "solutionMoves": ["Qh5"],
+      "solutionMoves": ["d1h5"],
       "solutionSequence": [
         {
-          "move": "Qh5",
+          "move": "d1h5",
           "isUserMove": true,
           "comment": "Threatening the knight and checkmate on f7"
         },
         {
-          "move": "Nxc4",
+          "move": "e5c4",
           "isUserMove": false,
           "comment": "Black tries to create counterplay"
         },
         {
-          "move": "Qxf7",
+          "move": "h5f7",
           "isUserMove": true,
           "comment": "Checkmate!"
         }

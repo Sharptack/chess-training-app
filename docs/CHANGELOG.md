@@ -1107,5 +1107,20 @@ See [BACKLOG.md](./BACKLOG.md) for future features and enhancements.
 - Level page now updates immediately after completing any game type
 - Games count in level progress card now correctly includes all game types (not just bots)
 - Fixed provider invalidation to refresh level page UI after game completion
+- Fixed check/checkmate game displaying positions before user input
+- Fixed puzzle_creator.html generating invalid FEN notation
+- Created 10 valid check/checkmate positions with proper chess rules
+
+### Tool Improvements
+- **puzzle_creator.html**: Fixed FEN generation to use standard chess notation (P/p instead of wP/bP)
+- **puzzle_creator.html**: Changed default castling rights from KQkq to - (no castling)
+- **ChessBoardWidget**: Added showGameStatus parameter to disable auto-reveal of check/checkmate status
+
+### Documentation
+- **chess_reference.md**: Added comprehensive FEN/SAN notation guide for content creators
+  - Complete FEN structure and validation checklist
+  - SAN move notation with disambiguation rules
+  - Chess rules and legal move generation
+  - Puzzle development best practices
 
 ---

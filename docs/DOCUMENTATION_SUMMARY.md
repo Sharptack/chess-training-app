@@ -94,6 +94,41 @@
 
 ---
 
+### ♟️ chess_reference.md (NEW - PERMANENT)
+**Purpose**: Complete reference guide for FEN, UCI, and SAN notation
+**Content**:
+- **Part 1: FEN (Forsyth-Edwards Notation)**
+  - FEN structure and all 6 fields explained
+  - Piece placement, castling rights, en passant
+  - Common mistakes and validation checklist
+  - Examples and debugging tips
+- **Part 2: Move Notation - UCI and SAN**
+  - **UCI (Universal Chess Interface)** - Recommended for puzzles
+  - Simple format: from-square + to-square (e.g., e2e4, g1f3)
+  - **SAN (Standard Algebraic Notation)** - For display/PGN
+  - Disambiguation rules and special notations
+- **Part 3: SAN Details**
+  - Move notation format
+  - Special notations (castling, promotion, en passant, check/mate)
+  - Parsing and validation
+- **Part 4: Chess Rules & Legal Move Generation**
+  - Piece movement rules
+  - Check, checkmate, and stalemate
+  - Pins and legal move generation
+- **Part 5: Working with Chess Puzzles**
+  - Puzzle FEN best practices
+  - **Solution format: Use UCI notation** (d8h4, not Qh4)
+  - Testing FEN strings
+  - Common libraries (Python chess, JavaScript chess.js)
+
+**Why Important**: Essential for content creators building puzzles and positions
+**Related Tools**:
+- `tools/puzzle_reviewer/puzzle_creator.html` - Uses FEN notation
+- `tools/puzzle_importer/` - Converts Lichess puzzles
+- Check/checkmate game positions
+
+---
+
 ### 📖 README.md (COMPLETELY REWRITTEN)
 **Purpose**: Project overview for developers/contributors
 **New Content**:
@@ -122,7 +157,9 @@ PROGRESS.md (status hub)
     │
     ├─→ CHANGELOG.md (historical record)
     │
-    └─→ ARCHITECTURE.md (technical reference)
+    ├─→ ARCHITECTURE.md (technical reference)
+    │
+    └─→ chess_reference.md (FEN/SAN notation guide)
 ```
 
 ---

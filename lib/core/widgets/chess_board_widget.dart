@@ -16,7 +16,8 @@ class ChessBoardWidget extends StatefulWidget {
   final Function(String move)? onMoveMade;
   final VoidCallback? onIllegalMove;
   final bool Function(String move)? validateMove; // NEW: Check if move is allowed before making it
-  
+  final bool showGameStatus; // Whether to show check/checkmate/stalemate overlays
+
   const ChessBoardWidget({
     super.key,
     required this.boardState,
@@ -29,6 +30,7 @@ class ChessBoardWidget extends StatefulWidget {
     this.onMoveMade,
     this.onIllegalMove,
     this.validateMove,
+    this.showGameStatus = true, // Default to true for backward compatibility
   });
   
   @override
@@ -54,16 +56,18 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   
   @override
   Widget build(BuildContext context) {
-    // Show checkmate/stalemate/draw status
+    // Show checkmate/stalemate/draw status (only if enabled)
     Widget? statusOverlay;
-    if (widget.boardState.isCheckmate) {
-      statusOverlay = _buildStatusOverlay('Checkmate!', Colors.red);
-    } else if (widget.boardState.isStalemate) {
-      statusOverlay = _buildStatusOverlay('Stalemate!', Colors.orange);
-    } else if (widget.boardState.isDraw) {
-      statusOverlay = _buildStatusOverlay('Draw!', Colors.blue);
-    } else if (widget.boardState.isInCheck) {
-      statusOverlay = _buildStatusOverlay('Check!', Colors.amber);
+    if (widget.showGameStatus) {
+      if (widget.boardState.isCheckmate) {
+        statusOverlay = _buildStatusOverlay('Checkmate!', Colors.red);
+      } else if (widget.boardState.isStalemate) {
+        statusOverlay = _buildStatusOverlay('Stalemate!', Colors.orange);
+      } else if (widget.boardState.isDraw) {
+        statusOverlay = _buildStatusOverlay('Draw!', Colors.blue);
+      } else if (widget.boardState.isInCheck) {
+        statusOverlay = _buildStatusOverlay('Check!', Colors.amber);
+      }
     }
     
     return SizedBox(

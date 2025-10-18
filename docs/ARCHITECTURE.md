@@ -21,6 +21,39 @@
 
 ---
 
+## Chess Notation Policy
+
+**TL;DR: Use UCI for data storage, SAN for display**
+
+### Data Storage (JSON files)
+All move data in JSON files MUST use **UCI notation**:
+- **Format**: `<from><to><promotion>` (e.g., `e2e4`, `g1f3`, `e7e8q`)
+- **Applies to**: Puzzle solutions, bot moves, game sequences
+- **Rationale**: Unambiguous, Stockfish-native, Lichess-compatible
+
+**Examples**:
+```json
+"solutionMoves": ["e2e4", "e7e5", "g1f3"]
+"moveSequence": ["d1h5", "e5c4", "h5f7"]
+```
+
+### Code Processing
+- The `chess` package's `move()` function accepts **both UCI and SAN**
+- Code uses `makeSanMove()` but it works with UCI data (chess.js compatibility)
+- Stockfish outputs UCI natively via `bestmove` command
+
+### User Display
+- Use **SAN notation** for displaying moves to users
+- Obtained via `getHistory()` which returns SAN
+- **Format**: `e4`, `Nf3`, `Qxf7#` (human-readable)
+
+### Tools
+- `puzzle_creator.html` - Generates UCI ✅
+- `puzzle_importer` - Outputs UCI (Lichess format) ✅
+- See [chess_reference.md](chess_reference.md) for full notation guide
+
+---
+
 ## Architecture Patterns
 
 ### 1. Feature-Based Organization
@@ -135,6 +168,8 @@ UI reflects new state
 
 #### `core/widgets/`
 - `chess_board_widget.dart` - Interactive chessboard (drag & click)
+  - Supports view-only mode (onMoveMade: null)
+  - showGameStatus parameter to hide/show check/checkmate overlays
 - `piece_widget.dart` - Draggable chess piece rendering
 - `game_view.dart` - Shared game UI (Play + Boss modes)
 - `async_value_view.dart` - Loading/error state wrapper
@@ -267,10 +302,11 @@ Game implementations for different game types. Separated from `play/` which hand
 
 **Current Games**:
 - `check_checkmate/` - Quiz-style game: view position, choose check or checkmate
-  - 20 positions per level (configurable)
+  - 10 positions per level (configurable via positionIds)
   - Instant feedback with correct/incorrect
   - Progress tracking with completion count
-  - Read-only chess board display
+  - Read-only chess board display (showGameStatus: false)
+  - Positions must be legal chess positions (validated by chess library)
 
 **Architecture**:
 - Each game type has its own folder under `features/games/`

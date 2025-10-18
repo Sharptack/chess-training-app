@@ -4,113 +4,169 @@
   "description": "Learn fundamental chess tactics",
   "puzzles": [
     {
-      "id": "puzzle_0001_001",
-      "title": "Checkmate in 1",
+      "id": "puzzle_009bn",
+      "title": "Tactical Puzzle",
       "subtitle": "Find the winning move for White",
-      "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
-      "toMove": "white",
-      "themes": ["checkmate", "back-rank"],
-      "difficulty": 1,
-      "solutionMoves": ["Re8#"],
-      "hints": ["Look for a move that attacks the enemy king on the back rank"],
-      "successMessage": "Excellent! You found the back-rank mate!",
-      "failureMessage": "Not quite right. Look for a move that attacks the king directly."
-    },
-    {
-      "id": "puzzle_0001_002",
-      "title": "Checkmate in 2",
-      "subtitle": "Find the forcing sequence for White",
-      "fen": "r5rk/5p1p/5R2/4B3/8/8/7P/7K w - - 0 1",
-      "toMove": "white",
-      "themes": ["checkmate", "mating-attack"],
-      "difficulty": 3,
-      "solutionMoves": ["Rxf7"],
-      "solutionSequence": [
-        {
-          "move": "Rxf7",
-          "isUserMove": true,
-          "comment": "Sacrifice the rook to open the king"
-        },
-        {
-          "move": "Rg7",
-          "isUserMove": false,
-          "comment": "Black must recapture with the f8 rook"
-        },
-        {
-          "move": "Bxg7#",
-          "isUserMove": true,
-          "comment": "Checkmate with the bishop!"
-        }
+      "fen": "2kr2r1/ppb2ppp/3qbn2/2Np2B1/P7/2P2Q1P/1PB2PP1/R4RK1 w - - 5 18",
+      "toMove": "black",
+      "themes": [
+        "tactics"
       ],
-      "hints": ["Sometimes you need to sacrifice material to deliver checkmate", "Look at f7"],
-      "successMessage": "Brilliant! You found the rook sacrifice leading to checkmate!",
-      "failureMessage": "Think about sacrificing material to expose the king."
-    },
-    {
-      "id": "puzzle_0001_003",
-      "title": "Checkmate in 3",
-      "subtitle": "Find the winning combination for White",
-      "fen": "1k1r4/pp1b1R2/3q2pp/4p3/2B5/4Q3/PPP2PPP/2K5 w - - 0 1",
-      "toMove": "white",
-      "themes": ["checkmate", "queen-sacrifice"],
-      "difficulty": 4,
-      "solutionMoves": ["Qxe5+"],
-      "solutionSequence": [
-        {
-          "move": "Qxe5+",
-          "isUserMove": true,
-          "comment": "Queen sacrifice to pull the queen away"
-        },
-        {
-          "move": "Qxe5",
-          "isUserMove": false,
-          "comment": "Black must take the queen"
-        },
-        {
-          "move": "Rf8+",
-          "isUserMove": true,
-          "comment": "Check with the rook"
-        },
-        {
-          "move": "Rxf8",
-          "isUserMove": false,
-          "comment": "Forced recapture"
-        },
-        {
-          "move": "Bg8",
-          "isUserMove": true,
-          "comment": "Checkmate with the bishop!"
-        }
-      ],
-      "hints": ["Look for a forcing sequence starting with a queen sacrifice", "The black king is vulnerable on the back rank"],
-      "successMessage": "Spectacular! You found the beautiful queen sacrifice combination!",
-      "failureMessage": "This is tricky - look for a forcing move that starts with a queen sacrifice."
-    },
-    {
-      "id": "puzzle_0001_004",
-      "title": "Win Material",
-      "subtitle": "Find the best move for White",
-      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 4",
-      "toMove": "white",
-      "themes": ["fork", "knight", "tactics"],
       "difficulty": 2,
-      "solutionMoves": ["Ng5"],
-      "hints": ["Look for a move that attacks two pieces at once", "Knights are great at forking!"],
-      "successMessage": "Great! The knight attacks f7 and creates multiple threats!",
-      "failureMessage": "Try again. Look for a move that attacks multiple targets."
+      "hints": [
+        "You can checkmate in this position!"
+      ],
+      "successMessage": "Excellent! You found the winning move!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "c5e6"
+      ],
+      "solutionSequence": [
+        {
+          "move": "c5e6",
+          "isUserMove": true,
+          "comment": "Move 1"
+        },
+        {
+          "move": "d6h2",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        }
+      ]
     },
     {
-      "id": "puzzle_0001_005",
-      "title": "Simple Endgame",
-      "subtitle": "Deliver checkmate with Queen and King",
-      "fen": "8/8/8/8/8/2K5/1Q6/7k w - - 0 1",
+      "id": "puzzle_zzxWX",
+      "title": "Tactical Puzzle",
+      "subtitle": "Find the winning move for Black",
+      "fen": "3r2rk/1b3p1Q/p4Pp1/3qpBB1/3b4/5R2/PpP3PP/1R5K b - - 0 26",
+      "toMove": "black",
+      "themes": [
+        "tactics"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "You can checkmate in this position!"
+      ],
+      "successMessage": "Excellent! You found the winning move!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "h8h7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "h8h7",
+          "isUserMove": true,
+          "comment": "Move 1"
+        },
+        {
+          "move": "f3h3",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_001KR",
+      "title": "Tactical Puzzle",
+      "subtitle": "Find the winning move for Black",
+      "fen": "6Qk/p1p3pp/4N3/1p6/2q1r1n1/2B5/PP4PP/3R1R1K b - - 0 28",
+      "toMove": "black",
+      "themes": [
+        "tactics"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "You can checkmate in this position!"
+      ],
+      "successMessage": "Excellent! You found the winning move!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "h8g8"
+      ],
+      "solutionSequence": [
+        {
+          "move": "h8g8",
+          "isUserMove": true,
+          "comment": "Move 1"
+        },
+        {
+          "move": "f1f8",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0030b",
+      "title": "Tactical Puzzle",
+      "subtitle": "Find the winning move for Black",
+      "fen": "6k1/5ppp/5nb1/pp6/6rP/5N1Q/Pq2r1P1/3R2RK b - - 4 32",
+      "toMove": "black",
+      "themes": [
+        "tactics"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "The back rank looks vulnerable..."
+      ],
+      "successMessage": "Excellent! You found the winning move!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "g6e4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "g6e4",
+          "isUserMove": true,
+          "comment": "Move 1"
+        },
+        {
+          "move": "d1d8",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        },
+        {
+          "move": "f6e8",
+          "isUserMove": true,
+          "comment": "Move 2"
+        },
+        {
+          "move": "d8e8",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_Ozemm",
+      "title": "Tactical Puzzle",
+      "subtitle": "Find the winning move for White",
+      "fen": "3q1rk1/p4pp1/1p2p3/4B3/bb6/4PN1P/5PP1/1Q2K2R w K - 0 21",
       "toMove": "white",
-      "themes": ["checkmate", "endgame", "queen"],
-      "difficulty": 1,
-      "solutionMoves": ["Qb1#"],
-      "hints": ["Use your queen to cut off the black king's escape squares"],
-      "successMessage": "Perfect! You delivered checkmate with queen and king!",
-      "failureMessage": "Not quite. Try to limit the black king's movement first."
+      "themes": [
+        "tactics"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "You can checkmate in this position!"
+      ],
+      "successMessage": "Excellent! You found the winning move!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b1b4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "b1b4",
+          "isUserMove": true,
+          "comment": "Move 1"
+        },
+        {
+          "move": "d8d1",
+          "isUserMove": false,
+          "comment": "Opponent's response"
+        }
+      ]
     }
   ]
 }

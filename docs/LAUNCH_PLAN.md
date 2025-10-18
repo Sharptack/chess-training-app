@@ -129,6 +129,12 @@ See **[CAMPAIGN_STRUCTURE.md](./CAMPAIGN_STRUCTURE.md)** for complete breakdown.
 **Goal**: Ensure app works on phones and tablets (iOS & Android)
 **Duration**: October 18, 2025 (1 day)
 
+**Additional Fixes** (Post-merge, October 18, 2025):
+- Fixed check/checkmate game auto-revealing answers before user interaction
+- Fixed puzzle_creator.html tool generating invalid FEN notation
+- Created 10 valid check/checkmate positions (was 20, but chess library requires legal positions)
+- Updated ChessBoardWidget with showGameStatus parameter for training games
+
 ### Tasks - ALL COMPLETE ✅
 
 **Responsive Utilities System**:

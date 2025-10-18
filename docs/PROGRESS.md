@@ -30,8 +30,9 @@ Chess learning app for kids with structured lessons, puzzles, and bot games. Cam
 - **Levels**: 10 level placeholders (2 with full content, 8 ready for content)
 - **Puzzles**: 11 puzzles total (5 in L1, 6 in L2 with 2 shared)
 - **Bots/Games**: 4 bot games configured (200-1200 ELO range)
-- **Game Types**: Check vs Checkmate game (20 positions)
+- **Game Types**: Check vs Checkmate game (10 valid positions: 5 check, 5 checkmate)
 - **Features**: Campaigns, Lessons, Puzzles, Games (multiple types), Boss battles all functional
+- **Tools**: puzzle_creator.html for creating custom chess positions with correct FEN notation
 
 ---
 

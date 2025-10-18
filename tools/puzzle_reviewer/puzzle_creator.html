@@ -180,21 +180,6 @@
 
             <div class="controls">
                 <div class="control-group">
-                    <h3>Board Setup</h3>
-                    <button class="secondary" onclick="startPosition()">Starting Position</button>
-                    <button class="secondary" onclick="clearBoard()">Clear Board</button>
-                    <button class="secondary" onclick="flipBoard()">Flip Board</button>
-                </div>
-
-                <div class="control-group">
-                    <h3>Turn to Move</h3>
-                    <div class="turn-selector">
-                        <button class="turn-btn active" id="whiteBtn" onclick="setTurn('w')">White</button>
-                        <button class="turn-btn" id="blackBtn" onclick="setTurn('b')">Black</button>
-                    </div>
-                </div>
-
-                <div class="control-group">
                     <h3>Add/Remove Pieces</h3>
                     <p><small>Click a piece below, then click a square on the board</small></p>
                     <div class="piece-selector">
@@ -212,6 +197,21 @@
                         <button class="piece-btn" data-piece="bK" style="background-image: url('https://chessboardjs.com/img/chesspieces/wikipedia/bK.png')"></button>
                     </div>
                     <button class="danger" onclick="selectTrash()">🗑️ Remove Piece</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Board Setup</h3>
+                    <button class="secondary" onclick="startPosition()">Starting Position</button>
+                    <button class="secondary" onclick="clearBoard()">Clear Board</button>
+                    <button class="secondary" onclick="flipBoard()">Flip Board</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Turn to Move</h3>
+                    <div class="turn-selector">
+                        <button class="turn-btn active" id="whiteBtn" onclick="setTurn('w')">White</button>
+                        <button class="turn-btn" id="blackBtn" onclick="setTurn('b')">Black</button>
+                    </div>
                 </div>
 
                 <div class="control-group">
@@ -243,8 +243,8 @@
 
                     <div class="form-group">
                         <label>Solution Moves (space-separated):</label>
-                        <textarea id="moves" placeholder="e2e4 e7e5 Nf3 Nc6"></textarea>
-                        <small>Format: e2e4 or Nf3 (standard algebraic or UCI notation)</small>
+                        <textarea id="moves" placeholder="e2e4 e7e5 g1f3 b8c6"></textarea>
+                        <small>Format: UCI notation (e2e4, g1f3) - see <a href="../../docs/chess_reference.md" target="_blank">chess_reference.md</a></small>
                     </div>
 
                     <div class="form-group">
@@ -368,7 +368,10 @@
                             fenRow += emptyCount;
                             emptyCount = 0;
                         }
-                        fenRow += piece;
+                        // Convert chessboardjs format (wP, bK) to standard FEN (P, k)
+                        const color = piece.charAt(0); // 'w' or 'b'
+                        const pieceType = piece.charAt(1); // 'P', 'N', 'B', 'R', 'Q', 'K'
+                        fenRow += (color === 'w') ? pieceType : pieceType.toLowerCase();
                     } else {
                         emptyCount++;
                     }
@@ -381,7 +384,7 @@
                 fenRows.push(fenRow);
             });
 
-            return fenRows.join('/') + ' ' + turn + ' KQkq - 0 1';
+            return fenRows.join('/') + ' ' + turn + ' - - 0 1';
         }
 
         function startPosition() {

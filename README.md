@@ -60,7 +60,8 @@ docs/
 ├── PROGRESS.md         # Current status and roadmap
 ├── BACKLOG.md          # Post-launch features (prioritized)
 ├── ARCHITECTURE.md     # Technical documentation
-└── CHANGELOG.md        # Development history (Phases 0-6.7)
+├── CHANGELOG.md        # Development history (Phases 0-6.7)
+└── chess_reference.md  # FEN/SAN notation guide for content creation
 ```
 
 ---
@@ -214,6 +215,7 @@ See [BACKLOG.md](docs/BACKLOG.md) for prioritized features.
 - **[BACKLOG.md](docs/BACKLOG.md)** - Post-launch features
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Technical documentation
 - **[CHANGELOG.md](docs/CHANGELOG.md)** - Development history
+- **[chess_reference.md](docs/chess_reference.md)** - FEN/SAN notation guide for puzzle creation
 
 ---
 

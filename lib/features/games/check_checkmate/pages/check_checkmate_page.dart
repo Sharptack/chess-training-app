@@ -302,6 +302,7 @@ class _CheckCheckmatePageState extends ConsumerState<CheckCheckmatePage> {
                       boardState: _boardState,
                       size: maxSize,
                       showCoordinates: true,
+                      showGameStatus: false, // Don't show check/checkmate - player needs to identify it
                       // Disable moves - this is view-only
                       onMoveMade: null,
                     );
