@@ -4,38 +4,907 @@
   "description": "Learn fundamental chess tactics",
   "puzzles": [
     {
-      "id": "puzzle_009bn",
-      "title": "Tactical Puzzle",
-      "subtitle": "Find the winning move for White",
-      "fen": "2kr2r1/ppb2ppp/3qbn2/2Np2B1/P7/2P2Q1P/1PB2PP1/R4RK1 w - - 5 18",
-      "toMove": "black",
+      "id": "puzzle_0001",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "8/8/8/8/8/5K2/1Q6/3rk3 b - - 0 1",
+      "toMove": "white",
       "themes": [
-        "tactics"
+        "mateIn1"
       ],
-      "difficulty": 2,
+      "difficulty": 1,
       "hints": [
-        "You can checkmate in this position!"
+        "Look for checkmate in one move"
       ],
-      "successMessage": "Excellent! You found the winning move!",
+      "successMessage": "Excellent! Checkmate!",
       "failureMessage": "Not quite right. Try again!",
       "solutionMoves": [
-        "c5e6"
+        "b2f2"
       ],
       "solutionSequence": [
         {
-          "move": "c5e6",
-          "isUserMove": true,
-          "comment": "Move 1"
+          "move": "e1f1",
+          "isUserMove": false,
+          "comment": "Black moves the king"
         },
         {
-          "move": "d6h2",
-          "isUserMove": false,
-          "comment": "Opponent's response"
+          "move": "b2f2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
         }
       ]
     },
     {
-      "id": "puzzle_zzxWX",
+      "id": "puzzle_0002",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1K6/8/8/8/6N1/8/1Q6/4k3 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 1,
+      "hints": [
+        "Look for checkmate in one move"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b2f2"
+      ],
+      "solutionSequence": [
+        {
+          "move": "e1f1",
+          "isUserMove": false,
+          "comment": "Black moves the king"
+        },
+        {
+          "move": "b2f2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0003",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "6K1/8/1B6/8/8/8/1Q6/4k3 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 1,
+      "hints": [
+        "Look for checkmate in one move"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b2f2"
+      ],
+      "solutionSequence": [
+        {
+          "move": "e1f1",
+          "isUserMove": false,
+          "comment": "Black moves the king"
+        },
+        {
+          "move": "b2f2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0004",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "8/4Q3/8/k7/8/2P5/8/6K1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e7b4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a5a4",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "e7b4",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0005",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "K7/4Q3/8/k7/8/8/2N5/8 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e7b4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a5a4",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "e7b4",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0006",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "8/4Q3/8/k7/8/8/6K1/1R6 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e7b4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a5a4",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "e7b4",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0007",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "8/4Q3/8/k7/8/2K5/8/8 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e7b4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a5a4",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "e7b4",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0008",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "5rk1/p4ppp/8/8/P2Q4/2B5/5PPP/5RK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "d4g7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a7a5",
+          "isUserMove": false,
+          "comment": "Black pawn moves"
+        },
+        {
+          "move": "d4g7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0009",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "5rk1/p4ppp/8/8/P5Q1/6R1/5PPP/5RK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "g4g7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a7a5",
+          "isUserMove": false,
+          "comment": "Black pawn moves"
+        },
+        {
+          "move": "g4g7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0010",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1K6/8/8/6B1/5Q2/8/8/4k3 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "f4d3"
+      ],
+      "solutionSequence": [
+        {
+          "move": "e1d1",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "f4d2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0011",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1K6/8/8/6B1/5Q2/8/r7/3k4 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "f4d3"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a2d2",
+          "isUserMove": false,
+          "comment": "Black rook moves"
+        },
+        {
+          "move": "f4d2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0012",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1K6/8/5B2/8/6k1/8/8/2Q5 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "c1g5"
+      ],
+      "solutionSequence": [
+        {
+          "move": "g4h5",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "c1g5",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0013",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "3R4/2p1r1kp/4bnp1/1NPq1p2/K4B2/6P1/5P2/1r1B1Q2 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b5a3"
+      ],
+      "solutionSequence": [
+        {
+          "move": "d5a2",
+          "isUserMove": false,
+          "comment": "Black queen checks the king"
+        },
+        {
+          "move": "b5a3",
+          "isUserMove": true,
+          "comment": "Knight blocks the check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0014",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/2P2P2/8/PP1PP1PP/RNBQKBNR b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Defend against Black's threat"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "g2g3"
+      ],
+      "solutionSequence": [
+        {
+          "move": "d8h4",
+          "isUserMove": false,
+          "comment": "Black queen checks the king"
+        },
+        {
+          "move": "g2g3",
+          "isUserMove": true,
+          "comment": "Pawn blocks the check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0015",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "2r1r1k1/p1q2p1p/Qp4pB/1P6/8/N5NP/P4PP1/R2K3R b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "h6d2"
+      ],
+      "solutionSequence": [
+        {
+          "move": "c7d7",
+          "isUserMove": false,
+          "comment": "Black queen checks the king"
+        },
+        {
+          "move": "h6d2",
+          "isUserMove": true,
+          "comment": "Bishop blocks the check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0016",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "Q2b1R2/6pk/1p5p/1P6/2P5/2N1PB1P/7K/5q2 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "f8f4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "d8c7",
+          "isUserMove": false,
+          "comment": "Black bishop checks the king"
+        },
+        {
+          "move": "f8f4",
+          "isUserMove": true,
+          "comment": "Rook blocks the check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0017",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "2k2r1r/1pp1bN2/p1b2q1p/8/1PB5/P7/2Q2P1P/3R2K1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "f7g5"
+      ],
+      "solutionSequence": [
+        {
+          "move": "f6g5",
+          "isUserMove": false,
+          "comment": "Black queen checks the king"
+        },
+        {
+          "move": "f7g5",
+          "isUserMove": true,
+          "comment": "Pawn captures and blocks"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0018",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1K6/8/8/8/8/8/6QR/2k5 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "g2b2"
+      ],
+      "solutionSequence": [
+        {
+          "move": "c1b1",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "g2b2",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0019",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "6k1/7p/8/5Q2/8/8/7R/6K1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "f5f8"
+      ],
+      "solutionSequence": [
+        {
+          "move": "g8h8",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "f5f8",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0020",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "5rk1/1RQ3pp/8/8/8/8/5PPP/5RK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "c7g7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "f8e8",
+          "isUserMove": false,
+          "comment": "Black rook moves"
+        },
+        {
+          "move": "c7g7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0021",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "6k1/Q2pq1p1/7p/pP1Kp3/8/Pn3PN1/6PP/8 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "d5e4"
+      ],
+      "solutionSequence": [
+        {
+          "move": "e7e6",
+          "isUserMove": false,
+          "comment": "Black queen checks the king"
+        },
+        {
+          "move": "d5e4",
+          "isUserMove": true,
+          "comment": "King moves out of check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0022",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "6qk/1nQ3p1/p6r/4P3/1Kpn1N2/7P/1P4P1/r1B2R2 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b4c3"
+      ],
+      "solutionSequence": [
+        {
+          "move": "d4c2",
+          "isUserMove": false,
+          "comment": "Black knight checks the king"
+        },
+        {
+          "move": "b4c3",
+          "isUserMove": true,
+          "comment": "King moves out of check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0023",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1r2k2r/p3ppbp/1p4p1/4q3/1Q6/P1P5/1PN2PPP/4RRK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b4e7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "e5h5",
+          "isUserMove": false,
+          "comment": "Black queen moves"
+        },
+        {
+          "move": "b4e7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0024",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "r3k2r/p3ppbp/1pq3p1/8/7B/P7/1PP1QPPP/R4RK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e2e7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "a8c8",
+          "isUserMove": false,
+          "comment": "Black rook moves"
+        },
+        {
+          "move": "e2e7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0025",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "3rk2r/pQ2ppbp/1p4p1/2q5/1B6/P7/1PP2PPP/R4RK1 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "b7e7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "c5g5",
+          "isUserMove": false,
+          "comment": "Black queen moves"
+        },
+        {
+          "move": "b7e7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0026",
+      "title": "Escaping Check",
+      "subtitle": "Get out of check",
+      "fen": "3r2k1/p7/1b5p/6pB/P7/8/4PP2/1R2K3 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "escapingCheck"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that gets out of check"
+      ],
+      "successMessage": "Success!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "e1f1"
+      ],
+      "solutionSequence": [
+        {
+          "move": "b6a5",
+          "isUserMove": false,
+          "comment": "Black bishop checks the king"
+        },
+        {
+          "move": "e1f1",
+          "isUserMove": true,
+          "comment": "King moves out of check"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0027",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1k6/6Q1/2K5/8/8/8/8/8 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "g7b7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "b8a8",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "g7b7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0028",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "1k6/2RR4/2K5/8/8/8/8/8 b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "d7d8",
+        "c7c8"
+      ],
+      "solutionSequence": [
+        {
+          "move": "b8a8",
+          "isUserMove": false,
+          "comment": "Black king moves"
+        },
+        {
+          "move": "d7d8",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0029",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
+      "fen": "r4rk1/pbp1qppp/1pn1pn2/3pP3/1b1P1B2/2NQ1N2/PPB2PPP/2KR3R b - - 0 1",
+      "toMove": "white",
+      "themes": [
+        "mateIn1"
+      ],
+      "difficulty": 2,
+      "hints": [
+        "Find the move that delivers checkmate"
+      ],
+      "successMessage": "Excellent! Checkmate!",
+      "failureMessage": "Not quite right. Try again!",
+      "solutionMoves": [
+        "d3h7"
+      ],
+      "solutionSequence": [
+        {
+          "move": "f6d7",
+          "isUserMove": false,
+          "comment": "Black knight moves"
+        },
+        {
+          "move": "d3h7",
+          "isUserMove": true,
+          "comment": "Checkmate!"
+        }
+      ]
+    },
+    {
+      "id": "puzzle_0030",
       "title": "Tactical Puzzle",
       "subtitle": "Find the winning move for Black",
       "fen": "3r2rk/1b3p1Q/p4Pp1/3qpBB1/3b4/5R2/PpP3PP/1R5K b - - 0 26",
@@ -50,120 +919,17 @@
       "successMessage": "Excellent! You found the winning move!",
       "failureMessage": "Not quite right. Try again!",
       "solutionMoves": [
-        "h8h7"
+        "f3h3"
       ],
       "solutionSequence": [
-        {
-          "move": "h8h7",
-          "isUserMove": true,
-          "comment": "Move 1"
-        },
         {
           "move": "f3h3",
           "isUserMove": false,
-          "comment": "Opponent's response"
-        }
-      ]
-    },
-    {
-      "id": "puzzle_001KR",
-      "title": "Tactical Puzzle",
-      "subtitle": "Find the winning move for Black",
-      "fen": "6Qk/p1p3pp/4N3/1p6/2q1r1n1/2B5/PP4PP/3R1R1K b - - 0 28",
-      "toMove": "black",
-      "themes": [
-        "tactics"
-      ],
-      "difficulty": 2,
-      "hints": [
-        "You can checkmate in this position!"
-      ],
-      "successMessage": "Excellent! You found the winning move!",
-      "failureMessage": "Not quite right. Try again!",
-      "solutionMoves": [
-        "h8g8"
-      ],
-      "solutionSequence": [
+          "comment": "Black's winning move"
+        },
         {
-          "move": "h8g8",
+          "move": "h8h7",
           "isUserMove": true,
-          "comment": "Move 1"
-        },
-        {
-          "move": "f1f8",
-          "isUserMove": false,
-          "comment": "Opponent's response"
-        }
-      ]
-    },
-    {
-      "id": "puzzle_0030b",
-      "title": "Tactical Puzzle",
-      "subtitle": "Find the winning move for Black",
-      "fen": "6k1/5ppp/5nb1/pp6/6rP/5N1Q/Pq2r1P1/3R2RK b - - 4 32",
-      "toMove": "black",
-      "themes": [
-        "tactics"
-      ],
-      "difficulty": 2,
-      "hints": [
-        "The back rank looks vulnerable..."
-      ],
-      "successMessage": "Excellent! You found the winning move!",
-      "failureMessage": "Not quite right. Try again!",
-      "solutionMoves": [
-        "g6e4"
-      ],
-      "solutionSequence": [
-        {
-          "move": "g6e4",
-          "isUserMove": true,
-          "comment": "Move 1"
-        },
-        {
-          "move": "d1d8",
-          "isUserMove": false,
-          "comment": "Opponent's response"
-        },
-        {
-          "move": "f6e8",
-          "isUserMove": true,
-          "comment": "Move 2"
-        },
-        {
-          "move": "d8e8",
-          "isUserMove": false,
-          "comment": "Opponent's response"
-        }
-      ]
-    },
-    {
-      "id": "puzzle_Ozemm",
-      "title": "Tactical Puzzle",
-      "subtitle": "Find the winning move for White",
-      "fen": "3q1rk1/p4pp1/1p2p3/4B3/bb6/4PN1P/5PP1/1Q2K2R w K - 0 21",
-      "toMove": "white",
-      "themes": [
-        "tactics"
-      ],
-      "difficulty": 2,
-      "hints": [
-        "You can checkmate in this position!"
-      ],
-      "successMessage": "Excellent! You found the winning move!",
-      "failureMessage": "Not quite right. Try again!",
-      "solutionMoves": [
-        "b1b4"
-      ],
-      "solutionSequence": [
-        {
-          "move": "b1b4",
-          "isUserMove": true,
-          "comment": "Move 1"
-        },
-        {
-          "move": "d8d1",
-          "isUserMove": false,
           "comment": "Opponent's response"
         }
       ]
