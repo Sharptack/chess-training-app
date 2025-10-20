@@ -76,6 +76,9 @@
             <li>Click "Convert to Puzzle Set Format"</li>
             <li>Copy the output from the right box and save to <code>assets/data/puzzles/puzzle_set_XXXX.json</code></li>
         </ol>
+        <p><strong>Note:</strong> The converter automatically determines move order based on the FEN position.
+        If the FEN shows it's the user's turn, their move will be first. If it's the opponent's turn,
+        the opponent's move will be first in the sequence.</p>
     </div>
 
     <div class="form-group">
@@ -164,8 +167,13 @@
                             converted.solutionMoves = p.moveSequence;
                         } else {
                             // Multi-move puzzle - need to determine user vs computer moves
-                            converted.solutionMoves = [p.moveSequence[0]];
-                            converted.solutionSequence = buildSolutionSequence(p.moveSequence, toMove);
+                            // First, determine who moves first based on FEN
+                            const fenToMove = fenParts[1] === 'w' ? 'white' : 'black';
+                            const userMovesFirst = (fenToMove === toMove);
+
+                            // Set solutionMoves to the first USER move
+                            converted.solutionMoves = [userMovesFirst ? p.moveSequence[0] : p.moveSequence[1]];
+                            converted.solutionSequence = buildSolutionSequence(p.moveSequence, toMove, userMovesFirst);
                         }
 
                         return converted;
@@ -213,16 +221,18 @@
             return 5;
         }
 
-        function buildSolutionSequence(moves, startingColor) {
+        function buildSolutionSequence(moves, userColor, userMovesFirst) {
             const sequence = [];
-            let isUserMove = true; // First move is always user
+            let isUserMove = userMovesFirst; // Start with user or opponent based on FEN
 
             for (let i = 0; i < moves.length; i++) {
+                const userMoveNumber = isUserMove ? Math.floor(i / 2) + 1 : Math.floor((i + 1) / 2);
+
                 sequence.push({
                     move: moves[i],
                     isUserMove: isUserMove,
                     comment: isUserMove
-                        ? (i === moves.length - 1 ? 'Winning move!' : `Move ${Math.floor(i / 2) + 1}`)
+                        ? (i === moves.length - 1 ? 'Winning move!' : `Move ${userMoveNumber}`)
                         : 'Opponent\'s response'
                 });
                 isUserMove = !isUserMove;

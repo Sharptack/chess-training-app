@@ -6,75 +6,12 @@ from pathlib import Path
 
 # Load your level themes mapping
 LEVEL_THEMES = {
-    "level_0001": {
-        "title": "Check vs. Checkmate",
-        "themes": ["mate", "mateIn1", "mateIn2"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Focus on recognizing checkmate vs just check"
-    },
-    "level_0002": {
-        "title": "Pawn Promotion",
-        "themes": ["promotion", "advancedPawn", "endgame"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Puzzles where pawn promotion is key to winning"
-    },
-    "level_0003": {
-        "title": "Stopping Check 1 - Capture",
-        "themes": ["capturingDefender", "defensiveMove", "hangingPiece"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Escape check by capturing the attacking piece"
-    },
-    "level_0004": {
-        "title": "Stopping Check 2 - Block",
-        "themes": ["intermezzo", "defensiveMove", "interference"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Block the check with another piece"
-    },
-    "level_0005": {
-        "title": "Stopping Check 3 - Move",
-        "themes": ["kingSafety", "exposedKing", "escapingCheck"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Move the king to safety"
-    },
-    "level_0006": {
-        "title": "Checkmate in 1 with Queen",
-        "themes": ["mateIn1", "queenEndgame", "attackingF2F7"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Simple queen checkmates"
-    },
-    "level_0007": {
-        "title": "Bishop Practice",
-        "themes": ["bishopEndgame", "long", "attraction"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Tactical patterns with bishops"
-    },
-    "level_0008": {
-        "title": "Checkmate in 1 with Queen (Part 2)",
-        "themes": ["mateIn1", "queenEndgame", "smotheredMate"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "More advanced queen checkmates"
-    },
-    "level_0009": {
-        "title": "Knight Practice",
-        "themes": ["knightEndgame", "fork", "doubleCheck"],
-        "rating_range": [600, 800],
-        "max_candidates": 50,
-        "notes": "Basic knight tactics"
-    },
     "level_0010": {
-        "title": "Checkmate in 1 with Rook",
+        "title": "get out of check",
         "themes": ["mateIn1", "rookEndgame", "backRankMate"],
         "rating_range": [600, 800],
         "max_candidates": 50,
-        "notes": "Simple rook checkmates"
+        "notes": "King is in check, find a way to move, block, or capture to get out of check"
     }
 }
 
