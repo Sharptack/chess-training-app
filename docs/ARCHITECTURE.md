@@ -38,14 +38,33 @@ All move data in JSON files MUST use **UCI notation**:
 ```
 
 ### Code Processing
-- The `chess` package's `move()` function accepts **both UCI and SAN**
-- Code uses `makeSanMove()` but it works with UCI data (chess.js compatibility)
+**IMPORTANT:** The `chess` package's `move()` function has different behavior:
+- ✅ Accepts SAN as **string**: `move('Nf3')`
+- ✅ Accepts UCI as **object**: `move({'from': 'e2', 'to': 'e4'})`
+- ❌ Does NOT accept UCI as **string**: `move('e2e4')` fails!
+
+**Our Solution:**
+- `makeUciMove(string)` - Converts UCI strings to object format
+- `makeSanMove(string)` - Passes SAN strings directly
+- Code tries UCI first, then SAN as fallback (for compatibility)
 - Stockfish outputs UCI natively via `bestmove` command
+
+### Move Flow in App
+**ChessBoardWidget → Game Logic:**
+- ChessBoardWidget sends moves in **UCI format** (`e2e4`, `d6h2`)
+- Built from from/to squares: `$from$to$promotion`
+- Matches puzzle data format directly (no conversion needed)
+
+**Internal Processing:**
+- `makeUciMove()` converts UCI string to object before calling chess.js
+- Move validation uses UCI notation from widget
+- Puzzle validation compares UCI to UCI
 
 ### User Display
 - Use **SAN notation** for displaying moves to users
 - Obtained via `getHistory()` which returns SAN
 - **Format**: `e4`, `Nf3`, `Qxf7#` (human-readable)
+- Display only - not used for validation
 
 ### Tools
 - `puzzle_creator.html` - Generates UCI ✅

@@ -1110,6 +1110,10 @@ See [BACKLOG.md](./BACKLOG.md) for future features and enhancements.
 - Fixed check/checkmate game displaying positions before user input
 - Fixed puzzle_creator.html generating invalid FEN notation
 - Created 10 valid check/checkmate positions with proper chess rules
+- **Fixed puzzle moves not working**: chess.js doesn't accept UCI as strings, only as objects
+  - Updated puzzles_page.dart to use makeUciMove() for puzzle move sequences
+  - Fixed puzzle_set_0001.json toMove field (was "black", should be "white")
+  - Code now tries UCI first, then SAN as fallback
 
 ### Tool Improvements
 - **puzzle_creator.html**: Fixed FEN generation to use standard chess notation (P/p instead of wP/bP)

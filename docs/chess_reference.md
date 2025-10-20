@@ -121,6 +121,24 @@ e5d6        - En passant capture
 - ✅ Works for all moves including castling and promotions
 - ✅ Used by Lichess puzzles and UCI chess engines
 
+#### **CRITICAL: chess.js Library Quirk**
+The chess.js `move()` function behaves differently for UCI:
+```javascript
+// ✅ WORKS: UCI as object
+chess.move({from: 'e2', to: 'e4'})
+
+// ❌ FAILS: UCI as string
+chess.move('e2e4')
+
+// ✅ WORKS: SAN as string
+chess.move('e4')
+```
+
+**Our wrapper functions handle this:**
+- `makeUciMove(string)` - Converts UCI strings to object format
+- `makeSanMove(string)` - Passes strings directly to chess.js
+- Data uses UCI strings, code converts before passing to chess.js
+
 #### Promotion
 - Append lowercase piece letter: `e7e8q`, `a7a8n`
 - Letters: `q`, `r`, `b`, `n` (never `k` or `p`)
@@ -448,13 +466,160 @@ After a move is made:
 4. **Halfmove clock** - Usually `0` for puzzles
 5. **Move number** - Can be `1` for puzzles (doesn't matter)
 
+### Puzzle Data Structure
+
+This app uses two types of puzzles: **single-move** and **multi-move** puzzles.
+
+#### Two Puzzle Formats
+
+**Format 1: User Moves First (Simple Puzzles)**
+- FEN shows the user's turn to move
+- User makes the first (and possibly only) move
+- Best for simple tactical puzzles
+
+**Format 2: Opponent Moves First (After-Move Puzzles)**
+- FEN shows the opponent's turn to move
+- `solutionSequence` starts with opponent move (`isUserMove: false`)
+- Opponent move plays automatically
+- Then user responds with winning move
+- Best for "find the best response" puzzles
+- `toMove` field indicates which side the USER plays (not who moves first in FEN)
+
+#### Single-Move Puzzles
+
+For simple tactical puzzles where the user makes one winning move:
+
+```json
+{
+  "id": "puzzle_001",
+  "title": "Checkmate in 1",
+  "subtitle": "Find the winning move for White",
+  "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+  "toMove": "white",
+  "themes": ["checkmate"],
+  "difficulty": 1,
+  "solutionMoves": ["e1e8"],
+  "hints": ["Look for back rank weakness"],
+  "successMessage": "Excellent! Checkmate!",
+  "failureMessage": "Not quite right. Try again!"
+}
+```
+
+**Key Points:**
+- `toMove` must match the side to move in the FEN (the `w` or `b` in field 2)
+- `solutionMoves` contains the user's winning move(s) in UCI notation
+- No `solutionSequence` field needed for single-move puzzles
+
+#### Multi-Move Puzzles - Format 1 (User First)
+
+For tactical sequences where the user initiates the combination:
+
+```json
+{
+  "id": "puzzle_002",
+  "title": "Mate in 2",
+  "subtitle": "Find the brilliant combination for White",
+  "fen": "r1b1kb1r/pppp1ppp/8/4n3/2B1P2q/2N5/PPPP1PPP/R1BQK2R w KQkq - 0 7",
+  "toMove": "white",
+  "themes": ["checkmate", "sacrifice"],
+  "difficulty": 4,
+  "solutionMoves": ["d1h5"],
+  "solutionSequence": [
+    {
+      "move": "d1h5",
+      "isUserMove": true,
+      "comment": "Threatening mate on f7"
+    },
+    {
+      "move": "e5c4",
+      "isUserMove": false,
+      "comment": "Black tries to defend"
+    },
+    {
+      "move": "h5f7",
+      "isUserMove": true,
+      "comment": "Checkmate!"
+    }
+  ],
+  "hints": ["Look for forcing moves"],
+  "successMessage": "Brilliant! You found the sequence!",
+  "failureMessage": "Look for moves that create multiple threats."
+}
+```
+
+**Sequence Flow:**
+1. Puzzle loads with FEN (white to move, user's turn)
+2. User makes first move (`isUserMove: true`)
+3. App automatically makes opponent response (`isUserMove: false`)
+4. User makes next move (`isUserMove: true`)
+5. Continue until sequence complete or checkmate
+
+#### Multi-Move Puzzles - Format 2 (Opponent First)
+
+For puzzles where user must find the best response to opponent's move:
+
+```json
+{
+  "id": "puzzle_003",
+  "title": "Tactical Puzzle",
+  "subtitle": "Find the winning move for Black",
+  "fen": "2kr2r1/ppb2ppp/3qbn2/2Np2B1/P7/2P2Q1P/1PB2PP1/R4RK1 w - - 5 18",
+  "toMove": "black",
+  "themes": ["tactics"],
+  "difficulty": 2,
+  "solutionMoves": ["d6h2"],
+  "solutionSequence": [
+    {
+      "move": "c5e6",
+      "isUserMove": false,
+      "comment": "White plays Ne6"
+    },
+    {
+      "move": "d6h2",
+      "isUserMove": true,
+      "comment": "Black delivers checkmate"
+    }
+  ],
+  "hints": ["You can checkmate in this position!"],
+  "successMessage": "Excellent! You found the winning move!",
+  "failureMessage": "Not quite right. Try again!"
+}
+```
+
+**Key Points:**
+- FEN shows white to move (opponent's turn)
+- `toMove: "black"` indicates USER plays black (not who moves first!)
+- `solutionSequence` **starts with opponent's move** (`isUserMove: false`)
+- Opponent move plays automatically after puzzle loads
+- Then user responds with winning move
+
+**Sequence Flow:**
+1. Puzzle loads with FEN (opponent's turn)
+2. App automatically makes opponent's move (`isUserMove: false`)
+3. User makes winning response (`isUserMove: true`)
+4. Puzzle complete
+
+#### General Rules for All Puzzles
+
+**Key Points:**
+- `toMove` field indicates which side the USER plays
+- `solutionMoves` contains only the user's moves in UCI notation
+- `solutionSequence` (if present) contains the complete move sequence
+- Opponent moves (`isUserMove: false`) are played automatically by the app
+- Each move must be in UCI notation
+- ChessBoardWidget sends moves in UCI format to match data
+
 ### Puzzle Solution Format
 
 **For this app:** MUST use **UCI notation** in all JSON data files:
 
 ```json
 "solutionMoves": ["e2e4", "g1f3"],
-"moveSequence": ["d8h4", "g2g3", "h4e1"]
+"solutionSequence": [
+  {"move": "d8h4", "isUserMove": true, "comment": "Attack!"},
+  {"move": "g2g3", "isUserMove": false, "comment": "Defending"},
+  {"move": "h4e1", "isUserMove": true, "comment": "Checkmate"}
+]
 ```
 
 **For display/documentation only:** SAN notation with move numbers:
