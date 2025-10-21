@@ -30,7 +30,7 @@ class ChessBoardWidget extends StatefulWidget {
     this.onMoveMade,
     this.onIllegalMove,
     this.validateMove,
-    this.showGameStatus = true, // Default to true for backward compatibility
+    this.showGameStatus = false, // Default to false - don't show check/checkmate overlays
   });
   
   @override
@@ -324,8 +324,10 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   }
   
   void _attemptMove(String from, String to, {String? promotion}) {
-  // First, try to get the SAN notation WITHOUT making the move
-  // We need to check what the move would be called to validate it
+  // Build UCI notation
+  final uciMove = promotion != null ? '$from$to$promotion' : '$from$to';
+
+  // First, try to make the move to validate it
   final tempSuccess = widget.boardState.makeMove(from, to, promotion: promotion);
 
   if (!tempSuccess) {
@@ -333,17 +335,17 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
     return;
   }
 
-  // Get the SAN notation from the move that was just made
-  final moveNotation = widget.boardState.moveHistory.isNotEmpty
+  // Get the SAN notation for validation (if needed)
+  final sanNotation = widget.boardState.moveHistory.isNotEmpty
       ? widget.boardState.moveHistory.last
-      : '$from$to';
+      : uciMove;
 
   // Undo the move so we can validate it first
   widget.boardState.undoMove();
 
-  // Validate the move if validator is provided
+  // Validate the move if validator is provided (uses SAN for compatibility)
   if (widget.validateMove != null) {
-    final isAllowed = widget.validateMove!(moveNotation);
+    final isAllowed = widget.validateMove!(sanNotation);
     if (!isAllowed) {
       // Move is not allowed by game rules (e.g., restriction)
       widget.onIllegalMove?.call();
@@ -355,8 +357,8 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   final success = widget.boardState.makeMove(from, to, promotion: promotion);
 
   if (success) {
-    // Call the callback with the SAN notation
-    widget.onMoveMade?.call(moveNotation);
+    // Call the callback with UCI notation (our standard format)
+    widget.onMoveMade?.call(uciMove);
   } else {
     widget.onIllegalMove?.call();
   }

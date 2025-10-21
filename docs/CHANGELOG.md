@@ -4,6 +4,49 @@ Complete history of all development phases with implementation details.
 
 ---
 
+## October 20, 2025: Puzzle and Game Improvements ✅
+
+### Puzzle Fixes
+- **Fixed puzzle 30 solution**: Corrected solutionSequence to match actual checkmate (Kxh7, Rh3#)
+- **Fixed puzzle set 0001**: Renumbered all puzzles 0001-0030, fixed FEN side-to-move, standardized themes
+- **Fixed multiple solutions support**: Multi-move puzzles now accept all moves in solutionMoves array
+- **Fixed puzzle replay**: Puzzles can now be replayed even after completion
+- **Fixed success message display**: Success messages now appear correctly on puzzle completion
+- **Added reset progress button**: Users can reset all puzzle progress for a level via menu
+
+### Game Improvements
+- **Fixed move history display**: Moves now shown in SAN notation (e.g., "e4", "Nf3") instead of UCI
+- **Added checkmate reason to status**: Game end now shows "You won! Checkmate" with reason
+- **Enabled checkmate overlay**: Added showCheckStatus to Level 1 bots for visual "Checkmate!" display
+
+### Tool Improvements
+- **Updated puzzle converter**: Now properly handles opponent-first puzzles with correct move ordering
+- **Cleaned up puzzle importer**: Removed unused level configurations
+
+### Documentation Updates
+- **Added comprehensive puzzle format docs**: Documented both user-first and opponent-first puzzle formats
+- **Added chess.js UCI quirk documentation**: Explained UCI string vs object handling
+- **Updated ARCHITECTURE.md**: Added move flow documentation and critical notes
+- **Updated chess_reference.md**: Added complete puzzle data structure examples
+
+### Bug Fixes
+- **Fixed puzzle completion detection**: Puzzles now properly complete and show feedback
+- **Fixed invalid chess positions**: Corrected FENs with missing kings
+- **Fixed move g4j5 to g4h5**: Corrected invalid move notation
+- **Improved debug logging**: Added detailed flags for puzzle state debugging
+
+### Files Modified
+- `assets/data/puzzles/puzzle_set_0001.json` - All 30 puzzles corrected and standardized
+- `assets/data/bots/bots.json` - Added showCheckStatus to Level 1 bots
+- `lib/core/game_logic/game_state.dart` - SAN notation for move history
+- `lib/features/play/pages/play_page.dart` - Added game over reason display
+- `lib/data/models/puzzle.dart` - Multiple solution support for multi-move puzzles
+- `lib/features/puzzles/pages/puzzles_page.dart` - Replay support and reset button
+- `tools/puzzle_converter/convert_puzzles.html` - Opponent-first puzzle support
+- `docs/*` - Comprehensive documentation updates
+
+---
+
 ## Phase 7.3: Mobile Responsiveness ✅ COMPLETE
 **Branch**: phase-7.3-mobile-responsiveness
 **Status**: Complete

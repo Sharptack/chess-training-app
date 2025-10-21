@@ -144,6 +144,7 @@ class GameView extends StatelessWidget {
                     size: size,
                     onMoveMade: gameState.onHumanMove,
                     validateMove: gameState.validateMove,
+                    showGameStatus: gameState.botConfig.showCheckStatus,
                     onIllegalMove: () {
                       // Don't show snackbar for restriction errors - they're shown in the banner
                       if (gameState.lastMoveRestrictionError == null) {

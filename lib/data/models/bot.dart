@@ -12,6 +12,7 @@ class Bot extends Equatable {
   final Map<int, List<String>>? allowedMoves; // Move number -> list of allowed SAN moves
   final int minMovesForCompletion;
   final bool allowUndo; // Whether undo button is available for this game
+  final bool showCheckStatus; // Whether to show check/checkmate overlays on the board
 
   const Bot({
     required this.id,
@@ -24,6 +25,7 @@ class Bot extends Equatable {
     this.allowedMoves,
     this.minMovesForCompletion = 10,
     this.allowUndo = true, // Default: undo is allowed
+    this.showCheckStatus = false, // Default: don't show check overlays
   });
 
   factory Bot.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,7 @@ class Bot extends Equatable {
       allowedMoves: allowedMoves,
       minMovesForCompletion: json['minMovesForCompletion'] as int? ?? 10,
       allowUndo: json['allowUndo'] as bool? ?? true,
+      showCheckStatus: json['showCheckStatus'] as bool? ?? false,
     );
   }
 
@@ -75,6 +78,7 @@ class Bot extends Equatable {
       'allowedMoves': movesJson,
       'minMovesForCompletion': minMovesForCompletion,
       'allowUndo': allowUndo,
+      'showCheckStatus': showCheckStatus,
     };
   }
 
@@ -88,5 +92,5 @@ class Bot extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, elo, style, weaknesses, engineSettings, startingFen, allowedMoves, minMovesForCompletion, allowUndo];
+  List<Object?> get props => [id, name, elo, style, weaknesses, engineSettings, startingFen, allowedMoves, minMovesForCompletion, allowUndo, showCheckStatus];
 }

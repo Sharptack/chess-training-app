@@ -220,14 +220,32 @@ Future<void> markLevelPuzzlesCompleted(WidgetRef ref, String levelId) async {
 /// Get puzzle progress for a specific puzzle
 final puzzleProgressProvider = FutureProvider.family<Progress, String>(
   (ref, String key) async {
-    // Key format: levelId_puzzleId
+    // Key format: puzzle_levelId_puzzleId (e.g., 'puzzle_level_0001_puzzle_0001')
     final parts = key.split('_');
-    if (parts.length < 2) {
-      throw ArgumentError('Invalid puzzle progress key format');
+    if (parts.length < 3 || parts[0] != 'puzzle') {
+      throw ArgumentError('Invalid puzzle progress key format. Expected: puzzle_levelId_puzzleId');
     }
-    final levelId = parts[0];
-    final puzzleId = parts.sublist(1).join('_');
-    
+    // Skip the first 'puzzle' prefix, take the levelId parts, then puzzleId parts
+    // For 'puzzle_level_0001_puzzle_0001', we want:
+    // - levelId: 'level_0001' (parts[1] + '_' + parts[2])
+    // - puzzleId: 'puzzle_0001' (parts[3] + '_' + parts[4])
+
+    // Find the second 'puzzle' occurrence to split levelId and puzzleId
+    int puzzleIdStartIndex = -1;
+    for (int i = 1; i < parts.length; i++) {
+      if (parts[i] == 'puzzle') {
+        puzzleIdStartIndex = i;
+        break;
+      }
+    }
+
+    if (puzzleIdStartIndex == -1) {
+      throw ArgumentError('Could not find puzzleId in key: $key');
+    }
+
+    final levelId = parts.sublist(1, puzzleIdStartIndex).join('_');
+    final puzzleId = parts.sublist(puzzleIdStartIndex).join('_');
+
     final repo = ref.watch(progressRepositoryProvider);
     return repo.getLessonProgress('puzzle_$levelId', puzzleId);
   },

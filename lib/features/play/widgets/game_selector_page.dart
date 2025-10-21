@@ -121,7 +121,7 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
   }
   
   Widget _buildOverallProgress() {
-    // Show combined progress for all bots, using requiredGames from Level config
+    // Show combined progress for all games in the level
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -147,19 +147,20 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
                       return const Text('Error loading level config');
                     }
                     final level = result.data!;
-                    return FutureBuilder<int>(
-                      future: _calculateTotalGames(),
-                      builder: (context, gamesSnapshot) {
-                        final totalGames = gamesSnapshot.data ?? 0;
-                        final totalRequired = level.requiredGames * widget.bots.length;
+                    return FutureBuilder<(int, int)>(
+                      future: _calculateGameProgress(level),
+                      builder: (context, progressSnapshot) {
+                        final progress = progressSnapshot.data ?? (0, 0);
+                        final completedGames = progress.$1;
+                        final totalGames = progress.$2;
                         return Column(
                           children: [
                             LinearProgressIndicator(
-                              value: (totalGames / totalRequired).clamp(0.0, 1.0),
+                              value: totalGames > 0 ? (completedGames / totalGames).clamp(0.0, 1.0) : 0.0,
                               minHeight: 8,
                             ),
                             const SizedBox(height: 4),
-                            Text('$totalGames / $totalRequired completions'),
+                            Text('$completedGames / $totalGames games complete'),
                           ],
                         );
                       },
@@ -230,7 +231,7 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
               ),
               trailing: _selectedBot?.id == bot.id
                 ? const Icon(Icons.check_circle, color: Colors.green)
-                : progress.isComplete 
+                : progress.gamesPlayed >= progress.gamesRequired
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () => setState(() => _selectedBot = bot),
@@ -306,7 +307,7 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
                 ),
                 trailing: _selectedGame?.id == game.id
                   ? const Icon(Icons.check_circle, color: Colors.green)
-                  : progress.isComplete
+                  : progress.gamesPlayed >= game.completionsRequired
                     ? const Icon(Icons.check, color: Colors.green)
                     : null,
                 onTap: () => setState(() {
@@ -349,7 +350,7 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
                 ),
                 trailing: _selectedGame?.id == game.id
                   ? const Icon(Icons.check_circle, color: Colors.green)
-                  : progress.isComplete
+                  : progress.completions >= game.completionsRequired
                     ? const Icon(Icons.check, color: Colors.green)
                     : null,
                 onTap: () => setState(() {
@@ -392,24 +393,51 @@ class _GameSelectorPageState extends ConsumerState<GameSelectorPage> {
     );
   }
   
-  Future<int> _calculateTotalGames() async {
-    // Get level config to know requiredGames
-    final levelResult = await ref.read(levelRepositoryProvider).getLevelById(widget.levelId);
-    if (levelResult.isError) return 0;
-    final level = levelResult.data!;
+  Future<(int, int)> _calculateGameProgress(dynamic level) async {
+    // Returns (completedGames, totalGames)
+    // Each game has a completionsRequired - once met, it counts as 1 complete game
 
-    int total = 0;
-    for (final bot in widget.bots) {
-      final progress = await ref.read(
-        botProgressProvider('${widget.levelId}_${bot.id}').future
-      );
-      // Only count up to requiredGames per bot (cap excess games)
-      final cappedGames = progress.gamesPlayed > level.requiredGames
-        ? level.requiredGames
-        : progress.gamesPlayed;
-      total += cappedGames;
+    if (level.games.isEmpty) {
+      // Legacy: use botIds and requiredGames
+      int completedBots = 0;
+      int totalBots = widget.bots.length;
+
+      for (final bot in widget.bots) {
+        final progress = await ref.read(
+          botProgressProvider('${widget.levelId}_${bot.id}').future
+        );
+        if (progress.gamesPlayed >= level.requiredGames) {
+          completedBots++;
+        }
+      }
+      return (completedBots, totalBots);
     }
-    return total;
+
+    // New: use games array
+    int completedGames = 0;
+    int totalGames = level.games.length as int;
+
+    for (final game in level.games) {
+      if (game.type == GameType.bot) {
+        // For bot games, check if gamesPlayed >= completionsRequired
+        final progress = await ref.read(
+          botProgressProvider('${widget.levelId}_${game.botId}').future
+        );
+        if (progress.gamesPlayed >= game.completionsRequired) {
+          completedGames++;
+        }
+      } else {
+        // For non-bot games (like check_checkmate), check game progress
+        final progress = await ref.read(
+          gameProgressProvider(game.id).future
+        );
+        if (progress.completions >= game.completionsRequired) {
+          completedGames++;
+        }
+      }
+    }
+
+    return (completedGames, totalGames);
   }
   
   Color _getDifficultyColor(int level) {
