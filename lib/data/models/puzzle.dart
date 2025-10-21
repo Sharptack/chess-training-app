@@ -63,23 +63,29 @@ class Puzzle {
     if (!isMultiMove) {
       return isSolutionMove(move);
     }
-    
+
     if (stepIndex >= solutionSequence!.length) {
       return false;
     }
-    
+
     final expectedStep = solutionSequence![stepIndex];
-    
+
     if (!expectedStep.isUserMove) {
       return false;
     }
-    
+
     final cleanMove = _cleanMoveNotation(move);
     final cleanExpected = _cleanMoveNotation(expectedStep.move);
-    
-    return cleanMove == cleanExpected || 
-           cleanExpected.startsWith(cleanMove) || 
-           cleanMove.startsWith(cleanExpected);
+
+    // First check the expected move in the sequence
+    if (cleanMove == cleanExpected ||
+        cleanExpected.startsWith(cleanMove) ||
+        cleanMove.startsWith(cleanExpected)) {
+      return true;
+    }
+
+    // Also check against ALL solution moves (for puzzles with multiple solutions)
+    return isSolutionMove(move);
   }
   
   /// Get computer's response move at given step
