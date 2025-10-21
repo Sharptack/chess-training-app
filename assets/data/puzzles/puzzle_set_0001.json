@@ -919,16 +919,16 @@
       "successMessage": "Excellent! Checkmate!",
       "failureMessage": "Not quite right. Try again!",
       "solutionMoves": [
-        "h7g8"
+        "f3h3"
       ],
       "solutionSequence": [
         {
           "move": "h8h7",
           "isUserMove": false,
-          "comment": "Black rook moves"
+          "comment": "Black king takes queen"
         },
         {
-          "move": "h7g8",
+          "move": "f3h3",
           "isUserMove": true,
           "comment": "Checkmate!"
         }
