@@ -928,7 +928,7 @@
           "comment": "Black rook moves"
         },
         {
-          "move": "f3h3",
+          "move": "h7g8",
           "isUserMove": true,
           "comment": "Checkmate!"
         }
