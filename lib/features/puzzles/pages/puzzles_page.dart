@@ -372,6 +372,76 @@ void _markPuzzleCompleted() {
     }
   }
 
+  void _showResetProgressDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset All Progress?'),
+        content: const Text(
+          'This will reset all puzzle progress for this level. '
+          'You can replay all puzzles from the beginning. '
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetAllProgress();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _resetAllProgress() async {
+    if (_puzzleSet == null) return;
+
+    final repo = ref.read(progressRepositoryProvider);
+
+    // Reset each individual puzzle
+    for (final puzzle in _puzzleSet!.puzzles) {
+      await repo.resetLesson('puzzle_${widget.levelId}', puzzle.id);
+    }
+
+    // Reset the overall level puzzles completion
+    await repo.resetLesson('puzzles', widget.levelId);
+
+    // Clear the local completed set
+    setState(() {
+      _completedPuzzleIds.clear();
+      _currentPuzzleIndex = 0;
+      _puzzleSolved = false;
+      _showingFeedback = false;
+    });
+
+    // Invalidate all providers to refresh UI
+    ref.invalidate(lessonProgressProvider('puzzles_${widget.levelId}'));
+    ref.invalidate(levelPuzzleProgressProvider(widget.levelId));
+    ref.invalidate(bossUnlockRequirementsProvider(widget.levelId));
+
+    // Reload the first puzzle
+    _loadCurrentPuzzle();
+
+    // Show confirmation
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All puzzle progress has been reset'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   void _showHint() {
     if (_currentPuzzle != null && _currentPuzzle!.hints.isNotEmpty) {
       final hint = _currentPuzzle!.hints.first;
@@ -537,6 +607,27 @@ void _markPuzzleCompleted() {
       appBar: AppBar(
         title: Text('Puzzles - Level ${widget.levelId}'),
         elevation: 0,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'reset_progress') {
+                _showResetProgressDialog();
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'reset_progress',
+                child: Row(
+                  children: [
+                    Icon(Icons.restart_alt),
+                    SizedBox(width: 8),
+                    Text('Reset All Progress'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: AsyncValueView(
         asyncValue: puzzleSetAsync,
