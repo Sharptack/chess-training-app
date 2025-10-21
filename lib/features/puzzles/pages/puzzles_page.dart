@@ -64,16 +64,15 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     _completedPuzzleIds.clear();
     if (_puzzleSet != null) {
       for (final puzzle in _puzzleSet!.puzzles) {
-        final progressKey = '${widget.levelId}_${puzzle.id}';
+        // Use the same key format as markPuzzleCompleted: 'puzzle_levelId_puzzleId'
+        final progressKey = 'puzzle_${widget.levelId}_${puzzle.id}';
         final progressAsync = await ref.read(puzzleProgressProvider(progressKey).future);
-        // Fix: Use the correct property name from Progress model
-        // Progress likely has 'completed' or 'completedAt' instead of 'isCompleted'
-        if (progressAsync.completed) {  // Changed from isCompleted to completed
+        if (progressAsync.completed) {
           _completedPuzzleIds.add(puzzle.id);
         }
       }
     }
-    // print('DEBUG: Loaded ${_completedPuzzleIds.length} completed puzzles');
+    print('DEBUG: Loaded ${_completedPuzzleIds.length} completed puzzles from storage');
   }
   
   void _findNextIncompletePuzzle() {
@@ -100,7 +99,7 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
         // print('DEBUG: Loading puzzle: ${puzzle.title}');
         setState(() {
           _currentPuzzle = puzzle;
-          _puzzleSolved = _completedPuzzleIds.contains(puzzle.id);
+          _puzzleSolved = false; // Always allow the puzzle to be played, even if completed before
           _showingFeedback = false;
           _loadPuzzlePosition(puzzle);
         });
@@ -115,12 +114,24 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
       if (!success) {
         throw Exception('Invalid FEN: ${puzzle.fen}');
       }
-      
+
       // Reset multi-move tracking
       _currentStepIndex = 0;
       _isComputerMoving = false;
-      
+
       setState(() {});
+
+      // Check if there's an initial computer move to make
+      if (puzzle.solutionSequence != null &&
+          puzzle.solutionSequence!.isNotEmpty &&
+          !puzzle.solutionSequence!.first.isUserMove) {
+        // Make the opponent's first move automatically
+        Future.delayed(Duration(milliseconds: 500), () {
+          final firstMove = puzzle.solutionSequence!.first.move;
+          print('DEBUG: Making initial opponent move: $firstMove');
+          _makeComputerMove(firstMove);
+        });
+      }
     } catch (e) {
       print('DEBUG: Error loading puzzle position: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -137,7 +148,7 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
     print('DEBUG PuzzlesPage: Current step: $_currentStepIndex');
     
     if (_puzzleSolved || _showingFeedback || _isComputerMoving) {
-      print('DEBUG PuzzlesPage: Ignoring move - puzzle solved/feedback/computer moving');
+      print('DEBUG PuzzlesPage: Ignoring move - _puzzleSolved=$_puzzleSolved, _showingFeedback=$_showingFeedback, _isComputerMoving=$_isComputerMoving');
       return;
     }
 
@@ -147,13 +158,13 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
       // Check if this is a multi-move puzzle
       if (_currentPuzzle!.isMultiMove) {
         // Debug the expected move at this step
-        if (_currentPuzzle!.solutionSequence != null && 
+        if (_currentPuzzle!.solutionSequence != null &&
             _currentStepIndex < _currentPuzzle!.solutionSequence!.length) {
           final expectedStep = _currentPuzzle!.solutionSequence![_currentStepIndex];
           print('DEBUG PuzzlesPage: Expected move at step $_currentStepIndex: ${expectedStep.move}');
           print('DEBUG PuzzlesPage: Is user move? ${expectedStep.isUserMove}');
         }
-        
+
         isCorrect = _currentPuzzle!.isCorrectMoveAtStep(move, _currentStepIndex);
         print('DEBUG PuzzlesPage: Multi-move puzzle - move correct at step $_currentStepIndex? $isCorrect');
         
@@ -216,10 +227,14 @@ class _PuzzlesPageState extends ConsumerState<PuzzlesPage> {
 
     // Delay to make it feel like computer is thinking
     await Future.delayed(Duration(milliseconds: GameConstants.computerMoveDelayMs));
-    
-    // Make the computer's move
-    final success = _boardState.makeSanMove(move);
-    
+
+    // Make the computer's move - puzzle data uses UCI format (our standard)
+    // Try UCI first, then SAN as fallback for legacy compatibility
+    bool success = _boardState.makeUciMove(move);
+    if (!success) {
+      success = _boardState.makeSanMove(move);
+    }
+
     if (success) {
       print('DEBUG PuzzlesPage: Computer moved: $move');
       _currentStepIndex++;
