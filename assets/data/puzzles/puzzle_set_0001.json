@@ -905,32 +905,32 @@
     },
     {
       "id": "puzzle_0030",
-      "title": "Tactical Puzzle",
-      "subtitle": "Find the winning move for Black",
+      "title": "Checkmate in One",
+      "subtitle": "Deliver checkmate for White",
       "fen": "3r2rk/1b3p1Q/p4Pp1/3qpBB1/3b4/5R2/PpP3PP/1R5K b - - 0 26",
-      "toMove": "black",
+      "toMove": "white",
       "themes": [
-        "tactics"
+        "mateIn1"
       ],
       "difficulty": 2,
       "hints": [
-        "You can checkmate in this position!"
+        "Find the move that delivers checkmate"
       ],
-      "successMessage": "Excellent! You found the winning move!",
+      "successMessage": "Excellent! Checkmate!",
       "failureMessage": "Not quite right. Try again!",
       "solutionMoves": [
-        "f3h3"
+        "h7g8"
       ],
       "solutionSequence": [
         {
-          "move": "f3h3",
+          "move": "h8h7",
           "isUserMove": false,
-          "comment": "Black's winning move"
+          "comment": "Black rook moves"
         },
         {
-          "move": "h8h7",
+          "move": "f3h3",
           "isUserMove": true,
-          "comment": "Opponent's response"
+          "comment": "Checkmate!"
         }
       ]
     }
