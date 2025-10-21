@@ -27,7 +27,8 @@
       "randomBlunderChance": 0.7
     },
     "weaknesses": ["hangs_pieces", "no_planning"],
-    "minMovesForCompletion": 10
+    "minMovesForCompletion": 10,
+    "showCheckStatus": true
   },
   "bot_002": {
     "id": "bot_002",
@@ -42,7 +43,8 @@
       "contempt": -30
     },
     "weaknesses": ["too_passive"],
-    "minMovesForCompletion": 10
+    "minMovesForCompletion": 10,
+    "showCheckStatus": true
   },
   "bot_003_endgame": {
     "id": "bot_003_endgame",
@@ -58,6 +60,7 @@
     "weaknesses": [],
     "minMovesForCompletion": 5,
     "startingFen": "8/5k2/8/8/8/8/4K3/6R1 w - - 0 1",
+    "showCheckStatus": true,
     "comment": "Example: Rook endgame - King and Rook vs King"
   },
   "bot_004_opening": {
