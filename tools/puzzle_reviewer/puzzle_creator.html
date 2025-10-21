@@ -270,7 +270,13 @@
             <!-- Tab 2: Library -->
             <div class="tab-content" id="library-tab">
                 <h3>Saved Puzzles (<span id="puzzleCount">0</span>)</h3>
-                <button class="primary" onclick="exportAllPuzzles()">📥 Export All</button>
+                <div class="info-box" style="background: #e3f2fd;">
+                    <strong>Export Formats:</strong><br>
+                    • <strong>Simple Format:</strong> For use with convert_puzzles.py (recommended)<br>
+                    • <strong>App Format:</strong> Ready to use in app (advanced)
+                </div>
+                <button class="primary" onclick="exportAllPuzzles()">📥 Export Simple Format</button>
+                <button class="secondary" onclick="exportAppFormat()">📥 Export App Format</button>
                 <button class="danger" onclick="clearLibrary()">🗑️ Clear Library</button>
                 <div class="puzzle-list" id="puzzleList"></div>
             </div>
@@ -590,6 +596,85 @@
 
             $('[onclick*="' + tabName + '"]').addClass('active');
             $('#' + tabName + '-tab').addClass('active');
+        }
+
+        function exportAppFormat() {
+            if (puzzleLibrary.length === 0) {
+                alert('No puzzles to export!');
+                return;
+            }
+
+            // Prompt for level metadata
+            const levelId = prompt('Enter Level ID (e.g., 0001):', '0001');
+            if (!levelId) return;
+
+            const title = prompt('Enter Level Title:', 'Custom Puzzles');
+            if (!title) return;
+
+            const description = prompt('Enter Level Description:', 'Practice tactical patterns');
+            if (!description) return;
+
+            // Convert to app format
+            const convertedPuzzles = puzzleLibrary.map((puzzle, index) => {
+                const fenParts = puzzle.fen.split(' ');
+                const toMove = fenParts[1] === 'w' ? 'white' : 'black';
+                const moves = puzzle.moveSequence;
+
+                // Build solution sequence (alternating user/opponent)
+                const solutionSequence = [];
+                let isUserMove = false; // Opponent moves first
+
+                moves.forEach((move, i) => {
+                    solutionSequence.push({
+                        move: move,
+                        isUserMove: isUserMove,
+                        comment: i === moves.length - 1 ? 'Winning move!' :
+                                (isUserMove ? 'Continue' : 'Opponent moves')
+                    });
+                    isUserMove = !isUserMove;
+                });
+
+                // Extract user moves
+                const userMoves = solutionSequence
+                    .filter(s => s.isUserMove)
+                    .map(s => s.move);
+
+                return {
+                    id: puzzle.id,
+                    title: puzzle.themes && puzzle.themes[0] ?
+                        puzzle.themes[0].charAt(0).toUpperCase() + puzzle.themes[0].slice(1) :
+                        'Tactical Puzzle',
+                    subtitle: `Find the best move for ${toMove === 'white' ? 'White' : 'Black'}`,
+                    fen: puzzle.fen,
+                    toMove: toMove,
+                    themes: puzzle.themes || ['custom'],
+                    difficulty: Math.min(5, Math.max(1, Math.floor((puzzle.rating || 800) / 300))),
+                    hints: [puzzle.hint || 'Find the best move'],
+                    successMessage: 'Excellent!',
+                    failureMessage: 'Not quite right. Try again!',
+                    solutionMoves: userMoves,
+                    solutionSequence: solutionSequence
+                };
+            });
+
+            const puzzleSet = {
+                levelId: levelId,
+                title: title,
+                description: description,
+                puzzles: convertedPuzzles
+            };
+
+            const json = JSON.stringify(puzzleSet, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `puzzle_set_${levelId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert(`✅ Exported ${convertedPuzzles.length} puzzles in app format!\n\n` +
+                  `Ready to use in: assets/data/puzzles/puzzle_set_${levelId}.json`);
         }
     </script>
 </body>

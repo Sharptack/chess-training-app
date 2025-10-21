@@ -219,6 +219,46 @@ See [BACKLOG.md](docs/BACKLOG.md) for prioritized features.
 
 ---
 
+## Development Tools
+
+### Puzzle Creation Workflow (NEW!)
+
+Create puzzles easily with our streamlined workflow:
+
+```bash
+cd tools
+./create_puzzles.sh
+```
+
+**Interactive menu with three options:**
+1. **Import from Lichess** - Find quality puzzles by theme/rating (10-15 min for 15 puzzles)
+2. **Create Custom** - Build puzzles from scratch with drag-and-drop (2-3 min per puzzle)
+3. **Convert Format** - Auto-convert to app format (instant)
+
+**Quick Example:**
+```bash
+./create_puzzles.sh lichess    # Generate candidates
+# → Review in browser UI
+# → Select best puzzles
+./create_puzzles.sh convert    # Auto-convert to app format
+# → Move to assets/data/puzzles/
+```
+
+**Documentation:**
+- **[tools/QUICK_START.md](tools/QUICK_START.md)** - 2-minute quick start
+- **[tools/PUZZLE_WORKFLOW.md](tools/PUZZLE_WORKFLOW.md)** - Complete guide
+- **[tools/README.md](tools/README.md)** - Tool overview
+
+**Features:**
+- ✅ Interactive Lichess database search (5.4M puzzles)
+- ✅ Visual puzzle review with chessboard preview
+- ✅ Drag-and-drop puzzle creator
+- ✅ Auto-format conversion to app format
+- ✅ Edit puzzles visually (FEN, moves, hints)
+- ✅ Batch import/export
+
+---
+
 ## Contributing
 
 This is currently a private project in development for chess club testing. Contributions welcome after public launch.
