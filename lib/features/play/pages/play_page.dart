@@ -275,9 +275,18 @@ class _PlayPageState extends ConsumerState<PlayPage> {
     switch (gameState.status) {
       case GameStatus.waitingForHuman: return 'Your turn';
       case GameStatus.waitingForBot: return 'Bot thinking...';
-      case GameStatus.humanWin: return 'You won!';
-      case GameStatus.botWin: return '${gameState.botConfig.name} won';
-      case GameStatus.draw: return 'Draw';
+      case GameStatus.humanWin:
+        return gameState.gameOverReason != null
+            ? 'You won! ${gameState.gameOverReason}'
+            : 'You won!';
+      case GameStatus.botWin:
+        return gameState.gameOverReason != null
+            ? '${gameState.botConfig.name} won - ${gameState.gameOverReason}'
+            : '${gameState.botConfig.name} won';
+      case GameStatus.draw:
+        return gameState.gameOverReason != null
+            ? 'Draw - ${gameState.gameOverReason}'
+            : 'Draw';
       default: return '';
     }
   }

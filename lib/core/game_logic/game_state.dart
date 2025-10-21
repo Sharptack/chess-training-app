@@ -194,6 +194,7 @@ class GameState extends ChangeNotifier {
   }
 
   /// Called when human makes a move (move has already been validated)
+  /// @param moveNotation - Move in UCI notation (e.g., "e2e4") from ChessBoardWidget
   void onHumanMove(String moveNotation) {
     if (_status != GameStatus.waitingForHuman) {
       return;
@@ -202,8 +203,13 @@ class GameState extends ChangeNotifier {
     // Increment move count
     _moveCount++;
 
-    // Record the move
-    _moveLog.add('${_moveLog.length ~/ 2 + 1}. $moveNotation');
+    // Get the move in SAN notation from the move history (last move just made)
+    final sanMove = _boardState.moveHistory.isNotEmpty
+        ? _boardState.moveHistory.last
+        : moveNotation;
+
+    // Record the move in SAN notation
+    _moveLog.add('${_moveLog.length ~/ 2 + 1}. $sanMove');
 
     // Check game state after human move
     if (_checkGameOver()) {
@@ -260,10 +266,11 @@ class GameState extends ChangeNotifier {
       }
     }
 
-    // Make the bot's move - try SAN first, then UCI
+    // Make the bot's move - Stockfish returns UCI format, try that first
+    // (We try SAN first for backward compatibility with older bot implementations)
     bool success = _boardState.makeSanMove(botMove);
     if (!success && botMove.length >= 4) {
-      // Try as UCI move
+      // Try as UCI move (standard format from Stockfish)
       success = _boardState.makeUciMove(botMove);
     }
 
@@ -271,15 +278,20 @@ class GameState extends ChangeNotifier {
       // Increment move count
       _moveCount++;
 
-      // Record bot move
+      // Get the move in SAN notation from the move history (last move just made)
+      final sanMove = _boardState.moveHistory.isNotEmpty
+          ? _boardState.moveHistory.last
+          : botMove;
+
+      // Record bot move in SAN notation
       final moveNumber = _moveLog.length ~/ 2 + 1;
       final isOddMove = _moveLog.length % 2 == 0;
 
       if (isOddMove) {
-        _moveLog.add('$moveNumber. $botMove');
+        _moveLog.add('$moveNumber. $sanMove');
       } else {
         // Add to existing move pair
-        _moveLog[_moveLog.length - 1] += ' $botMove';
+        _moveLog[_moveLog.length - 1] += ' $sanMove';
       }
 
       // Check game state after bot move
